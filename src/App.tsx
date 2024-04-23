@@ -2,6 +2,52 @@ import { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 
+const tooltip = (d: any) => {
+  return (
+    <div>
+      <div
+        style={{
+          borderBottom: '1px solid #D4D6D8',
+          padding: '1rem 1.5rem 1rem 1.5rem',
+        }}
+      >
+        <h6 className='undp-typography margin-bottom-00'>CountryName</h6>
+      </div>
+      <div style={{ padding: '1rem 1.5rem' }}>
+        <div key={d.countryCode}>
+          <div className='flex-div flex-column gap-02 flex-vert-align-center margin-bottom-00'>
+            {d.x !== undefined ? (
+              <div
+                style={{ width: '100%' }}
+                className='flex-div flex-row flex-space-between'
+              >
+                <p
+                  className='undp-typography margin-bottom-00'
+                  style={{ fontSize: '1rem', padding: 0, margin: 0 }}
+                >
+                  Interviewed households:
+                </p>
+                <p
+                  className='undp-typography margin-bottom-00'
+                  style={{
+                    textTransform: 'uppercase',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    padding: 0,
+                    margin: 0,
+                  }}
+                >
+                  {d.x}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [data, setData] = useState([]);
 
@@ -36,6 +82,7 @@ function App() {
         source='Organization ABC'
         sourceLink='www.example.com'
         domain={[2, 4, 6, 8]}
+        tooltip={tooltip}
       />
     </div>
   );
