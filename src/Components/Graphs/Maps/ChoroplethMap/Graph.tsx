@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { geoEqualEarth } from 'd3-geo';
 import { zoom } from 'd3-zoom';
 import { select } from 'd3-selection';
-import { scaleThreshold, scaleOrdinal } from 'd3-scale';
+// import { scaleThreshold, scaleOrdinal } from 'd3-scale';
 import UNDPColorModule from 'undp-viz-colors';
 import World from '../MapData/worldMap.json';
 import { ChoroplethMapDataType } from '../../../../Types';
@@ -51,9 +51,9 @@ export function Graph(props: Props) {
     .rotate([0, 0])
     .scale(scale)
     .translate(centerPoint);
-  const colorScale = categorical
-    ? scaleOrdinal<number, string>().domain(domain).range(colors)
-    : scaleThreshold<number, string>().domain(domain).range(colors);
+  // const colorScale = categorical
+  //   ? scaleOrdinal<number, string>().domain(domain).range(colors)
+  //   : scaleThreshold<number, string>().domain(domain).range(colors);
 
   useEffect(() => {
     const mapGSelect = select(mapG.current);
@@ -145,7 +145,12 @@ export function Graph(props: Props) {
               (el: any) => d.countryCode === el.properties.ISO3,
             );
             const color =
-              d.x !== undefined ? colorScale(d.x) : UNDPColorModule.graphNoData;
+              // d.x !== undefined ? colorScale(d.x) : UNDPColorModule.graphNoData;
+              d.x !== undefined
+                ? d.x === '1'
+                  ? UNDPColorModule.categoricalColors.colors[0]
+                  : UNDPColorModule.graphNoData
+                : UNDPColorModule.graphNoData;
             return (
               <g
                 key={i}
