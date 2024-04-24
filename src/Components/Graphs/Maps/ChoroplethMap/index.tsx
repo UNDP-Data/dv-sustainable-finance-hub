@@ -1,5 +1,7 @@
+/* eslint-disable react/button-has-type */
 import UNDPColorModule from 'undp-viz-colors';
 import { useState, useRef, useEffect } from 'react';
+import { Radio } from 'antd';
 import { Graph } from './Graph';
 import { ChoroplethMapDataType } from '../../../../Types';
 import { GraphFooter } from '../../../Elements/GraphFooter';
@@ -24,6 +26,8 @@ interface Props {
   padding?: string;
   tooltip?: (_d: any) => JSX.Element;
   onSeriesMouseOver?: (_d: any) => void;
+  selectedColumn: string;
+  onSelectColumn: (column: string) => void;
 }
 
 export function ChoroplethMap(props: Props) {
@@ -46,6 +50,8 @@ export function ChoroplethMap(props: Props) {
     backgroundColor,
     tooltip,
     onSeriesMouseOver,
+    onSelectColumn,
+    selectedColumn,
   } = props;
 
   const [svgWidth, setSvgWidth] = useState(0);
@@ -92,6 +98,23 @@ export function ChoroplethMap(props: Props) {
             graphDescription={graphDescription}
           />
         ) : null}
+        <div style={{ padding: '10px' }}>
+          <Radio.Group
+            defaultValue='public_finance_budget'
+            onChange={e => {
+              // eslint-disable-next-line no-console
+              onSelectColumn(e.target.value);
+            }}
+            className='undp-button-radio'
+          >
+            <Radio.Button value='public_finance_budget'>Budget</Radio.Button>
+            <Radio.Button value='public_finance_tax'>Tax</Radio.Button>
+            <Radio.Button value='public_finance_debt'>Debt</Radio.Button>
+            <Radio.Button value='insurance_and_risk_finance'>
+              Insurance and risk finance
+            </Radio.Button>
+          </Radio.Group>
+        </div>
         <div
           style={{
             flexGrow: 1,
@@ -104,7 +127,10 @@ export function ChoroplethMap(props: Props) {
         >
           {(width || svgWidth) && (height || svgHeight) ? (
             <Graph
-              data={data}
+              data={data.map(d => ({
+                ...d,
+                x: d[selectedColumn], // ensure the `selectedColumn` is mapped correctly
+              }))}
               domain={domain}
               width={width || svgWidth}
               height={height || svgHeight}
