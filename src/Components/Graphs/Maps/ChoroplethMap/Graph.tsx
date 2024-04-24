@@ -6,16 +6,16 @@ import { select } from 'd3-selection';
 import UNDPColorModule from 'undp-viz-colors';
 import World from '../MapData/worldMap.json';
 import { ChoroplethMapDataType } from '../../../../Types';
-import { numberFormattingFunction } from '../../../../Utils/numberFormattingFunction';
+// import { numberFormattingFunction } from '../../../../Utils/numberFormattingFunction';
 import { Tooltip } from '../../../Elements/Tooltip';
 
 interface Props {
-  domain: number[];
+  // domain: number[];
   width: number;
   height: number;
-  colors: string[];
-  colorLegendTitle?: string;
-  categorical?: boolean;
+  // colors: string[];
+  // colorLegendTitle?: string;
+  // categorical?: boolean;
   data: ChoroplethMapDataType[];
   scale: number;
   centerPoint: [number, number];
@@ -26,10 +26,10 @@ interface Props {
 export function Graph(props: Props) {
   const {
     data,
-    domain,
-    colors,
-    colorLegendTitle,
-    categorical,
+    // domain,
+    // colors,
+    // colorLegendTitle,
+    // categorical,
     height,
     width,
     scale,
@@ -37,9 +37,9 @@ export function Graph(props: Props) {
     tooltip,
     onSeriesMouseOver,
   } = props;
-  const [selectedColor, setSelectedColor] = useState<string | undefined>(
-    undefined,
-  );
+  // const [selectedColor, setSelectedColor] = useState<string | undefined>(
+  //   undefined,
+  // );
   const [mouseOverData, setMouseOverData] = useState<any>(undefined);
   const [eventX, setEventX] = useState<number | undefined>(undefined);
   const [eventY, setEventY] = useState<number | undefined>(undefined);
@@ -85,7 +85,7 @@ export function Graph(props: Props) {
             );
             if (index !== -1 || d.properties.NAME === 'Antarctica') return null;
             return (
-              <g key={i} opacity={!selectedColor ? 1 : 0.3}>
+              <g key={i}>
                 {d.geometry.type === 'MultiPolygon'
                   ? d.geometry.coordinates.map((el: any, j: any) => {
                       let masterPath = '';
@@ -154,9 +154,6 @@ export function Graph(props: Props) {
             return (
               <g
                 key={i}
-                opacity={
-                  selectedColor ? (selectedColor === color ? 1 : 0.3) : 1
-                }
                 onMouseEnter={event => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
@@ -204,7 +201,7 @@ export function Graph(props: Props) {
                             key={j}
                             d={masterPath}
                             style={{
-                              stroke: 'var(--gray-500)',
+                              stroke: 'var(--gray-400)',
                             }}
                             strokeWidth={0.25}
                             fill={color}
@@ -308,7 +305,7 @@ export function Graph(props: Props) {
             : null}
         </g>
       </svg>
-      <div
+      {/* <div
         style={{ position: 'sticky', bottom: '0px' }}
         className='bivariate-legend-container'
       >
@@ -401,7 +398,7 @@ export function Graph(props: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       {mouseOverData && tooltip && eventX && eventY ? (
         <Tooltip body={tooltip(mouseOverData)} xPos={eventX} yPos={eventY} />
       ) : null}
