@@ -1,7 +1,9 @@
+/* eslint-disable no-irregular-whitespace */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-plusplus */
 import React, { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
+import { Radio } from 'antd';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import World from './Components/Graphs/Maps/MapData/worldMap.json';
 import { ChoroplethMapDataType } from './Types';
@@ -25,6 +27,13 @@ const initialState: Counts = {
   countriesPublicRisk: 0,
   countriesPrivate: 0,
 };
+
+interface ColumnDescription {
+  [key: string]: {
+    text: string;
+    count: number;
+  };
+}
 
 function App() {
   const [data, setData] = useState<ChoroplethMapDataType[]>([]);
@@ -70,7 +79,6 @@ function App() {
             countryFlagsAny.add(d['Country ISO code']);
           }
 
-          // Check for any true across all columns
           if (
             budget === 1 ||
             tax === 1 ||
@@ -166,59 +174,168 @@ function App() {
     );
   };
 
+  const columnDescriptions: ColumnDescription = {
+    public_finance_budget: {
+      text: 'budgeting',
+      count: counts.countriesPublicBudget,
+    },
+    public_finance_tax: {
+      text: 'taxation',
+      count: counts.countriesPublicTax,
+    },
+    public_finance_debt: {
+      text: 'debt management',
+      count: counts.countriesPublicDebt,
+    },
+    insurance_and_risk_finance: {
+      text: 'insurance and risk finance',
+      count: counts.countriesPublicRisk,
+    },
+    private_capital: {
+      text: 'private capital',
+      count: counts.countriesPrivate,
+    },
+  };
+
   return (
-    <div className='undp-container flex-div flex-wrap flex-hor-align-center margin-bottom-13'>
-      <div className='flex-div grow'>
-        <div
-          className='stat-card no-hover'
-          style={{ width: '100%', border: '1px solid rgba(5, 5, 5, 0.06)' }}
+    <div className='undp-container flex-div flex-column flex-wrap flex-hor-align-center margin-bottom-13'>
+      <div
+        className='flex-div flex-column gap-02 padding-07'
+        style={{
+          backgroundColor: 'var(--gray-100)',
+          padding: '1rem',
+        }}
+      >
+        <h6
+          style={{
+            fontSize: '0.75rem',
+            marginTop: '0',
+            letterSpacing: '.48px',
+            fontWeight: '700',
+          }}
         >
-          <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
-          <h4 style={{ marginBottom: '0.5rem' }}>Countries</h4>
-          <p style={{ marginBottom: '0.5rem' }}>
-            with sustainable finance programming in total
-          </p>
-        </div>
-        <div
-          className='stat-card no-hover'
-          style={{ width: '100%', border: '1px solid rgba(5, 5, 5, 0.06)' }}
+          DASHBOARD
+        </h6>
+        <h2
+          className='undp-typography'
+          style={{
+            fontFamily: 'var(--fontFamilyHeadings) !important',
+            textTransform: 'uppercase',
+            color: 'var(--gray-700)',
+            marginBottom: '0.5rem',
+          }}
         >
-          <h3 style={{ margin: '0' }}> {counts.countriesPublicTotal}</h3>
-          <h4 style={{ marginBottom: '0.5rem' }}>Countries</h4>
-          <p style={{ marginBottom: '0.5rem' }}>
-            with public finance programming
-          </p>
-        </div>
-        <div
-          className='stat-card no-hover'
-          style={{ width: '100%', border: '1px solid rgba(5, 5, 5, 0.06)' }}
+          Sustainable Finance Programmmes
+        </h2>
+
+        <p style={{ margin: '0' }} className='undp-typography label'>
+          Programme areas
+        </p>
+        <Radio.Group
+          defaultValue='public_finance_budget'
+          size='small'
+          className='undp-button-radio'
+          buttonStyle='solid'
+          onChange={e => {
+            // eslint-disable-next-line no-console
+            handleSelectColumn(e.target.value);
+          }}
         >
-          <h3 style={{ margin: '0' }}> {counts.countriesPrivate}</h3>
-          <h4 style={{ marginBottom: '0.5rem' }}>Countries</h4>
-          <p style={{ marginBottom: '0.5rem' }}>
-            with private capital programming
-          </p>
-        </div>
-        {/* <div>Public finance budget count: {counts.countriesPublicBudget} {counts.countriesPublicBudget}</div>
+          <Radio.Button value='public_finance_budget'>Budgeting</Radio.Button>
+          <Radio.Button value='public_finance_tax'>Taxation</Radio.Button>
+          <Radio.Button value='public_finance_debt'>Debts</Radio.Button>
+          <Radio.Button value='insurance_and_risk_finance'>
+            Insurance and risk finance
+          </Radio.Button>
+          <Radio.Button value='private_capital'>Private Capital</Radio.Button>
+        </Radio.Group>
+      </div>
+      <div className='flex-div'>
+        <ChoroplethMap
+          data={data.map(d => ({
+            ...d,
+            x: d[selectedColumn], // ensure the `selectedColumn` is mapped correctly
+          }))}
+          backgroundColor
+          centerPoint={[470, 370]}
+          scale={270}
+          height={600}
+          source='Organization ABC'
+          sourceLink='www.example.com'
+          // domain={[0, 1, 2, 3, 4]}
+          tooltip={tooltip}
+        />
+        <div className='flex-div flex-column grow'>
+          <div
+            className='stat-card no-hover'
+            style={{
+              backgroundColor: 'var(--gray-100)',
+              flexBasis: '0',
+            }}
+          >
+            <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
+            <p
+              style={{
+                fontSize: '1.25rem',
+                marginBottom: '0.5rem',
+                lineHeight: '1.3',
+              }}
+            >
+              countries with sustainable
+              <br />
+              finance programming <b>in total</b>
+            </p>
+          </div>
+          <div
+            className='stat-card no-hover'
+            style={{
+              backgroundColor: 'var(--gray-100)',
+              flexBasis: '0',
+            }}
+          >
+            <h3 style={{ margin: '0' }}>
+              {columnDescriptions[selectedColumn].count}
+            </h3>
+            <p
+              style={{
+                fontSize: '1.25rem',
+                marginBottom: '0.5rem',
+                lineHeight: '1.3',
+              }}
+            >
+              countries with programmes
+              <br />
+              related to <b>{columnDescriptions[selectedColumn].text}</b>
+            </p>
+          </div>
+          <div
+            className='stat-card no-hover'
+            style={{
+              backgroundColor: 'var(--gray-100)',
+              flexBasis: '0',
+            }}
+          >
+            <h3 style={{ margin: '0' }}>XX</h3>
+            <p
+              style={{
+                fontSize: '1.25rem',
+                marginBottom: '0.5rem',
+                lineHeight: '1.3',
+              }}
+            >
+              any additional numbers
+              <br />
+              can be placed here
+            </p>
+          </div>
+          {/* <div>Public finance budget count: {counts.countriesPublicBudget} {counts.countriesPublicBudget}</div>
         <div>Public finance tax count: {counts.countriesPublicTax}</div>
         <div>Public finance debt count: {counts.countriesPublicDebt}</div>
         <div>
           Insurance and risk finance count: {counts.countriesPublicRisk}
         </div> */}
+        </div>
       </div>
-      <ChoroplethMap
-        data={data}
-        selectedColumn={selectedColumn}
-        backgroundColor
-        onSelectColumn={handleSelectColumn}
-        centerPoint={[470, 370]}
-        scale={270}
-        height={600}
-        source='Organization ABC'
-        sourceLink='www.example.com'
-        // domain={[0, 1, 2, 3, 4]}
-        tooltip={tooltip}
-      />
     </div>
   );
 }
