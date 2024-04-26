@@ -110,7 +110,7 @@ export function Graph(props: Props) {
               <G
                 key={i}
                 transform={`translate(${0},${y(`${d.label}`)})`}
-                onMouseEnter={event => {
+                onMouseEnter={(event: any) => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);
@@ -118,7 +118,7 @@ export function Graph(props: Props) {
                     onSeriesMouseOver(d);
                   }
                 }}
-                onMouseMove={event => {
+                onMouseMove={(event: any) => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);

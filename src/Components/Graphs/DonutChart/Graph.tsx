@@ -68,7 +68,7 @@ export function Graph(props: Props) {
                     : 0.3
                   : 1,
               }}
-              onMouseEnter={event => {
+              onMouseEnter={(event: any) => {
                 setMouseOverData(d.data);
                 setEventY(event.clientY);
                 setEventX(event.clientX);
@@ -76,7 +76,7 @@ export function Graph(props: Props) {
                   onSeriesMouseOver(d);
                 }
               }}
-              onMouseMove={event => {
+              onMouseMove={(event: any) => {
                 setMouseOverData(d.data);
                 setEventY(event.clientY);
                 setEventX(event.clientX);

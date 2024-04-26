@@ -164,7 +164,7 @@ export function Graph(props: Props) {
                 opacity={
                   selectedColor ? (selectedColor === color ? 1 : 0.3) : 1
                 }
-                onMouseEnter={event => {
+                onMouseEnter={(event: any) => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);
@@ -172,7 +172,7 @@ export function Graph(props: Props) {
                     onSeriesMouseOver(d);
                   }
                 }}
-                onMouseMove={event => {
+                onMouseMove={(event: any) => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);

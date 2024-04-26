@@ -386,7 +386,7 @@ export function Graph(props: Props) {
                   d={voronoiDiagram.renderCell(i)}
                   fill='#fff'
                   opacity={0}
-                  onMouseEnter={event => {
+                  onMouseEnter={(event: any) => {
                     setMouseOverData(d);
                     setEventY(event.clientY);
                     setEventX(event.clientX);
@@ -394,7 +394,7 @@ export function Graph(props: Props) {
                       onSeriesMouseOver(d);
                     }
                   }}
-                  onMouseMove={event => {
+                  onMouseMove={(event: any) => {
                     setMouseOverData(d);
                     setEventY(event.clientY);
                     setEventX(event.clientX);
