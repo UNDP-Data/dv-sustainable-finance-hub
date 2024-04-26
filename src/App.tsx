@@ -1,12 +1,43 @@
+/* eslint-disable react/jsx-key */
 /* eslint-disable no-irregular-whitespace */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-plusplus */
 import React, { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
 import { Radio } from 'antd';
+import styled from 'styled-components';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import World from './Components/Graphs/Maps/MapData/worldMap.json';
 import { ChoroplethMapDataType } from './Types';
+import { FIELDS } from './Utils/constants';
+import Table from './Components/Graphs/Table';
+
+const StyledSpan = styled.span`
+  position: relative;
+  line-height: 1.5;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background-color: var(--white);
+  padding: 1px 12px 2px 12px;
+
+  &::before {
+    content: '';
+    position: relative;
+    display: inline-block;
+    vertical-align: middle; // Vertically aligns the circle with the text
+    margin-right: 2px; // Space between the circle and the text
+    width: 10px;
+    height: 10px;
+    background-color: var(--blue-600);
+    border-radius: 50%;
+  }
+`;
+
+interface ProgrammeDetail {
+  column: string;
+  note: string;
+  key: string;
+}
 
 interface Counts {
   countriesTotal: number;
@@ -57,6 +88,18 @@ function App() {
           const debt = +d.public_finance_debt;
           const insurance = +d.insurance_and_risk_finance;
           const capital = +d.private_capital;
+          const programmes: ProgrammeDetail[] = [];
+
+          FIELDS.forEach(field => {
+            if (+d[field.key] === 1) {
+              // Ensure the value is treated as a number
+              programmes.push({
+                key: field.key,
+                column: field.label,
+                note: d[field.noteKey],
+              });
+            }
+          });
 
           if (budget === 1) {
             newCounts.countriesPublicBudget++;
@@ -98,6 +141,7 @@ function App() {
             countryCode: d['Country ISO code'],
             countryName: countryInfo ? countryInfo.properties.NAME : 'Unknown', // Fallback to 'Unknown' if not found
             x: +d[selectedColumn],
+            programmes,
           };
         });
 
@@ -116,30 +160,9 @@ function App() {
   };
 
   const tooltip = (d: any) => {
-    let note = '';
-    switch (selectedColumn) {
-      case 'public_finance_budget':
-        note = d.public_finance_budget_note;
-        break;
-      case 'public_finance_tax':
-        note = d.public_finance_tax_note;
-        break;
-      case 'public_finance_debt':
-        note = d.public_finance_debt_note;
-        break;
-      case 'insurance_and_risk_finance':
-        note = d.insurance_and_risk_finance_note;
-        break;
-      case 'private_capital':
-        note = d.private_capital_note;
-        break;
-      default:
-        note = '';
-    }
-
     return (
       <div>
-        {d.x === '1' ? (
+        {d.programmes.length > 0 && (
           <>
             <div
               style={{
@@ -153,23 +176,51 @@ function App() {
             </div>
             <div style={{ padding: '1rem 1.5rem' }}>
               <div key={d.countryCode}>
-                <div className='flex-div flex-column gap-02 flex-vert-align-center margin-bottom-00'>
+                <div className='flex-div flex-column flex-vert-align-center margin-bottom-00'>
                   <div
                     style={{ width: '100%' }}
-                    className='flex-div flex-row flex-space-between'
+                    className='flex-div flex-column margin-00 gap-03'
                   >
-                    <p
-                      className='undp-typography margin-bottom-00'
-                      style={{ fontSize: '1rem', padding: 0, margin: 0 }}
-                    >
-                      {note}
+                    <p className='undp-typography margin-bottom-00 bold label padding-bottom-00'>
+                      Available programmes
                     </p>
+                    {d.programmes.map((p: any) => (
+                      <p
+                        key={p.column}
+                        className='undp-typography margin-bottom-00 padding-bottom-00 label'
+                      >
+                        • {p.column}{' '}
+                        {p.key === selectedColumn && p.note ? '*' : ''}
+                      </p>
+                    ))}
                   </div>
+                  {d.programmes.some(
+                    (p: any) => p.key === selectedColumn && p.note,
+                  ) && (
+                    <div
+                      style={{
+                        borderTop: '1px var(--gray-400) solid',
+                        paddingTop: '1rem',
+                      }}
+                    >
+                      {d.programmes
+                        .filter((p: any) => p.key === selectedColumn && p.note)
+                        .map((p: any) => (
+                          <p
+                            key={p.key}
+                            style={{ color: '#757575' }}
+                            className='undp-typography margin-bottom-00 italics padding-bottom-00 label'
+                          >
+                            * {p.note}
+                          </p>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </>
-        ) : null}
+        )}
       </div>
     );
   };
@@ -184,7 +235,7 @@ function App() {
       count: counts.countriesPublicTax,
     },
     public_finance_debt: {
-      text: 'debt management',
+      text: 'debt',
       count: counts.countriesPublicDebt,
     },
     insurance_and_risk_finance: {
@@ -198,11 +249,11 @@ function App() {
   };
 
   return (
-    <div className='undp-container flex-div flex-column flex-wrap flex-hor-align-center margin-bottom-13'>
+    <div className='undp-container flex-div flex-column flex-wrap flex-hor-align-center'>
       <div
         className='flex-div flex-column gap-02 padding-07'
         style={{
-          backgroundColor: 'var(--gray-100)',
+          backgroundColor: 'var(--gray-300)',
           padding: '1rem',
         }}
       >
@@ -225,7 +276,7 @@ function App() {
             marginBottom: '0.5rem',
           }}
         >
-          Sustainable Finance Programmmes
+          Sustainable Finance Programmes
         </h2>
 
         <p style={{ margin: '0' }} className='undp-typography label'>
@@ -243,29 +294,30 @@ function App() {
         >
           <Radio.Button value='public_finance_budget'>Budgeting</Radio.Button>
           <Radio.Button value='public_finance_tax'>Taxation</Radio.Button>
-          <Radio.Button value='public_finance_debt'>Debts</Radio.Button>
+          <Radio.Button value='public_finance_debt'>Debt</Radio.Button>
           <Radio.Button value='insurance_and_risk_finance'>
             Insurance and risk finance
           </Radio.Button>
           <Radio.Button value='private_capital'>Private Capital</Radio.Button>
         </Radio.Group>
       </div>
-      <div className='flex-div'>
-        <ChoroplethMap
-          data={data.map(d => ({
-            ...d,
-            x: d[selectedColumn], // ensure the `selectedColumn` is mapped correctly
-          }))}
-          backgroundColor
-          centerPoint={[470, 370]}
-          scale={270}
-          height={600}
-          source='Organization ABC'
-          sourceLink='www.example.com'
-          // domain={[0, 1, 2, 3, 4]}
-          tooltip={tooltip}
-        />
-        <div className='flex-div flex-column grow'>
+      <div className='flex-div flex-wrap'>
+        <div className='flex-div' style={{ flexGrow: 2 }}>
+          <ChoroplethMap
+            data={data.map(d => ({
+              ...d,
+              x: d[selectedColumn],
+            }))}
+            backgroundColor
+            centerPoint={[470, 370]}
+            scale={270}
+            source='Organization ABC'
+            sourceLink='www.example.com'
+            // domain={[0, 1, 2, 3, 4]}
+            tooltip={tooltip}
+          />
+        </div>
+        <div className='flex-div flex-column' style={{ flexGrow: 1 }}>
           <div
             className='stat-card no-hover'
             style={{
@@ -305,7 +357,11 @@ function App() {
             >
               countries with programmes
               <br />
-              related to <b>{columnDescriptions[selectedColumn].text}</b>
+              related to{' '}
+              <StyledSpan>
+                {' '}
+                <b>{columnDescriptions[selectedColumn].text}</b>
+              </StyledSpan>
             </p>
           </div>
           <div
@@ -323,19 +379,14 @@ function App() {
                 lineHeight: '1.3',
               }}
             >
-              any additional numbers
+              any additional number
               <br />
               can be placed here
             </p>
           </div>
-          {/* <div>Public finance budget count: {counts.countriesPublicBudget} {counts.countriesPublicBudget}</div>
-        <div>Public finance tax count: {counts.countriesPublicTax}</div>
-        <div>Public finance debt count: {counts.countriesPublicDebt}</div>
-        <div>
-          Insurance and risk finance count: {counts.countriesPublicRisk}
-        </div> */}
         </div>
       </div>
+      <Table data={data} />
     </div>
   );
 }

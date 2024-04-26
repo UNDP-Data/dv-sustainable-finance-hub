@@ -65,8 +65,6 @@ export function ChoroplethMap(props: Props) {
       style={{
         display: 'flex',
         width: '100%',
-        flexDirection: 'column',
-        flexGrow: width ? 0 : 1,
         padding: backgroundColor
           ? padding || 'var(--spacing-05)'
           : padding || 0,
@@ -79,10 +77,10 @@ export function ChoroplethMap(props: Props) {
     >
       <div
         style={{
+          width: '100%',
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--spacing-05)',
-          flexGrow: 1,
           justifyContent: 'space-between',
         }}
       >

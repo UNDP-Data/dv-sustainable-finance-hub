@@ -48,6 +48,12 @@ export interface ChoroplethMapDataType {
   data?: object;
   [key: string]: any;
   countryName?: string;
+  programmes?: any[];
+  public_finance_budget: string;
+  insurance_and_risk: string;
+  public_finance_tax: string;
+  public_finance_debt: string;
+  private_capital: string;
 }
 
 export interface BivariateMapDataType {

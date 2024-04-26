@@ -56,8 +56,9 @@ export function UnitChart(props: Props) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        width: 'fit-content',
-        flexGrow: size ? 0 : 1,
+        flex: 3,
+        flexBasis: '100%',
+        // flexGrow: size ? 0 : 3,
         padding: backgroundColor
           ? padding || 'var(--spacing-05)'
           : padding || 0,
