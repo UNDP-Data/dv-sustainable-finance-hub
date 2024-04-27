@@ -176,7 +176,7 @@ function App() {
             </div>
             <div style={{ padding: '1rem 1.5rem' }}>
               <div key={d.countryCode}>
-                <div className='flex-div flex-column flex-vert-align-center margin-bottom-00'>
+                <div className='flex-div flex-column  margin-bottom-00'>
                   <div
                     style={{ width: '100%' }}
                     className='flex-div flex-column margin-00 gap-03'
@@ -208,8 +208,13 @@ function App() {
                         .map((p: any) => (
                           <p
                             key={p.key}
-                            style={{ color: '#757575' }}
-                            className='undp-typography margin-bottom-00 italics padding-bottom-00 label'
+                            style={{
+                              color: '#757575',
+                              textWrap: 'wrap',
+                              textAlign: 'left',
+                              width: '100%',
+                            }}
+                            className='margin-bottom-00 italics padding-bottom-00 label'
                           >
                             * {p.note}
                           </p>
@@ -249,43 +254,34 @@ function App() {
   };
 
   return (
-    <div className='undp-container flex-div flex-column flex-wrap flex-hor-align-center'>
+    <div
+      style={{ overflow: 'hidden' }}
+      className='undp-container flex-div gap-00 flex-column flex-wrap flex-hor-align-center'
+    >
       <div
-        className='flex-div flex-column gap-02 padding-07'
+        className='flex-div flex-column padding-04 margin-00 padding-bottom-00'
         style={{
           backgroundColor: 'var(--gray-300)',
-          padding: '1rem',
         }}
       >
-        <h6
-          style={{
-            fontSize: '0.75rem',
-            marginTop: '0',
-            letterSpacing: '.48px',
-            fontWeight: '700',
-          }}
+        <h3
+          className='margin-00'
+          style={{ color: 'var(--gray-700)', zIndex: '2' }}
         >
-          DASHBOARD
-        </h6>
-        <h2
-          className='undp-typography'
-          style={{
-            fontFamily: 'var(--fontFamilyHeadings) !important',
-            textTransform: 'uppercase',
-            color: 'var(--gray-700)',
-            marginBottom: '0.5rem',
-          }}
-        >
-          Sustainable Finance Programmes
-        </h2>
-
+          Sustainable Finance Hub Dashboard{' '}
+        </h3>
+      </div>
+      <div
+        className='margin-00 padding-04 padding-top-00'
+        style={{ backgroundColor: 'var(--gray-300)' }}
+      >
         <p style={{ margin: '0' }} className='undp-typography label'>
           Programme areas
         </p>
         <Radio.Group
           defaultValue='public_finance_budget'
           size='small'
-          className='undp-button-radio'
+          className='undp-segmented-small'
           buttonStyle='solid'
           onChange={e => {
             // eslint-disable-next-line no-console
@@ -300,89 +296,87 @@ function App() {
           </Radio.Button>
           <Radio.Button value='private_capital'>Private Capital</Radio.Button>
         </Radio.Group>
-      </div>
-      <div className='flex-div flex-wrap'>
-        <div className='flex-div' style={{ flexGrow: 2 }}>
-          <ChoroplethMap
-            data={data.map(d => ({
-              ...d,
-              x: d[selectedColumn],
-            }))}
-            backgroundColor
-            centerPoint={[470, 370]}
-            scale={270}
-            source='Organization ABC'
-            sourceLink='www.example.com'
-            // domain={[0, 1, 2, 3, 4]}
-            tooltip={tooltip}
-          />
-        </div>
-        <div className='flex-div flex-column' style={{ flexGrow: 1 }}>
-          <div
-            className='stat-card no-hover'
-            style={{
-              backgroundColor: 'var(--gray-100)',
-              flexBasis: '0',
-            }}
-          >
-            <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
-            <p
-              style={{
-                fontSize: '1.25rem',
-                marginBottom: '0.5rem',
-                lineHeight: '1.3',
-              }}
-            >
-              countries with sustainable
-              <br />
-              finance programming <b>in total</b>
-            </p>
+        <div className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05'>
+          <div className='flex-div' style={{ flexGrow: 2 }}>
+            <ChoroplethMap
+              data={data.map(d => ({
+                ...d,
+                x: d[selectedColumn],
+              }))}
+              backgroundColor='var(--gray-300)'
+              centerPoint={[450, 370]}
+              scale={260}
+              // domain={[0, 1, 2, 3, 4]}
+              tooltip={tooltip}
+            />
           </div>
-          <div
-            className='stat-card no-hover'
-            style={{
-              backgroundColor: 'var(--gray-100)',
-              flexBasis: '0',
-            }}
-          >
-            <h3 style={{ margin: '0' }}>
-              {columnDescriptions[selectedColumn].count}
-            </h3>
-            <p
+          <div className='flex-div flex-column' style={{ flexGrow: 1 }}>
+            <div
+              className='stat-card no-hover'
               style={{
-                fontSize: '1.25rem',
-                marginBottom: '0.5rem',
-                lineHeight: '1.3',
+                backgroundColor: 'ffffff80',
+                flexBasis: '0',
               }}
             >
-              countries with programmes
-              <br />
-              related to{' '}
-              <StyledSpan>
-                {' '}
-                <b>{columnDescriptions[selectedColumn].text}</b>
-              </StyledSpan>
-            </p>
-          </div>
-          <div
-            className='stat-card no-hover'
-            style={{
-              backgroundColor: 'var(--gray-100)',
-              flexBasis: '0',
-            }}
-          >
-            <h3 style={{ margin: '0' }}>XX</h3>
-            <p
+              <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
+              <p
+                style={{
+                  fontSize: '1.25rem',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.3',
+                }}
+              >
+                countries with sustainable
+                <br />
+                finance programming <b>in total</b>
+              </p>
+            </div>
+            <div
+              className='stat-card no-hover'
               style={{
-                fontSize: '1.25rem',
-                marginBottom: '0.5rem',
-                lineHeight: '1.3',
+                backgroundColor: 'ffffff80',
+                flexBasis: '0',
               }}
             >
-              any additional number
-              <br />
-              can be placed here
-            </p>
+              <h3 style={{ margin: '0' }}>
+                {columnDescriptions[selectedColumn].count}
+              </h3>
+              <p
+                style={{
+                  fontSize: '1.25rem',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.3',
+                }}
+              >
+                countries with programmes
+                <br />
+                related to{' '}
+                <StyledSpan>
+                  {' '}
+                  <b>{columnDescriptions[selectedColumn].text}</b>
+                </StyledSpan>
+              </p>
+            </div>
+            <div
+              className='stat-card no-hover'
+              style={{
+                backgroundColor: '#ffffff80',
+                flexBasis: '0',
+              }}
+            >
+              <h3 style={{ margin: '0' }}>XX</h3>
+              <p
+                style={{
+                  fontSize: '1.25rem',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.3',
+                }}
+              >
+                any additional number
+                <br />
+                can be placed here
+              </p>
+            </div>
           </div>
         </div>
       </div>

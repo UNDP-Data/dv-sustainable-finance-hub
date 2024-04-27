@@ -22,7 +22,6 @@ interface Props {
   scale?: number;
   centerPoint?: [number, number];
   backgroundColor?: string | boolean;
-  padding?: string;
   tooltip?: (_d: any) => JSX.Element | any;
   onSeriesMouseOver?: (_d: any) => void;
 }
@@ -43,7 +42,6 @@ export function ChoroplethMap(props: Props) {
     // categorical,
     scale,
     centerPoint,
-    padding,
     backgroundColor,
     tooltip,
     onSeriesMouseOver,
@@ -65,9 +63,7 @@ export function ChoroplethMap(props: Props) {
       style={{
         display: 'flex',
         width: '100%',
-        padding: backgroundColor
-          ? padding || 'var(--spacing-05)'
-          : padding || 0,
+        padding: 0,
         backgroundColor: !backgroundColor
           ? 'transparent'
           : backgroundColor === true

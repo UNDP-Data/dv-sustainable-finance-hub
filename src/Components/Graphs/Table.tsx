@@ -13,7 +13,10 @@ function Table(props: Props) {
   );
 
   return (
-    <div className='undp-container' style={{ width: '100%' }}>
+    <div
+      className='undp-container padding-top-04'
+      style={{ width: '100%', height: '500px' }}
+    >
       <div
         className='undp-table-head-small'
         style={{
