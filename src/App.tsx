@@ -245,6 +245,7 @@ function App() {
                               textWrap: 'wrap',
                               textAlign: 'left',
                               width: '100%',
+                              overflowWrap: 'break-word',
                             }}
                             className='margin-bottom-00 italics padding-bottom-00 label'
                           >
@@ -297,9 +298,9 @@ function App() {
         }}
       >
         <div style={{ zIndex: '4' }}>
-          <h3 className='margin-00' style={{ color: 'var(--gray-700)' }}>
+          <h2 className='margin-00' style={{ color: 'var(--gray-700)' }}>
             Sustainable Finance Hub Dashboard{' '}
-          </h3>
+          </h2>
           <div
             className='padding-top-04'
             style={{ backgroundColor: 'var(--gray-300)', marginLeft: '-4px' }}
