@@ -110,7 +110,7 @@ export function Graph(props: Props) {
                           style={{
                             stroke: 'var(--gray-300)',
                           }}
-                          strokeWidth={0.25}
+                          strokeWidth={0.5}
                           fill='var(--gray-400)'
                         />
                       );
@@ -133,7 +133,7 @@ export function Graph(props: Props) {
                           style={{
                             stroke: 'var(--gray-300)',
                           }}
-                          strokeWidth={0.25}
+                          strokeWidth={0.4}
                           fill='var(--gray-400)'
                         />
                       );
@@ -229,7 +229,7 @@ export function Graph(props: Props) {
                             style={{
                               stroke: 'var(--gray-300)',
                             }}
-                            strokeWidth={0.25}
+                            strokeWidth={0.5}
                             fill={color}
                           />
                         );
@@ -271,7 +271,7 @@ export function Graph(props: Props) {
                                   stroke: 'var(--gray-300)',
                                   fill: 'none',
                                   fillOpacity: 0,
-                                  strokeWidth: '0.4',
+                                  strokeWidth: '0.5',
                                 }}
                               />
                             );

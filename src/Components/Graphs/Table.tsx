@@ -1,4 +1,6 @@
-import { Check } from 'lucide-react';
+import { Check, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { Input } from 'antd';
 import { ChoroplethMapDataType } from '../../Types';
 import { FIELDS } from '../../Utils/constants';
 
@@ -8,15 +10,31 @@ interface Props {
 
 function Table(props: Props) {
   const { data } = props;
-  const filteredData = data.filter(rowData =>
-    FIELDS.some(field => rowData[field.key] === '1'),
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredData = data.filter(
+    (rowData: any) =>
+      rowData.countryName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      FIELDS.some(field => rowData[field.key] === '1'),
   );
 
   return (
     <div
-      className='undp-container padding-top-04'
-      style={{ width: '100%', height: '500px' }}
+      className='undp-container margin-top-04'
+      style={{
+        width: '100%',
+        height: '500px',
+        overflow: 'auto',
+        overflowY: 'scroll',
+      }}
     >
+      <Input
+        placeholder='Search by country'
+        className='undp-input'
+        prefix={<Search size={18} strokeWidth={2.5} color='var(--black)' />}
+        onChange={e => setSearchTerm(e.target.value)}
+        style={{ marginBottom: '10px', width: '100%' }}
+      />
       <div
         className='undp-table-head-small'
         style={{

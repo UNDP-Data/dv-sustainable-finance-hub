@@ -4,7 +4,7 @@
 /* eslint-disable no-plusplus */
 import React, { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
-import { Radio } from 'antd';
+import { Segmented } from 'antd';
 import styled from 'styled-components';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import World from './Components/Graphs/Maps/MapData/worldMap.json';
@@ -30,6 +30,25 @@ const StyledSpan = styled.span`
     height: 10px;
     background-color: var(--blue-600);
     border-radius: 50%;
+  }
+`;
+
+const StyledSegmented = styled(Segmented)`
+  background-color: var(--gray-200) !important; // Change track background color
+
+  .ant-segmented-item {
+    &:hover {
+      background-color: var(
+        --gray-300
+      ) !important; // Change hover background color
+    }
+
+    &.ant-segmented-item-selected {
+      background-color: var(
+        --blue-600
+      ) !important; // Change selected item background color
+      color: white; // Change text color for selected item
+    }
   }
 `;
 
@@ -66,9 +85,11 @@ interface ColumnDescription {
   };
 }
 
+type SegmentedValue = string | number;
+
 function App() {
   const [data, setData] = useState<ChoroplethMapDataType[]>([]);
-  const [selectedColumn, setSelectedColumn] = useState<string>(
+  const [selectedColumn, setSelectedColumn] = useState<SegmentedValue>(
     'public_finance_budget',
   );
   const [counts, setCounts] = useState<Counts>(initialState);
@@ -155,9 +176,20 @@ function App() {
       });
   }, [selectedColumn]);
 
-  const handleSelectColumn = (column: string) => {
-    setSelectedColumn(column);
+  const handleSelectColumn = (value: any) => {
+    setSelectedColumn(value);
   };
+
+  const options = [
+    { label: 'Budgeting', value: 'public_finance_budget' },
+    { label: 'Taxation', value: 'public_finance_tax' },
+    { label: 'Debt', value: 'public_finance_debt' },
+    {
+      label: 'Insurance and risk',
+      value: 'insurance_and_risk_finance',
+    },
+    { label: 'Private Capital', value: 'private_capital' },
+  ];
 
   const tooltip = (d: any) => {
     return (
@@ -244,7 +276,7 @@ function App() {
       count: counts.countriesPublicDebt,
     },
     insurance_and_risk_finance: {
-      text: 'insurance and risk finance',
+      text: 'insurance and risk',
       count: counts.countriesPublicRisk,
     },
     private_capital: {
@@ -259,43 +291,30 @@ function App() {
       className='undp-container flex-div gap-00 flex-column flex-wrap flex-hor-align-center'
     >
       <div
-        className='flex-div flex-column padding-04 margin-00 padding-bottom-00'
+        className='flex-div flex-column padding-top-06 padding-left-06 padding-bottom-03 margin-00'
         style={{
           backgroundColor: 'var(--gray-300)',
         }}
       >
-        <h3
-          className='margin-00'
-          style={{ color: 'var(--gray-700)', zIndex: '2' }}
-        >
-          Sustainable Finance Hub Dashboard{' '}
-        </h3>
-      </div>
-      <div
-        className='margin-00 padding-04 padding-top-00'
-        style={{ backgroundColor: 'var(--gray-300)' }}
-      >
-        <p style={{ margin: '0' }} className='undp-typography label'>
-          Programme areas
-        </p>
-        <Radio.Group
-          defaultValue='public_finance_budget'
-          size='small'
-          className='undp-segmented-small'
-          buttonStyle='solid'
-          onChange={e => {
-            // eslint-disable-next-line no-console
-            handleSelectColumn(e.target.value);
-          }}
-        >
-          <Radio.Button value='public_finance_budget'>Budgeting</Radio.Button>
-          <Radio.Button value='public_finance_tax'>Taxation</Radio.Button>
-          <Radio.Button value='public_finance_debt'>Debt</Radio.Button>
-          <Radio.Button value='insurance_and_risk_finance'>
-            Insurance and risk finance
-          </Radio.Button>
-          <Radio.Button value='private_capital'>Private Capital</Radio.Button>
-        </Radio.Group>
+        <div style={{ zIndex: '4' }}>
+          <h3 className='margin-00' style={{ color: 'var(--gray-700)' }}>
+            Sustainable Finance Hub Dashboard{' '}
+          </h3>
+          <div
+            className='padding-top-04'
+            style={{ backgroundColor: 'var(--gray-300)', marginLeft: '-4px' }}
+          >
+            <p className='undp-typography label margin-bottom-02 margin-left-02'>
+              Countries with programmes related to
+            </p>
+            <StyledSegmented
+              className='undp-segmented-small'
+              onChange={handleSelectColumn}
+              options={options}
+            />
+          </div>
+        </div>
+
         <div className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05'>
           <div className='flex-div' style={{ flexGrow: 2 }}>
             <ChoroplethMap
@@ -304,24 +323,26 @@ function App() {
                 x: d[selectedColumn],
               }))}
               backgroundColor='var(--gray-300)'
-              centerPoint={[450, 370]}
-              scale={260}
+              centerPoint={[410, 360]}
+              scale={240}
               // domain={[0, 1, 2, 3, 4]}
               tooltip={tooltip}
             />
           </div>
-          <div className='flex-div flex-column' style={{ flexGrow: 1 }}>
+          <div
+            className='flex-div flex-column padding-right-04'
+            style={{ flexGrow: 1, minWidth: '370px' }}
+          >
             <div
               className='stat-card no-hover'
               style={{
-                backgroundColor: 'ffffff80',
                 flexBasis: '0',
               }}
             >
               <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
               <p
                 style={{
-                  fontSize: '1.25rem',
+                  fontSize: '1.1rem',
                   marginBottom: '0.5rem',
                   lineHeight: '1.3',
                 }}
@@ -334,7 +355,6 @@ function App() {
             <div
               className='stat-card no-hover'
               style={{
-                backgroundColor: 'ffffff80',
                 flexBasis: '0',
               }}
             >
@@ -343,7 +363,7 @@ function App() {
               </h3>
               <p
                 style={{
-                  fontSize: '1.25rem',
+                  fontSize: '1.1rem',
                   marginBottom: '0.5rem',
                   lineHeight: '1.3',
                 }}
@@ -360,14 +380,13 @@ function App() {
             <div
               className='stat-card no-hover'
               style={{
-                backgroundColor: '#ffffff80',
                 flexBasis: '0',
               }}
             >
               <h3 style={{ margin: '0' }}>XX</h3>
               <p
                 style={{
-                  fontSize: '1.25rem',
+                  fontSize: '1.1rem',
                   marginBottom: '0.5rem',
                   lineHeight: '1.3',
                 }}
