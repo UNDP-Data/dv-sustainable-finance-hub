@@ -239,7 +239,7 @@ function App() {
       count: counts.countriesPublicDebt,
     },
     insurance_and_risk_finance: {
-      text: 'insurance and risk finance',
+      text: 'insurance and risk',
       count: counts.countriesPublicRisk,
     },
     private_capital: {
@@ -311,13 +311,14 @@ function App() {
             backgroundColor
             centerPoint={[470, 370]}
             scale={270}
-            source='Organization ABC'
-            sourceLink='www.example.com'
             // domain={[0, 1, 2, 3, 4]}
             tooltip={tooltip}
           />
         </div>
-        <div className='flex-div flex-column' style={{ flexGrow: 1 }}>
+        <div
+          className='flex-div flex-column'
+          style={{ flexGrow: 1, minWidth: '370px' }}
+        >
           <div
             className='stat-card no-hover'
             style={{
@@ -328,7 +329,7 @@ function App() {
             <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
             <p
               style={{
-                fontSize: '1.25rem',
+                fontSize: '1.1rem',
                 marginBottom: '0.5rem',
                 lineHeight: '1.3',
               }}
@@ -350,7 +351,7 @@ function App() {
             </h3>
             <p
               style={{
-                fontSize: '1.25rem',
+                fontSize: '1.1rem',
                 marginBottom: '0.5rem',
                 lineHeight: '1.3',
               }}
@@ -374,7 +375,7 @@ function App() {
             <h3 style={{ margin: '0' }}>XX</h3>
             <p
               style={{
-                fontSize: '1.25rem',
+                fontSize: '1.1rem',
                 marginBottom: '0.5rem',
                 lineHeight: '1.3',
               }}
