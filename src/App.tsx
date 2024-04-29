@@ -172,6 +172,7 @@ function App() {
         setCounts(newCounts);
       })
       .catch((err: any) => {
+        // eslint-disable-next-line no-console
         console.error('Error loading the CSV file:', err);
       });
   }, [selectedColumn]);
@@ -287,12 +288,9 @@ function App() {
   };
 
   return (
-    <div
-      style={{ overflow: 'hidden' }}
-      className='undp-container flex-div gap-00 flex-column flex-wrap flex-hor-align-center'
-    >
+    <div className='undp-container'>
       <div
-        className='flex-div flex-column padding-top-06 padding-left-06 padding-bottom-03 margin-00'
+        className='flex-div padding-top-06 padding-left-06 padding-bottom-03 margin-00'
         style={{
           backgroundColor: 'var(--gray-300)',
         }}
@@ -301,10 +299,7 @@ function App() {
           <h2 className='margin-00' style={{ color: 'var(--gray-700)' }}>
             Sustainable Finance Hub Dashboard{' '}
           </h2>
-          <div
-            className='padding-top-04'
-            style={{ backgroundColor: 'var(--gray-300)', marginLeft: '-4px' }}
-          >
+          <div className='padding-top-04' style={{ marginLeft: '-4px' }}>
             <p className='undp-typography label margin-bottom-02 margin-left-02'>
               Countries with programmes related to
             </p>
@@ -315,88 +310,93 @@ function App() {
             />
           </div>
         </div>
+      </div>
 
-        <div className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05'>
-          <div className='flex-div' style={{ flexGrow: 2 }}>
-            <ChoroplethMap
-              data={data.map(d => ({
-                ...d,
-                x: d[selectedColumn],
-              }))}
-              backgroundColor='var(--gray-300)'
-              centerPoint={[410, 360]}
-              scale={240}
-              // domain={[0, 1, 2, 3, 4]}
-              tooltip={tooltip}
-            />
+      <div
+        className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05 margin-bottom-07'
+        style={{
+          backgroundColor: 'var(--gray-300)',
+        }}
+      >
+        <div style={{ flexGrow: 2 }}>
+          <ChoroplethMap
+            data={data.map(d => ({
+              ...d,
+              x: d[selectedColumn],
+            }))}
+            backgroundColor='var(--gray-300)'
+            centerPoint={[410, 360]}
+            scale={240}
+            // domain={[0, 1, 2, 3, 4]}
+            tooltip={tooltip}
+          />
+        </div>
+        <div
+          className='flex-div flex-column padding-right-04'
+          style={{ flexGrow: 1, minWidth: '370px', flexDirection: 'column' }}
+        >
+          <div
+            className='stat-card no-hover'
+            style={{
+              flexBasis: '0',
+            }}
+          >
+            <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
+            <p
+              style={{
+                fontSize: '1.1rem',
+                marginBottom: '0.5rem',
+                lineHeight: '1.3',
+              }}
+            >
+              countries with sustainable
+              <br />
+              finance programming <b>in total</b>
+            </p>
           </div>
           <div
-            className='flex-div flex-column padding-right-04'
-            style={{ flexGrow: 1, minWidth: '370px' }}
+            className='stat-card no-hover'
+            style={{
+              flexBasis: '0',
+            }}
           >
-            <div
-              className='stat-card no-hover'
+            <h3 style={{ margin: '0' }}>
+              {columnDescriptions[selectedColumn].count}
+            </h3>
+            <p
               style={{
-                flexBasis: '0',
+                fontSize: '1.1rem',
+                marginBottom: '0.5rem',
+                lineHeight: '1.3',
               }}
             >
-              <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
-              <p
-                style={{
-                  fontSize: '1.1rem',
-                  marginBottom: '0.5rem',
-                  lineHeight: '1.3',
-                }}
-              >
-                countries with sustainable
-                <br />
-                finance programming <b>in total</b>
-              </p>
-            </div>
-            <div
-              className='stat-card no-hover'
+              countries with programmes
+              <br />
+              related to{' '}
+              <StyledSpan>
+                {' '}
+                <b>{columnDescriptions[selectedColumn].text}</b>
+              </StyledSpan>
+            </p>
+          </div>
+          <div
+            className='stat-card no-hover'
+            style={{
+              flexBasis: '0',
+            }}
+          >
+            <h3 style={{ margin: '0' }}>XX</h3>
+            <p
               style={{
-                flexBasis: '0',
+                fontSize: '1.1rem',
+                marginBottom: '0.5rem',
+                lineHeight: '1.3',
               }}
             >
-              <h3 style={{ margin: '0' }}>
-                {columnDescriptions[selectedColumn].count}
-              </h3>
-              <p
-                style={{
-                  fontSize: '1.1rem',
-                  marginBottom: '0.5rem',
-                  lineHeight: '1.3',
-                }}
-              >
-                countries with programmes
-                <br />
-                related to{' '}
-                <StyledSpan>
-                  {' '}
-                  <b>{columnDescriptions[selectedColumn].text}</b>
-                </StyledSpan>
-              </p>
-            </div>
-            <div
-              className='stat-card no-hover'
-              style={{
-                flexBasis: '0',
-              }}
-            >
-              <h3 style={{ margin: '0' }}>XX</h3>
-              <p
-                style={{
-                  fontSize: '1.1rem',
-                  marginBottom: '0.5rem',
-                  lineHeight: '1.3',
-                }}
-              >
-                any additional number
-                <br />
-                can be placed here
-              </p>
-            </div>
+              any additional number
+              <br />
+              can be placed here
+            </p>
           </div>
         </div>
       </div>
