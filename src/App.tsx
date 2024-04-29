@@ -209,6 +209,7 @@ function App() {
             </div>
             <div style={{ padding: '1rem 1.5rem' }}>
               <div key={d.countryCode}>
+
                 <div className='flex-div flex-column  margin-bottom-00'>
                   <div
                     style={{ width: '100%' }}
@@ -245,10 +246,11 @@ function App() {
                               color: '#757575',
                               textWrap: 'wrap',
                               textAlign: 'left',
+
                               width: '100%',
                               overflowWrap: 'break-word',
                             }}
-                            className='margin-bottom-00 italics padding-bottom-00 label'
+                            className='undp-typography margin-bottom-00 italics padding-bottom-00 label'
                           >
                             * {p.note}
                           </p>
