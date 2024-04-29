@@ -314,12 +314,18 @@ function App() {
       </div>
 
       <div
-        className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05 margin-bottom-07'
+        className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05 margin-bottom-07 padding-right-05'
         style={{
           backgroundColor: 'var(--gray-300)',
         }}
       >
-        <div style={{ flexGrow: 2 }}>
+        <div
+          style={{
+            flexGrow: 1,
+            width: 'calc(100% - 340px)',
+            minWidth: '30rem',
+          }}
+        >
           <ChoroplethMap
             data={data.map(d => ({
               ...d,
@@ -334,8 +340,8 @@ function App() {
           />
         </div>
         <div
-          className='flex-div flex-column padding-right-04'
-          style={{ flexGrow: 1, minWidth: '370px', flexDirection: 'column' }}
+          className='flex-div flex-column'
+          style={{ width: '340px', flexDirection: 'column', flexGrow: 1 }}
         >
           <div
             className='stat-card no-hover'
