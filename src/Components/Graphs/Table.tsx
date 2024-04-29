@@ -20,15 +20,6 @@ function Table(props: Props) {
 
   return (
     <div>
-    <div
-      className='undp-container margin-top-04'
-      style={{
-        width: '100%',
-        height: '500px',
-        overflow: 'auto',
-        overflowY: 'scroll',
-      }}
-    >
       <Input
         placeholder='Search by country'
         className='undp-input'
