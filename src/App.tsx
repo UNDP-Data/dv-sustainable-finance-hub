@@ -325,8 +325,9 @@ function App() {
               x: d[selectedColumn],
             }))}
             backgroundColor='var(--gray-300)'
-            centerPoint={[410, 360]}
+            centerPoint={[430, 360]}
             scale={240}
+            height={600}
             // domain={[0, 1, 2, 3, 4]}
             tooltip={tooltip}
           />
