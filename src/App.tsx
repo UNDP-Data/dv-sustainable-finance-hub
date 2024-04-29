@@ -4,7 +4,7 @@
 /* eslint-disable no-plusplus */
 import React, { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
-import { Radio } from 'antd';
+import { Segmented } from 'antd';
 import styled from 'styled-components';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import World from './Components/Graphs/Maps/MapData/worldMap.json';
@@ -30,6 +30,25 @@ const StyledSpan = styled.span`
     height: 10px;
     background-color: var(--blue-600);
     border-radius: 50%;
+  }
+`;
+
+const StyledSegmented = styled(Segmented)`
+  background-color: var(--gray-200) !important; // Change track background color
+
+  .ant-segmented-item {
+    &:hover {
+      background-color: var(
+        --gray-300
+      ) !important; // Change hover background color
+    }
+
+    &.ant-segmented-item-selected {
+      background-color: var(
+        --blue-600
+      ) !important; // Change selected item background color
+      color: white; // Change text color for selected item
+    }
   }
 `;
 
@@ -66,9 +85,11 @@ interface ColumnDescription {
   };
 }
 
+type SegmentedValue = string | number;
+
 function App() {
   const [data, setData] = useState<ChoroplethMapDataType[]>([]);
-  const [selectedColumn, setSelectedColumn] = useState<string>(
+  const [selectedColumn, setSelectedColumn] = useState<SegmentedValue>(
     'public_finance_budget',
   );
   const [counts, setCounts] = useState<Counts>(initialState);
@@ -151,13 +172,25 @@ function App() {
         setCounts(newCounts);
       })
       .catch((err: any) => {
+        // eslint-disable-next-line no-console
         console.error('Error loading the CSV file:', err);
       });
   }, [selectedColumn]);
 
-  const handleSelectColumn = (column: string) => {
-    setSelectedColumn(column);
+  const handleSelectColumn = (value: any) => {
+    setSelectedColumn(value);
   };
+
+  const options = [
+    { label: 'Budgeting', value: 'public_finance_budget' },
+    { label: 'Taxation', value: 'public_finance_tax' },
+    { label: 'Debt', value: 'public_finance_debt' },
+    {
+      label: 'Insurance and risk',
+      value: 'insurance_and_risk_finance',
+    },
+    { label: 'Private Capital', value: 'private_capital' },
+  ];
 
   const tooltip = (d: any) => {
     return (
@@ -176,7 +209,8 @@ function App() {
             </div>
             <div style={{ padding: '1rem 1.5rem' }}>
               <div key={d.countryCode}>
-                <div className='flex-div flex-column margin-bottom-00'>
+
+                <div className='flex-div flex-column  margin-bottom-00'>
                   <div
                     style={{ width: '100%' }}
                     className='flex-div flex-column margin-00 gap-03'
@@ -210,6 +244,9 @@ function App() {
                             key={p.key}
                             style={{
                               color: '#757575',
+                              textWrap: 'wrap',
+                              textAlign: 'left',
+
                               width: '100%',
                               overflowWrap: 'break-word',
                             }}
@@ -253,80 +290,57 @@ function App() {
   };
 
   return (
-    <div className='undp-container flex-div flex-column flex-wrap flex-hor-align-center'>
+    <div className='undp-container'>
       <div
-        className='flex-div flex-column gap-02 padding-07'
+        className='flex-div padding-top-06 padding-left-06 padding-bottom-03 margin-00'
         style={{
           backgroundColor: 'var(--gray-300)',
-          padding: '1rem',
         }}
       >
-        <h6
-          style={{
-            fontSize: '0.75rem',
-            marginTop: '0',
-            letterSpacing: '.48px',
-            fontWeight: '700',
-          }}
-        >
-          DASHBOARD
-        </h6>
-        <h2
-          className='undp-typography'
-          style={{
-            fontFamily: 'var(--fontFamilyHeadings) !important',
-            textTransform: 'uppercase',
-            color: 'var(--gray-700)',
-            marginBottom: '0.5rem',
-          }}
-        >
-          Sustainable Finance Programmes
-        </h2>
-
-        <p style={{ margin: '0' }} className='undp-typography label'>
-          Programme areas
-        </p>
-        <Radio.Group
-          defaultValue='public_finance_budget'
-          size='small'
-          className='undp-button-radio'
-          buttonStyle='solid'
-          onChange={e => {
-            // eslint-disable-next-line no-console
-            handleSelectColumn(e.target.value);
-          }}
-        >
-          <Radio.Button value='public_finance_budget'>Budgeting</Radio.Button>
-          <Radio.Button value='public_finance_tax'>Taxation</Radio.Button>
-          <Radio.Button value='public_finance_debt'>Debt</Radio.Button>
-          <Radio.Button value='insurance_and_risk_finance'>
-            Insurance and risk finance
-          </Radio.Button>
-          <Radio.Button value='private_capital'>Private Capital</Radio.Button>
-        </Radio.Group>
+        <div style={{ zIndex: '4' }}>
+          <h2 className='margin-00' style={{ color: 'var(--gray-700)' }}>
+            Sustainable Finance Hub Dashboard{' '}
+          </h2>
+          <div className='padding-top-04' style={{ marginLeft: '-4px' }}>
+            <p className='undp-typography label margin-bottom-02 margin-left-02'>
+              Countries with programmes related to
+            </p>
+            <StyledSegmented
+              className='undp-segmented-small'
+              onChange={handleSelectColumn}
+              options={options}
+            />
+          </div>
+        </div>
       </div>
-      <div className='flex-div flex-wrap'>
-        <div className='flex-div' style={{ flexGrow: 2 }}>
+
+      <div
+        className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05 margin-bottom-07'
+        style={{
+          backgroundColor: 'var(--gray-300)',
+        }}
+      >
+        <div style={{ flexGrow: 2 }}>
           <ChoroplethMap
             data={data.map(d => ({
               ...d,
               x: d[selectedColumn],
             }))}
-            backgroundColor
-            centerPoint={[470, 370]}
-            scale={270}
+            backgroundColor='var(--gray-300)'
+            centerPoint={[430, 360]}
+            scale={240}
+            height={600}
             // domain={[0, 1, 2, 3, 4]}
             tooltip={tooltip}
           />
         </div>
         <div
-          className='flex-div flex-column'
-          style={{ flexGrow: 1, minWidth: '370px' }}
+          className='flex-div flex-column padding-right-04'
+          style={{ flexGrow: 1, minWidth: '370px', flexDirection: 'column' }}
         >
           <div
             className='stat-card no-hover'
             style={{
-              backgroundColor: 'var(--gray-100)',
               flexBasis: '0',
             }}
           >
@@ -340,13 +354,12 @@ function App() {
             >
               countries with sustainable
               <br />
-              finance programming <b>in total</b>
+              finance programming <b>in total</b>
             </p>
           </div>
           <div
             className='stat-card no-hover'
             style={{
-              backgroundColor: 'var(--gray-100)',
               flexBasis: '0',
             }}
           >
@@ -372,7 +385,6 @@ function App() {
           <div
             className='stat-card no-hover'
             style={{
-              backgroundColor: 'var(--gray-100)',
               flexBasis: '0',
             }}
           >
