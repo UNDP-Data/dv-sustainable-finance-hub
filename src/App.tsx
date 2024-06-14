@@ -66,6 +66,7 @@ interface Counts {
   countriesPublicDebt: number;
   countriesPublicRisk: number;
   countriesPrivate: number;
+  fragileTotal: number;
 }
 
 const initialState: Counts = {
@@ -76,6 +77,7 @@ const initialState: Counts = {
   countriesPublicDebt: 0,
   countriesPublicRisk: 0,
   countriesPrivate: 0,
+  fragileTotal: 0,
 };
 
 interface ColumnDescription {
@@ -92,6 +94,7 @@ function App() {
   const [selectedColumn, setSelectedColumn] = useState<SegmentedValue>(
     'public_finance_budget',
   );
+  const [filter, setFilter] = useState<SegmentedValue>('All');
   const [counts, setCounts] = useState<Counts>(initialState);
 
   useEffect(() => {
@@ -101,6 +104,7 @@ function App() {
       .then((loadedData: any[]) => {
         const countryFlagsAny = new Set();
         const countryFlagsFinance = new Set();
+        const fragileCountries = new Set();
         const newCounts = { ...initialState };
 
         const transformedData = loadedData.map(d => {
@@ -121,6 +125,15 @@ function App() {
               });
             }
           });
+
+          const isFragile =
+            !!d.WB_Fragile_and_Crisis_Affected_Countries ||
+            !!d.crisis_level ||
+            !!d.OECD_Multidimensional_Fragility_Framework;
+
+          if (isFragile) {
+            fragileCountries.add(d['Country ISO code']);
+          }
 
           if (budget === 1) {
             newCounts.countriesPublicBudget++;
@@ -163,11 +176,13 @@ function App() {
             countryName: countryInfo ? countryInfo.properties.NAME : 'Unknown', // Fallback to 'Unknown' if not found
             x: +d[selectedColumn],
             programmes,
+            isFragile,
           };
         });
 
         setData(transformedData);
         newCounts.countriesTotal = countryFlagsAny.size;
+        newCounts.fragileTotal = fragileCountries.size;
         newCounts.countriesPublicTotal = countryFlagsFinance.size;
         setCounts(newCounts);
       })
@@ -181,7 +196,11 @@ function App() {
     setSelectedColumn(value);
   };
 
-  const options = [
+  const handleFilterChange = (value: any) => {
+    setFilter(value);
+  };
+
+  const programmeOptions = [
     { label: 'Budgeting', value: 'public_finance_budget' },
     { label: 'Taxation', value: 'public_finance_tax' },
     { label: 'Debt', value: 'public_finance_debt' },
@@ -190,6 +209,11 @@ function App() {
       value: 'insurance_and_risk_finance',
     },
     { label: 'Private Capital', value: 'private_capital' },
+  ];
+
+  const fragilityOptions = [
+    { label: 'All Countries', value: 'All' },
+    { label: 'Fragile and Crisis Affected', value: 'Fragile' },
   ];
 
   const tooltip = (d: any) => {
@@ -245,7 +269,6 @@ function App() {
                               color: '#757575',
                               textWrap: 'wrap',
                               textAlign: 'left',
-
                               width: '100%',
                               overflowWrap: 'break-word',
                             }}
@@ -254,6 +277,38 @@ function App() {
                             * {p.note}
                           </p>
                         ))}
+                    </div>
+                  )}
+                  {/* Access Fragility Columns Directly */}
+                  {(d.WB_Fragile_and_Crisis_Affected_Countries ||
+                    d.crisis_level ||
+                    d.OECD_Multidimensional_Fragility_Framework) && (
+                    <div
+                      style={{
+                        borderTop: '1px var(--gray-400) solid',
+                        paddingTop: '1rem',
+                      }}
+                    >
+                      <p className='undp-typography margin-bottom-00 bold label padding-bottom-00'>
+                        Fragility Information:
+                      </p>
+                      {d.OECD_Multidimensional_Fragility_Framework && (
+                        <p className='undp-typography margin-bottom-00 label'>
+                          • OECD Multidimensional Fragility Framework :{' '}
+                          {d.OECD_Multidimensional_Fragility_Framework}
+                        </p>
+                      )}
+                      {d.WB_Fragile_and_Crisis_Affected_Countries && (
+                        <p className='undp-typography margin-bottom-00 label'>
+                          • World Bank Fragile and Crisis Affected Countries :{' '}
+                          {d.WB_Fragile_and_Crisis_Affected_Countries}
+                        </p>
+                      )}
+                      {d.crisis_level && (
+                        <p className='undp-typography margin-bottom-00 label'>
+                          • Crisis Level: {d.crisis_level}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -288,6 +343,9 @@ function App() {
     },
   };
 
+  const filteredData =
+    filter === 'Fragile' ? data.filter(d => d.isFragile) : data;
+  console.log(filteredData);
   return (
     <div className='undp-container'>
       <div
@@ -296,19 +354,41 @@ function App() {
           backgroundColor: 'var(--gray-300)',
         }}
       >
-        <div style={{ zIndex: '4' }}>
+        <div style={{ zIndex: '4', width: '100%' }}>
           <h2 className='margin-00' style={{ color: 'var(--gray-700)' }}>
             Sustainable Finance Hub Dashboard{' '}
           </h2>
-          <div className='padding-top-04' style={{ marginLeft: '-4px' }}>
+          <div
+            className='padding-top-04'
+            style={{ marginLeft: '-4px', width: '100%' }}
+          >
             <p className='undp-typography label margin-bottom-02 margin-left-02'>
               Countries with programmes related to
             </p>
-            <StyledSegmented
-              className='undp-segmented-small'
-              onChange={handleSelectColumn}
-              options={options}
-            />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              <div style={{ flex: 1, marginRight: '10px' }}>
+                <StyledSegmented
+                  className='undp-segmented-small'
+                  onChange={handleSelectColumn}
+                  options={programmeOptions}
+                />
+              </div>
+              <div style={{ flex: 1, textAlign: 'right' }}>
+                <StyledSegmented
+                  className='undp-segmented-small'
+                  onChange={handleFilterChange}
+                  options={fragilityOptions}
+                  value={filter}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -327,7 +407,7 @@ function App() {
           }}
         >
           <ChoroplethMap
-            data={data.map(d => ({
+            data={filteredData.map(d => ({
               ...d,
               x: d[selectedColumn],
             }))}
@@ -408,7 +488,7 @@ function App() {
           </div>
         </div>
       </div>
-      <Table data={data} />
+      <Table data={filteredData} />
     </div>
   );
 }
