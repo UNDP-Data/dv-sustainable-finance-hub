@@ -4,8 +4,9 @@
 /* eslint-disable no-plusplus */
 import React, { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
-import { Segmented } from 'antd';
+import { Segmented, Radio } from 'antd';
 import styled from 'styled-components';
+import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import World from './Components/Graphs/Maps/MapData/worldMap.json';
 import { ChoroplethMapDataType } from './Types';
@@ -16,7 +17,6 @@ const StyledSpan = styled.span`
   position: relative;
   line-height: 1.5;
   border: 1px solid var(--gray-300);
-  border-radius: 8px;
   background-color: var(--white);
   padding: 1px 12px 2px 12px;
 
@@ -29,27 +29,94 @@ const StyledSpan = styled.span`
     width: 10px;
     height: 10px;
     background-color: var(--blue-600);
-    border-radius: 50%;
   }
 `;
 
-const StyledSegmented = styled(Segmented)`
-  background-color: var(--gray-200) !important; // Change track background color
+const programmeOptions = [
+  {
+    label: 'All Sustainable Financial Programmes',
+    value: 'public_finance_budget',
+    color: '#006EB5',
+    icon: Leaf,
+  },
+  {
+    label: 'Public finance for the SDGs',
+    value: 'public_finance_tax',
+    color: '#5DD4F0',
+    icon: School,
+  },
+  {
+    label: 'Unlocking private capital and aligning for the SDGs',
+    value: 'public_finance_debt',
+    color: '#02A38A',
+    icon: BriefcaseBusiness,
+  },
+  {
+    label: 'Integrated National Financing Frameworks',
+    value: 'insurance_and_risk_finance',
+    color: '#E78625',
+    icon: Flag,
+  },
+  {
+    label: 'Biofin',
+    value: 'private_capital',
+    color: '#E0529E',
+    icon: Shell,
+  },
+];
+
+const StyledSegmented = styled(Segmented)<{ selectedValue: string }>`
+  background-color: white !important;
+  display: flex;
+  width: 100%;
 
   .ant-segmented-item {
+    border-radius: 0px !important;
+    width: 20%;
+    background-color: var(--gray-200) !important;
+    flex: 1;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 68px;
     &:hover {
       background-color: var(
         --gray-300
       ) !important; // Change hover background color
     }
-
+    &:not(:last-child) {
+      margin-right: 8px; // Add gap between items except the last one
+    }
+    .ant-segmented-item-label {
+      white-space: normal;
+      display: flex;
+      gap: 16px;
+      padding: 0 16px;
+      align-items: center;
+    }
     &.ant-segmented-item-selected {
-      background-color: var(
-        --blue-600
-      ) !important; // Change selected item background color
-      color: white; // Change text color for selected item
+      background-color: ${({ selectedValue }) => {
+        const selectedOption = programmeOptions.find(
+          option => option.value === selectedValue,
+        );
+        return selectedOption ? selectedOption.color : 'var(--blue-600)';
+      }} !important; // Change selected item background color
+      color: white !important; // Change text color for selected item
     }
   }
+`;
+
+const IconWrapper = styled.span<{ color: string }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; // Adjust the size as needed
+  height: 32px; // Adjust the size as needed
+  border-radius: 100px;
+  background-color: ${({ color }) => `${color}33`};
+  color: ${({ color }) => color};
+  margin-right: 8px; // Space between the icon and the label
 `;
 
 interface ProgrammeDetail {
@@ -192,28 +259,15 @@ function App() {
       });
   }, [selectedColumn]);
 
-  const handleSelectColumn = (value: any) => {
+  const handleChange = (value: SegmentedValue) => {
     setSelectedColumn(value);
   };
-
-  const handleFilterChange = (value: any) => {
-    setFilter(value);
-  };
-
-  const programmeOptions = [
-    { label: 'Budgeting', value: 'public_finance_budget' },
-    { label: 'Taxation', value: 'public_finance_tax' },
-    { label: 'Debt', value: 'public_finance_debt' },
-    {
-      label: 'Insurance and risk',
-      value: 'insurance_and_risk_finance',
-    },
-    { label: 'Private Capital', value: 'private_capital' },
-  ];
 
   const fragilityOptions = [
     { label: 'All Countries', value: 'All' },
     { label: 'Fragile and Crisis Affected', value: 'Fragile' },
+    { label: 'LDC', value: 'LDC' },
+    { label: 'SIDS', value: 'SIDS' },
   ];
 
   const tooltip = (d: any) => {
@@ -345,64 +399,165 @@ function App() {
 
   const filteredData =
     filter === 'Fragile' ? data.filter(d => d.isFragile) : data;
-  console.log(filteredData);
   return (
-    <div className='undp-container'>
+    <div
+      className='undp-container'
+      style={{
+        border: '1px solid var(--gray-300)',
+      }}
+    >
       <div
         className='flex-div padding-top-06 padding-left-06 padding-bottom-03 margin-00'
         style={{
-          backgroundColor: 'var(--gray-300)',
+          backgroundColor: 'var(--white)',
         }}
       >
         <div style={{ zIndex: '4', width: '100%' }}>
-          <h2 className='margin-00' style={{ color: 'var(--gray-700)' }}>
-            Sustainable Finance Hub Dashboard{' '}
+          <h2
+            className='margin-00 undp-typograhy'
+            style={{ color: 'var(--gray-700)', fontWeight: '600' }}
+          >
+            Sustainable Finance Hub{' '}
           </h2>
           <div
-            className='padding-top-04'
+            className='padding-top-04 flex-div flex-row'
             style={{ marginLeft: '-4px', width: '100%' }}
           >
-            <p className='undp-typography label margin-bottom-02 margin-left-02'>
-              Countries with programmes related to
-            </p>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-              }}
-            >
-              <div style={{ flex: 1, marginRight: '10px' }}>
-                <StyledSegmented
-                  className='undp-segmented-small'
-                  onChange={handleSelectColumn}
-                  options={programmeOptions}
-                />
-              </div>
-              <div style={{ flex: 1, textAlign: 'right' }}>
-                <StyledSegmented
-                  className='undp-segmented-small'
-                  onChange={handleFilterChange}
-                  options={fragilityOptions}
-                  value={filter}
-                />
-              </div>
+            <div style={{ flex: 1, marginRight: '10px' }}>
+              <StyledSegmented
+                options={programmeOptions.map(option => ({
+                  label: (
+                    <>
+                      <IconWrapper color={option.color}>
+                        <option.icon />
+                      </IconWrapper>
+                      <div
+                        style={{
+                          lineHeight: '1.2',
+                          textAlign: 'left',
+                        }}
+                      >
+                        {option.label}
+                      </div>
+                    </>
+                  ),
+                  value: option.value,
+                }))}
+                value={selectedColumn}
+                onChange={handleChange}
+                selectedValue={selectedColumn as string}
+              />
             </div>
           </div>
         </div>
       </div>
 
       <div
-        className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05 margin-bottom-07 padding-right-05'
+        className='flex-div flex-wrap gap-00 padding-top-05 padding-bottom-05 margin-bottom-07 padding-right-05 padding-left-06'
         style={{
-          backgroundColor: 'var(--gray-300)',
+          backgroundColor: 'var(--white)',
         }}
       >
         <div
+          className='flex-div flex-column'
+          style={{
+            width: 'calc(20% - 55px)',
+            flexDirection: 'column',
+            flexGrow: 1,
+          }}
+        >
+          <div
+            style={{
+              border: '1px solid var(--gray-300)',
+            }}
+          >
+            <div className='padding-04'>
+              <p className='undp-typography label'>Filter by country gropup</p>
+              <Radio.Group
+                onChange={e => setFilter(e.target.value)}
+                value={filter}
+                className='undp-radio'
+              >
+                {fragilityOptions.map(option => (
+                  <div>
+                    <Radio key={option.value} value={option.value}>
+                      {option.label}
+                    </Radio>
+                  </div>
+                ))}
+              </Radio.Group>
+            </div>
+          </div>
+          <div style={{ border: '1px solid var(--gray-300)' }}>
+            <div
+              className='no-hover'
+              style={{
+                flexBasis: '0',
+              }}
+            >
+              <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
+              <p
+                style={{
+                  fontSize: '1.1rem',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.3',
+                }}
+              >
+                countries with sustainable
+                <br />
+                finance programming <b>in total</b>
+              </p>
+            </div>
+            <div
+              className='no-hover'
+              style={{
+                flexBasis: '0',
+              }}
+            >
+              <h3 style={{ margin: '0' }}>
+                {columnDescriptions[selectedColumn].count}
+              </h3>
+              <p
+                style={{
+                  fontSize: '1.1rem',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.3',
+                }}
+              >
+                countries with programmes
+                <br />
+                related to{' '}
+                <StyledSpan>
+                  {' '}
+                  <b>{columnDescriptions[selectedColumn].text}</b>
+                </StyledSpan>
+              </p>
+            </div>
+            <div
+              className='no-hover'
+              style={{
+                flexBasis: '0',
+              }}
+            >
+              <h3 style={{ margin: '0' }}>XX</h3>
+              <p
+                style={{
+                  fontSize: '1.1rem',
+                  marginBottom: '0.5rem',
+                  lineHeight: '1.3',
+                }}
+              >
+                any additional number
+                <br />
+                can be placed here
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
           style={{
             flexGrow: 1,
-            width: 'calc(100% - 340px)',
+            width: 'calc(80% - 44px)',
             minWidth: '30rem',
           }}
         >
@@ -411,81 +566,13 @@ function App() {
               ...d,
               x: d[selectedColumn],
             }))}
-            backgroundColor='var(--gray-300)'
+            backgroundColor='var(--white)'
             centerPoint={[430, 360]}
-            scale={240}
+            scale={250}
             height={600}
             // domain={[0, 1, 2, 3, 4]}
             tooltip={tooltip}
           />
-        </div>
-        <div
-          className='flex-div flex-column'
-          style={{ width: '340px', flexDirection: 'column', flexGrow: 1 }}
-        >
-          <div
-            className='stat-card no-hover'
-            style={{
-              flexBasis: '0',
-            }}
-          >
-            <h3 style={{ margin: '0' }}> {counts.countriesTotal}</h3>
-            <p
-              style={{
-                fontSize: '1.1rem',
-                marginBottom: '0.5rem',
-                lineHeight: '1.3',
-              }}
-            >
-              countries with sustainable
-              <br />
-              finance programming <b>in total</b>
-            </p>
-          </div>
-          <div
-            className='stat-card no-hover'
-            style={{
-              flexBasis: '0',
-            }}
-          >
-            <h3 style={{ margin: '0' }}>
-              {columnDescriptions[selectedColumn].count}
-            </h3>
-            <p
-              style={{
-                fontSize: '1.1rem',
-                marginBottom: '0.5rem',
-                lineHeight: '1.3',
-              }}
-            >
-              countries with programmes
-              <br />
-              related to{' '}
-              <StyledSpan>
-                {' '}
-                <b>{columnDescriptions[selectedColumn].text}</b>
-              </StyledSpan>
-            </p>
-          </div>
-          <div
-            className='stat-card no-hover'
-            style={{
-              flexBasis: '0',
-            }}
-          >
-            <h3 style={{ margin: '0' }}>XX</h3>
-            <p
-              style={{
-                fontSize: '1.1rem',
-                marginBottom: '0.5rem',
-                lineHeight: '1.3',
-              }}
-            >
-              any additional number
-              <br />
-              can be placed here
-            </p>
-          </div>
         </div>
       </div>
       <Table data={filteredData} />

@@ -110,7 +110,7 @@ export function Graph(props: Props) {
                             stroke: 'var(--gray-300)',
                           }}
                           strokeWidth={0.5}
-                          fill='var(--gray-400)'
+                          fill='var(--gray-200)'
                         />
                       );
                     })
@@ -133,7 +133,7 @@ export function Graph(props: Props) {
                             stroke: 'var(--gray-300)',
                           }}
                           strokeWidth={0.4}
-                          fill='var(--gray-400)'
+                          fill='var(--gray-200)'
                         />
                       );
                     })}
@@ -149,8 +149,8 @@ export function Graph(props: Props) {
               d.x !== undefined
                 ? d.x === '1'
                   ? UNDPColorModule.categoricalColors.colors[0]
-                  : 'var(--gray-400)'
-                : 'var(--gray-400)';
+                  : 'var(--gray-200)'
+                : 'var(--gray-200)';
             return (
               <g
                 key={i}
@@ -201,7 +201,7 @@ export function Graph(props: Props) {
                             key={j}
                             d={masterPath}
                             style={{
-                              stroke: 'var(--gray-300)',
+                              stroke: '#C6C6C6',
                             }}
                             strokeWidth={0.4}
                             fill={color}
@@ -226,9 +226,9 @@ export function Graph(props: Props) {
                             key={j}
                             d={path}
                             style={{
-                              stroke: 'var(--gray-300)',
+                              stroke: '#C6C6C6',
                             }}
-                            strokeWidth={0.5}
+                            strokeWidth={0.4}
                             fill={color}
                           />
                         );
@@ -267,10 +267,10 @@ export function Graph(props: Props) {
                                 key={j}
                                 d={masterPath}
                                 style={{
-                                  stroke: 'var(--gray-300)',
+                                  stroke: '#C6C6C6',
                                   fill: 'none',
                                   fillOpacity: 0,
-                                  strokeWidth: '0.5',
+                                  strokeWidth: '0.4',
                                 }}
                               />
                             );
@@ -291,10 +291,10 @@ export function Graph(props: Props) {
                                 key={j}
                                 d={path}
                                 style={{
-                                  stroke: 'var(--gray-300)',
+                                  stroke: '#C6C6C6',
                                   fill: 'none',
                                   fillOpacity: 0,
-                                  strokeWidth: '0.5',
+                                  strokeWidth: '0.4',
                                 }}
                               />
                             );
