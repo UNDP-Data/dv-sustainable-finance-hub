@@ -1,4 +1,14 @@
 import { Checkbox, CheckboxOptionType } from 'antd';
+import styled from 'styled-components';
+
+const StyledCheckboxGroup = styled(Checkbox.Group)`
+  .ant-checkbox-wrapper {
+    span:last-child {
+      font-size: 14px !important;
+      line-height: 1.8;
+    }
+  }
+`;
 
 interface CheckboxGroupProps {
   options: CheckboxOptionType[];
@@ -15,7 +25,7 @@ function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
       style={{ border: '0.06rem solid var(--gray-400)' }}
     >
       <p className='undp-typography label'>Filter by subprogrammes</p>
-      <Checkbox.Group
+      <StyledCheckboxGroup
         options={options}
         value={value}
         className='undp-checkbox'

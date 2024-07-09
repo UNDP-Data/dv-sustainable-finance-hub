@@ -4,7 +4,14 @@ import { GROUPS } from './Constants';
 
 const StyledRadioGroup = styled(Radio.Group)`
   display: flex;
-  flex-direction: column; // Display items in one column
+  flex-direction: column;
+
+  .ant-radio-wrapper {
+    span:last-child {
+      font-size: 14px !important;
+      line-height: 1.8;
+    }
+  }
 `;
 
 interface CountryGroupProps {
