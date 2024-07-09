@@ -1,10 +1,10 @@
-/* eslint-disable react/button-has-type */
-// import UNDPColorModule from 'undp-viz-colors';
 import { useState, useRef, useEffect } from 'react';
 import { Graph } from './Graph';
 import { ChoroplethMapDataType } from '../../../../Types';
 import { GraphFooter } from '../../../Elements/GraphFooter';
 import { GraphHeader } from '../../../Elements/GraphHeader';
+import { PROGRAMMES } from '../../../Constants';
+import { useProgramme } from '../../../ProgrammeContext';
 
 interface Props {
   graphTitle?: string;
@@ -14,15 +14,12 @@ interface Props {
   width?: number;
   height?: number;
   source?: string;
-  // domain: number[];
-  // colors?: string[];
-  // colorLegendTitle?: string;
-  // categorical?: boolean;
   data: ChoroplethMapDataType[];
   scale?: number;
   centerPoint?: [number, number];
   backgroundColor?: string | boolean;
-  tooltip?: (_d: any) => JSX.Element | any;
+  padding?: string;
+  tooltip?: (_d: any) => JSX.Element;
   onSeriesMouseOver?: (_d: any) => void;
 }
 
@@ -30,22 +27,24 @@ export function ChoroplethMap(props: Props) {
   const {
     data,
     graphTitle,
-    // colors,
     source,
     graphDescription,
     sourceLink,
     height,
     width,
     footNote,
-    // domain,
-    // colorLegendTitle,
-    // categorical,
     scale,
     centerPoint,
+    padding,
     backgroundColor,
     tooltip,
     onSeriesMouseOver,
   } = props;
+
+  const { currentProgramme } = useProgramme();
+  const currentProgrammeColor =
+    PROGRAMMES.find(prog => prog.value === currentProgramme.value)?.color ||
+    '#000000';
 
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
@@ -62,21 +61,26 @@ export function ChoroplethMap(props: Props) {
     <div
       style={{
         display: 'flex',
-        width: '100%',
-        padding: 0,
+        flexDirection: 'column',
+        width: 'fit-content',
+        flexGrow: width ? 0 : 1,
+        padding: backgroundColor
+          ? padding || 'var(--spacing-05)'
+          : padding || 0,
         backgroundColor: !backgroundColor
           ? 'transparent'
           : backgroundColor === true
-          ? 'var(--gray-100)'
+          ? 'var(--gray-200)'
           : backgroundColor,
       }}
     >
       <div
         style={{
-          width: '100%',
           display: 'flex',
           flexDirection: 'column',
+          width: '100%',
           gap: 'var(--spacing-05)',
+          flexGrow: 1,
           justifyContent: 'space-between',
         }}
       >
@@ -99,25 +103,11 @@ export function ChoroplethMap(props: Props) {
           {(width || svgWidth) && (height || svgHeight) ? (
             <Graph
               data={data}
-              // domain={domain}
               width={width || svgWidth}
               height={height || svgHeight}
               scale={scale || 180}
               centerPoint={centerPoint || [470, 315]}
-              // colors={
-              //   colors ||
-              //   (categorical
-              //     ? UNDPColorModule.sequentialColors[
-              //         `neutralColorsx0${domain.length as 4 | 5 | 6 | 7 | 8 | 9}`
-              //       ]
-              //     : UNDPColorModule.sequentialColors[
-              //         `neutralColorsx0${
-              //           (domain.length + 1) as 4 | 5 | 6 | 7 | 8 | 9
-              //         }`
-              //       ])
-              // }
-              // colorLegendTitle={colorLegendTitle}
-              // categorical={categorical}
+              colors={[currentProgrammeColor]}
               tooltip={tooltip}
               onSeriesMouseOver={onSeriesMouseOver}
             />
