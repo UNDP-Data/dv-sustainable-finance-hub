@@ -2,20 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { geoEqualEarth } from 'd3-geo';
 import { zoom } from 'd3-zoom';
 import { select } from 'd3-selection';
-// import { scaleThreshold, scaleOrdinal } from 'd3-scale';
 import UNDPColorModule from 'undp-viz-colors';
 import World from '../MapData/worldMap.json';
 import { ChoroplethMapDataType } from '../../../../Types';
-// import { numberFormattingFunction } from '../../../../Utils/numberFormattingFunction';
 import { Tooltip } from '../../../Elements/Tooltip';
 
 interface Props {
-  // domain: number[];
   width: number;
   height: number;
-  // colors: string[];
-  // colorLegendTitle?: string;
-  // categorical?: boolean;
+  colors: string[];
   data: ChoroplethMapDataType[];
   scale: number;
   centerPoint: [number, number];
@@ -26,10 +21,7 @@ interface Props {
 export function Graph(props: Props) {
   const {
     data,
-    // domain,
-    // colors,
-    // colorLegendTitle,
-    // categorical,
+    colors,
     height,
     width,
     scale,
@@ -37,9 +29,6 @@ export function Graph(props: Props) {
     tooltip,
     onSeriesMouseOver,
   } = props;
-  // const [selectedColor, setSelectedColor] = useState<string | undefined>(
-  //   undefined,
-  // );
   const [mouseOverData, setMouseOverData] = useState<any>(undefined);
   const [eventX, setEventX] = useState<number | undefined>(undefined);
   const [eventY, setEventY] = useState<number | undefined>(undefined);
@@ -51,9 +40,6 @@ export function Graph(props: Props) {
     .rotate([0, 0])
     .scale(scale)
     .translate(centerPoint);
-  // const colorScale = categorical
-  //   ? scaleOrdinal<number, string>().domain(domain).range(colors)
-  //   : scaleThreshold<number, string>().domain(domain).range(colors);
 
   useEffect(() => {
     const mapGSelect = select(mapG.current);
@@ -70,6 +56,9 @@ export function Graph(props: Props) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapSvgSelect.call(zoomBehaviour as any);
   }, [svgHeight, svgWidth]);
+
+  const programmeColor = colors[0];
+
   return (
     <>
       <svg
@@ -107,10 +96,10 @@ export function Graph(props: Props) {
                           key={j}
                           d={masterPath}
                           style={{
-                            stroke: 'var(--gray-300)',
+                            stroke: 'var(--gray-500)',
                           }}
-                          strokeWidth={0.5}
-                          fill='var(--gray-400)'
+                          strokeWidth={0.25}
+                          fill={UNDPColorModule.graphNoData}
                         />
                       );
                     })
@@ -130,10 +119,10 @@ export function Graph(props: Props) {
                           key={j}
                           d={path}
                           style={{
-                            stroke: 'var(--gray-300)',
+                            stroke: 'var(--gray-500)',
                           }}
-                          strokeWidth={0.4}
-                          fill='var(--gray-400)'
+                          strokeWidth={0.25}
+                          fill={UNDPColorModule.graphNoData}
                         />
                       );
                     })}
@@ -144,17 +133,17 @@ export function Graph(props: Props) {
             const index = (World as any).features.findIndex(
               (el: any) => d.countryCode === el.properties.ISO3,
             );
-            const color =
-              // d.x !== undefined ? colorScale(d.x) : UNDPColorModule.graphNoData;
-              d.x !== undefined
-                ? d.x === '1'
-                  ? UNDPColorModule.categoricalColors.colors[0]
-                  : 'var(--gray-400)'
-                : 'var(--gray-400)';
+            let color = 'var(--gray-200)';
+            // eslint-disable-next-line no-restricted-globals
+            if (index !== -1 && !isNaN(d.x)) {
+              if (d.x === 1) {
+                color = programmeColor;
+              }
+            }
             return (
               <g
                 key={i}
-                onMouseEnter={(event: any) => {
+                onMouseEnter={event => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);
@@ -162,7 +151,7 @@ export function Graph(props: Props) {
                     onSeriesMouseOver(d);
                   }
                 }}
-                onMouseMove={(event: any) => {
+                onMouseMove={event => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);
@@ -201,9 +190,9 @@ export function Graph(props: Props) {
                             key={j}
                             d={masterPath}
                             style={{
-                              stroke: 'var(--gray-300)',
+                              stroke: 'var(--gray-500)',
                             }}
-                            strokeWidth={0.4}
+                            strokeWidth={0.25}
                             fill={color}
                           />
                         );
@@ -226,9 +215,9 @@ export function Graph(props: Props) {
                             key={j}
                             d={path}
                             style={{
-                              stroke: 'var(--gray-300)',
+                              stroke: 'var(--gray-500)',
                             }}
-                            strokeWidth={0.5}
+                            strokeWidth={0.25}
                             fill={color}
                           />
                         );
@@ -267,7 +256,7 @@ export function Graph(props: Props) {
                                 key={j}
                                 d={masterPath}
                                 style={{
-                                  stroke: 'var(--gray-300)',
+                                  stroke: 'var(--gray-700)',
                                   fill: 'none',
                                   fillOpacity: 0,
                                   strokeWidth: '0.5',
@@ -291,7 +280,7 @@ export function Graph(props: Props) {
                                 key={j}
                                 d={path}
                                 style={{
-                                  stroke: 'var(--gray-300)',
+                                  stroke: 'var(--gray-700)',
                                   fill: 'none',
                                   fillOpacity: 0,
                                   strokeWidth: '0.5',
@@ -305,100 +294,6 @@ export function Graph(props: Props) {
             : null}
         </g>
       </svg>
-      {/* <div
-        style={{ position: 'sticky', bottom: '0px' }}
-        className='bivariate-legend-container'
-      >
-        <div className='univariate-legend-el'>
-          <div className='univariate-map-color-legend-element'>
-            <div>
-              {colorLegendTitle ? (
-                <div
-                  className='univariate-map-legend-text'
-                  style={{ lineHeight: 'normal' }}
-                >
-                  {colorLegendTitle}
-                </div>
-              ) : null}
-              <svg width='100%' viewBox='0 0 320 30'>
-                <g>
-                  {domain.map((d, i) => (
-                    <g
-                      key={i}
-                      onMouseOver={() => {
-                        setSelectedColor(colors[i]);
-                      }}
-                      onMouseLeave={() => {
-                        setSelectedColor(undefined);
-                      }}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <rect
-                        x={
-                          categorical
-                            ? (i * 320) / domain.length + 1
-                            : (i * 320) / colors.length + 1
-                        }
-                        y={1}
-                        width={
-                          categorical
-                            ? 320 / domain.length - 2
-                            : 320 / colors.length - 2
-                        }
-                        height={8}
-                        fill={colors[i]}
-                        stroke={
-                          selectedColor === colors[i] ? '#212121' : colors[i]
-                        }
-                      />
-                      <text
-                        x={
-                          categorical
-                            ? (i * 320) / domain.length + 160 / domain.length
-                            : ((i + 1) * 320) / colors.length
-                        }
-                        y={25}
-                        textAnchor='middle'
-                        fontSize={12}
-                        fill='#212121'
-                        style={{
-                          fontFamily: 'var(--fontFamily)',
-                        }}
-                      >
-                        {numberFormattingFunction(d)}
-                      </text>
-                    </g>
-                  ))}
-                  {categorical ? null : (
-                    <g>
-                      <rect
-                        onMouseOver={() => {
-                          setSelectedColor(colors[domain.length]);
-                        }}
-                        onMouseLeave={() => {
-                          setSelectedColor(undefined);
-                        }}
-                        x={(domain.length * 320) / colors.length + 1}
-                        y={1}
-                        width={320 / colors.length - 2}
-                        height={8}
-                        fill={colors[domain.length]}
-                        stroke={
-                          selectedColor === colors[domain.length]
-                            ? '#212121'
-                            : colors[domain.length]
-                        }
-                        strokeWidth={1}
-                        style={{ cursor: 'pointer' }}
-                      />
-                    </g>
-                  )}
-                </g>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div> */}
       {mouseOverData && tooltip && eventX && eventY ? (
         <Tooltip body={tooltip(mouseOverData)} xPos={eventX} yPos={eventY} />
       ) : null}
