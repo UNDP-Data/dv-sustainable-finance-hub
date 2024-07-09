@@ -43,17 +43,18 @@ export interface DonutChartDataType {
 }
 
 export interface ChoroplethMapDataType {
-  x: string;
+  x: number;
   countryCode: string;
-  data?: object;
-  [key: string]: any;
-  countryName?: string;
-  programmes?: any[];
-  public_finance_budget: string;
-  insurance_and_risk: string;
-  public_finance_tax: string;
-  public_finance_debt: string;
-  private_capital: string;
+  data: {
+    country: string;
+    programmeValue: any;
+    public_finance_budget?: any;
+    insurance_and_risk?: any;
+    public_finance_tax?: any;
+    public_finance_debt?: any;
+    private_capital?: any;
+    [key: string]: any; // Allow additional properties
+  };
 }
 
 export interface BivariateMapDataType {

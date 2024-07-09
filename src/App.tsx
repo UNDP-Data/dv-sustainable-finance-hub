@@ -67,26 +67,40 @@ function AppContent() {
     });
 
     return filteredData.map(item => ({
-      x: parseFloat(item[programme]), // Assuming the data in the programme column can be parsed as a number
+      x: parseFloat(item[programme]),
       countryCode: item.iso,
       data: {
         country: item.country,
         programmeValue: item[programme],
+        public_finance_budget: item.public_finance_budget,
+        insurance_and_risk: item.insurance_and_risk,
+        public_finance_tax: item.public_finance_tax,
+        public_finance_debt: item.public_finance_debt,
+        private_capital: item.private_capital,
       },
     }));
   };
 
-  const calculateTotals = (rawData: any[], programmes: typeof PROGRAMMES) => {
-    const totals: { [key: string]: { label: string; total: number } } = {};
-    programmes.forEach(programme => {
-      totals[programme.value] = {
-        label: programme.short,
-        total: rawData.reduce((sum, item) => {
-          return sum + (item[programme.value] === '1' ? 1 : 0);
+  const calculateProgrammeTotals = (
+    rawData: any[],
+    programme: {
+      value: string;
+      subcategories?: { label: string; value: string }[];
+    },
+  ) => {
+    const programmeTotal = rawData.reduce((sum, item) => {
+      return sum + (item[programme.value] === '1' ? 1 : 0);
+    }, 0);
+
+    const subcategoryTotals =
+      programme.subcategories?.map(subcategory => ({
+        label: subcategory.label,
+        total: data.reduce((sum, item) => {
+          return sum + (item[subcategory.value] === '1' ? 1 : 0);
         }, 0),
-      };
-    });
-    return totals;
+      })) || [];
+
+    return { programmeTotal, subcategoryTotals };
   };
 
   const transformedData = transformData(
@@ -95,7 +109,7 @@ function AppContent() {
     selectedRadio,
   );
 
-  const programmeTotals = calculateTotals(data, PROGRAMMES);
+  const programmeTotals = calculateProgrammeTotals(data, currentProgramme);
 
   return (
     <div className='undp-container flex-div gap-06 flex-wrap flex-hor-align-center padding-04'>
@@ -107,22 +121,25 @@ function AppContent() {
             width: 'calc(20% - 54px)',
           }}
         >
-          <FilterCountryGroup
-            onRadioChange={handleRadioChange}
-            selectedRadio={selectedRadio}
-          />
-          {currentProgramme?.subcategories && (
-            <CheckboxGroup
-              options={currentProgramme.subcategories.map(
-                (sub: { label: any; value: any }) => ({
-                  label: sub.label,
-                  value: sub.value,
-                }),
-              )}
-              onChange={handleCheckboxChange}
-              value={selectedCheckboxes}
+          <div className='flex-div flex-column gap-03'>
+            <FilterCountryGroup
+              onRadioChange={handleRadioChange}
+              selectedRadio={selectedRadio}
             />
-          )}
+            {currentProgramme.value !== 'all_programmes' &&
+              currentProgramme?.subcategories && (
+                <CheckboxGroup
+                  options={currentProgramme.subcategories.map(
+                    (sub: { label: any; value: any }) => ({
+                      label: sub.label,
+                      value: sub.value,
+                    }),
+                  )}
+                  onChange={handleCheckboxChange}
+                  value={selectedCheckboxes}
+                />
+              )}
+          </div>
           <Summary totals={programmeTotals} />
         </div>
         <div

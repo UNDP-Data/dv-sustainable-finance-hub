@@ -22,6 +22,12 @@ export const PROGRAMMES: Programme[] = [
     value: 'all_programmes',
     color: '#006EB5',
     icon: Leaf,
+    subcategories: [
+      { label: 'Public finance for the SDGs', value: 'public' },
+      { label: 'Private Capital', value: 'private' },
+      { label: 'Integrated Frameworks', value: 'frameworks' },
+      { label: 'Biofin', value: 'biofin' },
+    ],
   },
   {
     label: 'Public finance for the SDGs',
@@ -30,8 +36,10 @@ export const PROGRAMMES: Programme[] = [
     color: '#5DD4F0',
     icon: School,
     subcategories: [
-      { label: 'Sub Programme 1.1', value: 'subProgramme1.1' },
-      { label: 'Sub Programme 1.2', value: 'subProgramme1.2' },
+      { label: 'Budget for the SDGs', value: 'public_budget' },
+      { label: 'Tax for the SDGs', value: 'public_tax' },
+      { label: 'Debt for the SDGs', value: 'public_debt' },
+      { label: 'Insurance and Risk Finance', value: 'insurance_and_risk' },
     ],
   },
   {
@@ -41,8 +49,9 @@ export const PROGRAMMES: Programme[] = [
     color: '#02A38A',
     icon: BriefcaseBusiness,
     subcategories: [
-      { label: 'Sub Programme 2.1', value: 'subProgramme2.1' },
-      { label: 'Sub Programme 2.2', value: 'subProgramme2.2' },
+      { label: 'Originating pipelines', value: 'private_pipelines' },
+      { label: 'Managing for Impact', value: 'private_impact' },
+      { label: 'Enabling environment', value: 'private_environment' },
     ],
   },
   {
