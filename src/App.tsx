@@ -7,6 +7,8 @@ import { PROGRAMMES } from './Components/Constants';
 import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
+import Table from './Components/Table';
+import Summary from './Components/Summary';
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
@@ -74,18 +76,33 @@ function AppContent() {
     }));
   };
 
+  const calculateTotals = (rawData: any[], programmes: typeof PROGRAMMES) => {
+    const totals: { [key: string]: { label: string; total: number } } = {};
+    programmes.forEach(programme => {
+      totals[programme.value] = {
+        label: programme.short,
+        total: rawData.reduce((sum, item) => {
+          return sum + (item[programme.value] === '1' ? 1 : 0);
+        }, 0),
+      };
+    });
+    return totals;
+  };
+
   const transformedData = transformData(
     data,
     currentProgramme.value,
     selectedRadio,
   );
 
+  const programmeTotals = calculateTotals(data, PROGRAMMES);
+
   return (
     <div className='undp-container flex-div gap-06 flex-wrap flex-hor-align-center padding-04'>
       <Header onSegmentChange={handleSegmentChange} />
       <div className='flex-div flex-row' style={{ width: '100%' }}>
         <div
-          className='flex-div flex-column gap-03 grow'
+          className='flex-div flex-column flex-space-between gap-03 grow'
           style={{
             width: 'calc(20% - 54px)',
           }}
@@ -106,6 +123,7 @@ function AppContent() {
               value={selectedCheckboxes}
             />
           )}
+          <Summary totals={programmeTotals} />
         </div>
         <div
           className='flex-div flex-column grow'
@@ -122,6 +140,7 @@ function AppContent() {
           />
         </div>
       </div>
+      <Table data={transformedData} />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
 
 // constants.ts
 export interface Programme {
+  [x: string]: any;
   label: string;
   value: string;
   color: string;
@@ -17,12 +18,14 @@ export interface Subcategory {
 export const PROGRAMMES: Programme[] = [
   {
     label: 'All Sustainable Financial Programmes',
+    short: 'All Programmes',
     value: 'all_programmes',
     color: '#006EB5',
     icon: Leaf,
   },
   {
     label: 'Public finance for the SDGs',
+    short: 'Public finance for the SDGs',
     value: 'public',
     color: '#5DD4F0',
     icon: School,
@@ -33,6 +36,7 @@ export const PROGRAMMES: Programme[] = [
   },
   {
     label: 'Unlocking private capital and aligning for the SDGs',
+    short: 'Unlocking private capital',
     value: 'private',
     color: '#02A38A',
     icon: BriefcaseBusiness,
@@ -43,12 +47,14 @@ export const PROGRAMMES: Programme[] = [
   },
   {
     label: 'Integrated National Financing Frameworks',
+    short: 'Integrated National Frameworks',
     value: 'frameworks',
     color: '#E78625',
     icon: Flag,
   },
   {
     label: 'Biofin',
+    short: 'Biofin',
     value: 'biofin',
     color: '#E0529E',
     icon: Shell,
