@@ -9,6 +9,7 @@ import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
 import Cards from './Components/Cards';
+import Summary from './Components/Summary';
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
@@ -17,6 +18,9 @@ function AppContent() {
     CheckboxValueType[]
   >([]);
   const { currentProgramme, setCurrentProgramme } = useProgramme();
+  const [programmeTotals, setProgrammeTotals] = useState<{
+    [key: string]: number;
+  }>({});
 
   useEffect(() => {
     csv(
@@ -53,6 +57,72 @@ function AppContent() {
           };
         });
         setData(transformedData);
+
+        // Calculate totals for each programme
+        const totals = {
+          all_programmes: transformedData.reduce(
+            (sum: number, item: { all_programmes: string }) =>
+              sum + (parseInt(item.all_programmes, 10) || 0),
+            0,
+          ),
+          public: transformedData.reduce(
+            (sum: number, item: { public: string }) =>
+              sum + (parseInt(item.public, 10) || 0),
+            0,
+          ),
+          private: transformedData.reduce(
+            (sum: number, item: { private: string }) =>
+              sum + (parseInt(item.private, 10) || 0),
+            0,
+          ),
+          frameworks: transformedData.reduce(
+            (sum: number, item: { frameworks: string }) =>
+              sum + (parseInt(item.frameworks, 10) || 0),
+            0,
+          ),
+          biofin: transformedData.reduce(
+            (sum: number, item: { biofin: string }) =>
+              sum + (parseInt(item.biofin, 10) || 0),
+            0,
+          ),
+          public_budget: transformedData.reduce(
+            (sum: number, item: { public_budget: string }) =>
+              sum + (parseInt(item.public_budget, 10) || 0),
+            0,
+          ),
+          public_tax: transformedData.reduce(
+            (sum: number, item: { public_tax: string }) =>
+              sum + (parseInt(item.public_tax, 10) || 0),
+            0,
+          ),
+          public_debt: transformedData.reduce(
+            (sum: number, item: { public_debt: string }) =>
+              sum + (parseInt(item.public_debt, 10) || 0),
+            0,
+          ),
+          public_insurance: transformedData.reduce(
+            (sum: number, item: { public_insurance: string }) =>
+              sum + (parseInt(item.public_insurance, 10) || 0),
+            0,
+          ),
+          private_pipelines: transformedData.reduce(
+            (sum: number, item: { private_pipelines: string }) =>
+              sum + (parseInt(item.private_pipelines, 10) || 0),
+            0,
+          ),
+          private_impact: transformedData.reduce(
+            (sum: number, item: { private_impact: string }) =>
+              sum + (parseInt(item.private_impact, 10) || 0),
+            0,
+          ),
+          private_environment: transformedData.reduce(
+            (sum: number, item: { private_environment: string }) =>
+              sum + (parseInt(item.private_environment, 10) || 0),
+            0,
+          ),
+        };
+
+        setProgrammeTotals(totals);
       })
       .catch((err: any) => {
         console.error('Error loading the CSV file:', err);
@@ -143,6 +213,7 @@ function AppContent() {
               />
             )}
           </div>
+          <Summary totals={programmeTotals} />
         </div>
         <div
           className='flex-div flex-column grow'
