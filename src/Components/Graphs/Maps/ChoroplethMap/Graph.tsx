@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { geoEqualEarth } from 'd3-geo';
 import { zoom } from 'd3-zoom';
 import { select } from 'd3-selection';
-import UNDPColorModule from 'undp-viz-colors';
 import World from '../MapData/worldMap.json';
 import { ChoroplethMapDataType } from '../../../../Types';
 import { Tooltip } from '../../../Elements/Tooltip';
@@ -99,7 +98,7 @@ export function Graph(props: Props) {
                             stroke: 'var(--gray-500)',
                           }}
                           strokeWidth={0.25}
-                          fill={UNDPColorModule.graphNoData}
+                          fill='var(--gray-200)'
                         />
                       );
                     })
@@ -122,7 +121,7 @@ export function Graph(props: Props) {
                             stroke: 'var(--gray-500)',
                           }}
                           strokeWidth={0.25}
-                          fill={UNDPColorModule.graphNoData}
+                          fill='var(--gray-200)'
                         />
                       );
                     })}
