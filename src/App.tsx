@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { csv } from 'd3-fetch';
+import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import Header from './Components/Header';
 import FilterCountryGroup from './Components/Filter';
@@ -12,7 +13,9 @@ import Cards from './Components/Cards';
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
   const [selectedRadio, setSelectedRadio] = useState<string>('allCountries');
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState<
+    CheckboxValueType[]
+  >([]);
   const { currentProgramme, setCurrentProgramme } = useProgramme();
 
   useEffect(() => {
@@ -67,7 +70,7 @@ function AppContent() {
     setSelectedRadio(value);
   };
 
-  const handleCheckboxChange = (checkedValues: string[]) => {
+  const handleCheckboxChange = (checkedValues: CheckboxValueType[]) => {
     setSelectedCheckboxes(checkedValues);
   };
 

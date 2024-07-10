@@ -1,3 +1,4 @@
+import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { Checkbox } from 'antd';
 import styled from 'styled-components';
 
@@ -12,8 +13,8 @@ const StyledCheckboxGroup = styled(Checkbox.Group)`
 
 interface CheckboxGroupProps {
   options: { label: string; value: string }[];
-  onChange: (checkedValues: string[]) => void;
-  value: string[];
+  onChange: (checkedValues: CheckboxValueType[]) => void;
+  value: CheckboxValueType[];
 }
 
 function CheckboxGroup({ options, onChange, value }: CheckboxGroupProps) {
