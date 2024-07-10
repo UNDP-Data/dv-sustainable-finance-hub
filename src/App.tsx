@@ -7,8 +7,8 @@ import { PROGRAMMES } from './Components/Constants';
 import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
-import Table from './Components/Table';
 import Summary from './Components/Summary';
+import Cards from './Components/Table';
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
@@ -108,8 +108,13 @@ function AppContent() {
     currentProgramme.value,
     selectedRadio,
   );
-
   const programmeTotals = calculateProgrammeTotals(data, currentProgramme);
+
+  const allProgramsData = data.map(item => ({
+    country: item.country,
+    iso: item.iso,
+    ...item,
+  }));
 
   return (
     <div className='undp-container flex-div gap-06 flex-wrap flex-hor-align-center padding-04'>
@@ -157,7 +162,7 @@ function AppContent() {
           />
         </div>
       </div>
-      <Table data={transformedData} />
+      <Cards data={allProgramsData} />
     </div>
   );
 }

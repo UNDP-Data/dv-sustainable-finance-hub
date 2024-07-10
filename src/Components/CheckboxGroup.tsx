@@ -29,7 +29,7 @@ function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
         options={options}
         value={value}
         className='undp-checkbox'
-        onChange={checkedValues => onChange(checkedValues as string[])}
+        onChange={(checkedValues: any[]) => onChange(checkedValues as string[])}
       />
     </div>
   );
