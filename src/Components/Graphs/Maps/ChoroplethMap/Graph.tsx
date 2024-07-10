@@ -136,7 +136,7 @@ export function Graph(props: Props) {
             let color = 'var(--gray-200)';
             // eslint-disable-next-line no-restricted-globals
             if (index !== -1 && !isNaN(d.x)) {
-              if (d.x === 1) {
+              if (d.x > 0) {
                 color = programmeColor;
               }
             }

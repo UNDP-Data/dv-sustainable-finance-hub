@@ -2,68 +2,40 @@ import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
 
 // constants.ts
 export interface Programme {
-  [x: string]: any;
+  [x: number]: any;
   label: string;
   value: string;
   color: string;
   icon: any;
-  subcategories?: Subcategory[];
 }
 
-export interface Subcategory {
-  label: string;
-  value: string;
-}
-
-export const PROGRAMMES: Programme[] = [
+export const PROGRAMMES = [
   {
-    label: 'All Sustainable Financial Programmes',
-    short: 'All Programmes',
+    label: 'All Programmes',
     value: 'all_programmes',
     color: '#006EB5',
     icon: Leaf,
-    subcategories: [
-      { label: 'Public finance for the SDGs', value: 'public' },
-      { label: 'Private Capital', value: 'private' },
-      { label: 'Integrated Frameworks', value: 'frameworks' },
-      { label: 'Biofin', value: 'biofin' },
-    ],
   },
   {
     label: 'Public finance for the SDGs',
-    short: 'Public finance for the SDGs',
     value: 'public',
     color: '#5DD4F0',
     icon: School,
-    subcategories: [
-      { label: 'Budget for the SDGs', value: 'public_budget' },
-      { label: 'Tax for the SDGs', value: 'public_tax' },
-      { label: 'Debt for the SDGs', value: 'public_debt' },
-      { label: 'Insurance and Risk Finance', value: 'insurance_and_risk' },
-    ],
   },
   {
     label: 'Unlocking private capital and aligning for the SDGs',
-    short: 'Unlocking private capital',
     value: 'private',
     color: '#02A38A',
     icon: BriefcaseBusiness,
-    subcategories: [
-      { label: 'Originating pipelines', value: 'private_pipelines' },
-      { label: 'Managing for Impact', value: 'private_impact' },
-      { label: 'Enabling environment', value: 'private_environment' },
-    ],
   },
   {
     label: 'Integrated National Financing Frameworks',
-    short: 'Integrated National Frameworks',
     value: 'frameworks',
     color: '#E78625',
     icon: Flag,
   },
   {
     label: 'Biofin',
-    short: 'Biofin',
     value: 'biofin',
     color: '#E0529E',
     icon: Shell,
@@ -75,4 +47,61 @@ export const GROUPS = [
   { label: 'Fragile and Affected', value: 'fragile_affected' },
   { label: 'LDC', value: 'ldc' },
   { label: 'SIDS', value: 'sids' },
+];
+
+export const SPECIFIED_PROGRAMMES = [
+  {
+    label: 'Budget for the SDGs',
+    value: 'public_budget',
+    color: '#006EB5',
+    icon: Leaf,
+  },
+  {
+    label: 'Tax for the SDGs',
+    value: 'public_tax',
+    color: '#5DD4F0',
+    icon: School,
+  },
+  {
+    label: 'Debt for the SDGs',
+    value: 'public_debt',
+    color: '#02A38A',
+    icon: BriefcaseBusiness,
+  },
+  {
+    label: 'Insurance and Risk Finance',
+    value: 'public_insurance',
+    color: '#E78625',
+    icon: Flag,
+  },
+  {
+    label: 'Originating pipelines',
+    value: 'private_pipelines',
+    color: '#E0529E',
+    icon: Shell,
+  },
+  {
+    label: 'Managing for Impact',
+    value: 'private_impact',
+    color: '#00A651',
+    icon: Leaf,
+  },
+  {
+    label: 'Enabling environment',
+    value: 'private_environment',
+    color: '#FF6F61',
+    icon: School,
+  },
+  {
+    label: 'Integrated National Financing Frameworks',
+    value: 'frameworks',
+    color: '#6A1B9A',
+    icon: BriefcaseBusiness,
+  },
+  {
+    label: 'Biofin',
+    value: 'biofin',
+    color: '#00ACC1',
+    icon: Flag,
+  },
 ];

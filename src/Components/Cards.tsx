@@ -2,10 +2,11 @@ import { Search } from 'lucide-react';
 import React, { useState } from 'react';
 import { Input, Tag } from 'antd';
 import styled from 'styled-components';
-import { PROGRAMMES } from './Constants';
+import { Programme } from './Constants';
 
 interface Props {
   data: any[]; // Use any[] to accommodate the raw data structure
+  programmes: Programme[];
 }
 
 const CardContainer = styled.div`
@@ -41,7 +42,7 @@ const NoProgrammes = styled.div`
 `;
 
 function Cards(props: Props) {
-  const { data } = props;
+  const { data, programmes } = props;
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredData = data.filter(item =>
@@ -62,8 +63,8 @@ function Cards(props: Props) {
         style={{ height: '500px' }}
       >
         {filteredData.map((item, index) => {
-          const programmes = PROGRAMMES.filter(
-            field => item[field.value] === '1',
+          const programmesForCountry = programmes.filter(
+            program => item[program.value] === '1',
           );
           return (
             <Card key={index}>
@@ -76,10 +77,10 @@ function Cards(props: Props) {
                 </h6>
               </CountryDiv>
               <ProgramsDiv>
-                {programmes.length > 0 ? (
-                  programmes.map(field => (
-                    <Tag key={field.value} color={field.color}>
-                      {field.short}
+                {programmesForCountry.length > 0 ? (
+                  programmesForCountry.map(program => (
+                    <Tag key={program.value} color={program.color}>
+                      {program.label}
                     </Tag>
                   ))
                 ) : (

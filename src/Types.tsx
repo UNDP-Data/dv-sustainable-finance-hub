@@ -45,15 +45,14 @@ export interface DonutChartDataType {
 export interface ChoroplethMapDataType {
   x: number;
   countryCode: string;
-  data: {
+  data?: {
     country: string;
-    programmeValue: any;
-    public_finance_budget?: any;
-    insurance_and_risk?: any;
-    public_finance_tax?: any;
-    public_finance_debt?: any;
-    private_capital?: any;
-    [key: string]: any; // Allow additional properties
+    all_programmes?: any;
+    public?: any;
+    private?: any;
+    frameworks?: any;
+    biofin?: any;
+    [key: string]: any; // To allow for any additional fields
   };
 }
 

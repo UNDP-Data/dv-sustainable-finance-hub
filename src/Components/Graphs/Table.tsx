@@ -78,7 +78,7 @@ function Table(props: Props) {
                   className='padding-left-05 padding-right-05 padding-top-02 flex-div flex-vert-align-center flex-hor-align-center
 '
                 >
-                  {rowData[field.key] === '1' ? (
+                  {rowData[field.key] > 1 ? (
                     <Check size={18} strokeWidth={3} color='var(--blue-600)' />
                   ) : null}
                 </div>
