@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { csv } from 'd3-fetch';
+import { json, csv } from 'd3-request';
+import { queue } from 'd3-queue';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import Header from './Components/Header';
@@ -17,22 +18,44 @@ function AppContent() {
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<
     CheckboxValueType[]
   >([]);
+  const [sidsCountries, setSidsCountries] = useState<string[]>([]);
+  const [ldcCountries, setLdcCountries] = useState<string[]>([]);
   const { currentProgramme, setCurrentProgramme } = useProgramme();
   const [programmeTotals, setProgrammeTotals] = useState<{
     [key: string]: number;
   }>({});
 
   useEffect(() => {
-    csv(
-      `https://raw.githubusercontent.com/UNDP-Data/dv-sustainable-finance-hub-data-repo/main/SFH_data.csv`,
-    )
-      .then((loadedData: any) => {
+    queue()
+      .defer(
+        csv,
+        'https://raw.githubusercontent.com/UNDP-Data/dv-sustainable-finance-hub-data-repo/main/SFH_data.csv',
+      )
+      .defer(
+        json,
+        'https://raw.githubusercontent.com/UNDP-Data/country-taxonomy-from-azure/main/country_territory_groups.json',
+      )
+      .await((err: any, loadedData: any[], countryTaxonomy: any[]) => {
+        if (err) {
+          console.error('Error loading data:', err);
+          return;
+        }
+
+        // Extract SIDS and LDC country codes
+        const sids = countryTaxonomy
+          .filter((d: any) => d.SIDS === true)
+          .map((d: any) => d['Alpha-3 code']);
+        const ldc = countryTaxonomy
+          .filter((d: any) => d.LDC === true)
+          .map((d: any) => d['Alpha-3 code']);
+
+        setSidsCountries(sids);
+        setLdcCountries(ldc);
+
         // Transform the loaded data
         const transformedData = loadedData.map((item: any) => {
           const allProgrammesSum = SPECIFIED_PROGRAMMES.reduce(
-            (sum, program) => {
-              return sum + (parseInt(item[program.value], 10) || 0);
-            },
+            (sum, program) => sum + (parseInt(item[program.value], 10) || 0),
             0,
           );
 
@@ -123,9 +146,6 @@ function AppContent() {
         };
 
         setProgrammeTotals(totals);
-      })
-      .catch((err: any) => {
-        console.error('Error loading the CSV file:', err);
       });
   }, []);
 
@@ -151,8 +171,13 @@ function AppContent() {
   ): ChoroplethMapDataType[] => {
     const filteredData = rawData.filter(item => {
       if (countryGroup === 'allCountries') return true;
+      if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
+      if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
+      if (countryGroup === 'fragile') return item.fragile === '1';
       return item[countryGroup] === '1';
     });
+
+    console.log('Filtered Data:', filteredData);
 
     return filteredData.map(item => ({
       x: parseFloat(item[programme]),
@@ -164,7 +189,7 @@ function AppContent() {
     }));
   };
 
-  const transformedData = transformData(
+  const filteredAndTransformedData = transformData(
     data,
     currentProgramme.value,
     selectedRadio,
@@ -222,7 +247,7 @@ function AppContent() {
           }}
         >
           <ChoroplethMap
-            data={transformedData}
+            data={filteredAndTransformedData}
             width={1000}
             height={550}
             scale={270}
