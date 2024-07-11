@@ -113,6 +113,7 @@ export const SPECIFIED_PROGRAMMES = [
   },
   {
     label: 'Biofin',
+    short: 'Biofin',
     value: 'biofin',
     color: '#E0529E',
     icon: Flag,
