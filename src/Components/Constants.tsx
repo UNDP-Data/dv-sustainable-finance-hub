@@ -4,6 +4,7 @@ import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
 export interface Programme {
   [x: number]: any;
   label: string;
+  short: string;
   value: string;
   color: string;
   icon: any;

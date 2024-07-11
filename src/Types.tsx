@@ -52,7 +52,7 @@ export interface ChoroplethMapDataType {
     private?: any;
     frameworks?: any;
     biofin?: any;
-    [key: string]: any; // To allow for any additional fields
+    [key: string]: any;
   };
 }
 
