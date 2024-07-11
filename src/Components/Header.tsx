@@ -66,7 +66,10 @@ function Header(props: HeaderProps): JSX.Element {
           >
             About Dashboard
           </p>
-          <Tooltip title='This is some random text for the tooltip'>
+          <Tooltip
+            title='This is some random text for the tooltip'
+            arrow={false}
+          >
             <Info size={14} style={{ color: 'var(--gray-500' }} />
           </Tooltip>
         </div>
