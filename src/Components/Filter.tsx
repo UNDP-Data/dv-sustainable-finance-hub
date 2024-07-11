@@ -23,18 +23,12 @@ function FilterCountryGroup(props: CountryGroupProps): JSX.Element {
   const { onRadioChange, selectedRadio } = props;
 
   return (
-    <div
-      className='padding-04'
-      style={{ border: '0.06rem solid var(--gray-400)' }}
-    >
-      <p className='undp-typography label'>Filter by country group</p>
-      <StyledRadioGroup
-        options={GROUPS}
-        value={selectedRadio}
-        onChange={(e: any) => onRadioChange(e.target.value)}
-        className='undp-radio'
-      />
-    </div>
+    <StyledRadioGroup
+      options={GROUPS}
+      value={selectedRadio}
+      onChange={(e: any) => onRadioChange(e.target.value)}
+      className='undp-radio margin-top-04'
+    />
   );
 }
 

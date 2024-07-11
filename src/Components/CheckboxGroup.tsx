@@ -3,6 +3,7 @@ import { Checkbox } from 'antd';
 import styled from 'styled-components';
 
 const StyledCheckboxGroup = styled(Checkbox.Group)`
+  display: inline-grid;
   .ant-checkbox-wrapper {
     span:last-child {
       font-size: 14px !important;
@@ -19,18 +20,12 @@ interface CheckboxGroupProps {
 
 function CheckboxGroup({ options, onChange, value }: CheckboxGroupProps) {
   return (
-    <div
-      className='padding-04'
-      style={{ border: '0.06rem solid var(--gray-400)' }}
-    >
-      <p className='undp-typography label'>Filter by subcategories</p>
-      <StyledCheckboxGroup
-        options={options}
-        className='undp-checkbox'
-        onChange={onChange}
-        value={value}
-      />
-    </div>
+    <StyledCheckboxGroup
+      options={options}
+      className='undp-checkbox margin-top-04'
+      onChange={onChange}
+      value={value}
+    />
   );
 }
 

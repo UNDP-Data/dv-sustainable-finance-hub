@@ -19,14 +19,14 @@ export const PROGRAMMES = [
   },
   {
     label: 'Public finance for the SDGs',
-    short: 'Public finance for the SDGs',
+    short: 'Public finance',
     value: 'public',
     color: '#5DD4F0',
     icon: School,
   },
   {
     label: 'Unlocking private capital and aligning for the SDGs',
-    short: 'Unlocking private capital',
+    short: 'Private finance',
     value: 'private',
     color: '#02A38A',
     icon: BriefcaseBusiness,
@@ -39,8 +39,8 @@ export const PROGRAMMES = [
     icon: Flag,
   },
   {
-    label: 'Biofin',
-    short: 'Biofin',
+    label: 'Biodiversity Finance',
+    short: 'Biodiversity finance',
     value: 'biofin',
     color: '#E0529E',
     icon: Shell,

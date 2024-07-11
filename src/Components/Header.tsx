@@ -1,62 +1,38 @@
-import { Segmented } from 'antd';
+import { Segmented, Tooltip } from 'antd';
 import styled from 'styled-components';
+import { Info } from 'lucide-react';
 import { useProgramme } from './ProgrammeContext';
 import { PROGRAMMES } from './Constants';
 
 const StyledSegmented = styled(Segmented)<{ selectedColor: string }>`
   background-color: white !important;
   display: flex;
-  width: 100%;
+  width: 60%;
 
   .ant-segmented-item {
-    border: 0.06rem solid var(--gray-400);
-    width: 20%;
+    border-bottom: 0.5rem solid var(--gray-400);
+    border-radius: 0;
+    width: 120px;
     flex: 1;
     color: var(--gray-700);
     display: flex;
-    align-items: center;
     justify-content: flex-start;
-    height: 68px;
-
     &:not(:last-child) {
-      margin-right: 8px; // Add gap between items except the last one
+      margin-right: 4px; // Add gap between items except the last one
     }
-    .ant-segmented-item-label {
-      white-space: normal;
-      display: flex;
-      gap: 16px;
-      padding: 0 16px;
-      align-items: center;
-    }
+  }
+
+  .ant-segmented-item-label {
+    white-space: normal;
+    display: flex;
+    padding: 0 !important;
   }
 
   .ant-segmented-item-selected {
-    background-color: ${({ selectedColor }) => selectedColor} !important;
-    border: 0.07rem solid ${({ selectedColor }) => selectedColor};
-    color: white !important;
-
-    .ant-segmented-item-label {
-      .icon-wrapper {
-        color: white !important; 
-        background-color: #ffffff33;
-        ) !important;  
-      }
-    }
-  }
-`;
-
-const IconWrapper = styled.span<{ color: string }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  border-radius: 100px;
-  background-color: ${({ color }) => `${color}33`};
-  color: ${({ color }) => color};
-  margin-right: 8px; // Space between the icon and the label
-  &.ant-segmented-item-label {
-    color: white !important; // Change icon color for selected item
-    background-color: white !important;
+    border-bottom: 0.5rem solid ${({ selectedColor }) => selectedColor};
+    box-shadow: none;
+    font-weight: 600;
+    font-size: 14px;
   }
 `;
 
@@ -69,30 +45,44 @@ function Header(props: HeaderProps): JSX.Element {
   const { currentProgramme } = useProgramme();
 
   return (
-    <div className='header-container'>
-      <h5
-        style={{ fontWeight: '600', marginBottom: '0.5rem' }}
-        className='undp-typography'
+    <div
+      className='header-container flex-div flex-vert-align-center flex-space-between flex-row margin-00 padding-05'
+      style={{ width: '100%', borderBottom: '0.07rem solid var(--gray-400)' }}
+    >
+      <div
+        className='flex-div flex-column  gap-00 margin-00 padding-00'
+        style={{ width: '25%' }}
       >
-        Sustainable Financial Hub
-      </h5>
+        <p
+          className='undp-typography margin-00 padding-00'
+          style={{ fontSize: '1rem' }}
+        >
+          Sustainable Financial Hub <span className='bold'>Dashboard</span>
+        </p>
+        <div className='flex-div flex-row flex-vert-align-center gap-02 margin-00 padding-00'>
+          <p
+            className='undp-typograph margin-00 padding-00 small-font'
+            style={{ color: 'var(--gray-500)' }}
+          >
+            About Dashboard
+          </p>
+          <Tooltip title='This is some random text for the tooltip'>
+            <Info size={14} style={{ color: 'var(--gray-500' }} />
+          </Tooltip>
+        </div>
+      </div>
       <StyledSegmented
         selectedColor={currentProgramme.color}
         options={PROGRAMMES.map(programme => ({
           label: (
-            <>
-              <IconWrapper className='icon-wrapper' color={programme.color}>
-                <programme.icon />
-              </IconWrapper>
-              <div
-                style={{
-                  lineHeight: '1.2',
-                  textAlign: 'left',
-                }}
-              >
-                {programme.label}
-              </div>
-            </>
+            <p
+              className='undp-typography label'
+              style={{
+                borderBottom: `4px solid ${programme.color}}`,
+              }}
+            >
+              {programme.short}
+            </p>
           ),
           value: programme.value,
         }))}

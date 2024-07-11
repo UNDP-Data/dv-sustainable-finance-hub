@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { json, csv } from 'd3-request';
 import { queue } from 'd3-queue';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
+import { CircleChevronDown, CircleChevronRight } from 'lucide-react';
+import { Segmented } from 'antd';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import Header from './Components/Header';
 import FilterCountryGroup from './Components/Filter';
@@ -10,7 +12,6 @@ import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
 import Cards from './Components/Cards';
-import Summary from './Components/Summary';
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
@@ -21,9 +22,9 @@ function AppContent() {
   const [sidsCountries, setSidsCountries] = useState<string[]>([]);
   const [ldcCountries, setLdcCountries] = useState<string[]>([]);
   const { currentProgramme, setCurrentProgramme } = useProgramme();
-  const [programmeTotals, setProgrammeTotals] = useState<{
-    [key: string]: number;
-  }>({});
+  const [filterExpanded, setFilterExpanded] = useState(true);
+  const [filterTwoExpanded, setFilterTwoExpanded] = useState(true);
+  const [viewMode, setViewMode] = useState<string>('Map'); // Add state for the view mode
 
   useEffect(() => {
     queue()
@@ -80,72 +81,6 @@ function AppContent() {
           };
         });
         setData(transformedData);
-
-        // Calculate totals for each programme
-        const totals = {
-          all_programmes: transformedData.reduce(
-            (sum: number, item: { all_programmes: string }) =>
-              sum + (parseInt(item.all_programmes, 10) || 0),
-            0,
-          ),
-          public: transformedData.reduce(
-            (sum: number, item: { public: string }) =>
-              sum + (parseInt(item.public, 10) || 0),
-            0,
-          ),
-          private: transformedData.reduce(
-            (sum: number, item: { private: string }) =>
-              sum + (parseInt(item.private, 10) || 0),
-            0,
-          ),
-          frameworks: transformedData.reduce(
-            (sum: number, item: { frameworks: string }) =>
-              sum + (parseInt(item.frameworks, 10) || 0),
-            0,
-          ),
-          biofin: transformedData.reduce(
-            (sum: number, item: { biofin: string }) =>
-              sum + (parseInt(item.biofin, 10) || 0),
-            0,
-          ),
-          public_budget: transformedData.reduce(
-            (sum: number, item: { public_budget: string }) =>
-              sum + (parseInt(item.public_budget, 10) || 0),
-            0,
-          ),
-          public_tax: transformedData.reduce(
-            (sum: number, item: { public_tax: string }) =>
-              sum + (parseInt(item.public_tax, 10) || 0),
-            0,
-          ),
-          public_debt: transformedData.reduce(
-            (sum: number, item: { public_debt: string }) =>
-              sum + (parseInt(item.public_debt, 10) || 0),
-            0,
-          ),
-          public_insurance: transformedData.reduce(
-            (sum: number, item: { public_insurance: string }) =>
-              sum + (parseInt(item.public_insurance, 10) || 0),
-            0,
-          ),
-          private_pipelines: transformedData.reduce(
-            (sum: number, item: { private_pipelines: string }) =>
-              sum + (parseInt(item.private_pipelines, 10) || 0),
-            0,
-          ),
-          private_impact: transformedData.reduce(
-            (sum: number, item: { private_impact: string }) =>
-              sum + (parseInt(item.private_impact, 10) || 0),
-            0,
-          ),
-          private_environment: transformedData.reduce(
-            (sum: number, item: { private_environment: string }) =>
-              sum + (parseInt(item.private_environment, 10) || 0),
-            0,
-          ),
-        };
-
-        setProgrammeTotals(totals);
       });
   }, []);
 
@@ -177,8 +112,6 @@ function AppContent() {
       return item[countryGroup] === '1';
     });
 
-    console.log('Filtered Data:', filteredData);
-
     return filteredData.map(item => ({
       x: parseFloat(item[programme]),
       countryCode: item.iso,
@@ -189,13 +122,31 @@ function AppContent() {
     }));
   };
 
+  const transformDataForCards = (
+    rawData: any[],
+    countryGroup: string,
+  ): any[] => {
+    const filteredData = rawData.filter(item => {
+      if (countryGroup === 'allCountries') return true;
+      if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
+      if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
+      if (countryGroup === 'fragile') return item.fragile === '1';
+      return item[countryGroup] === '1';
+    });
+
+    return filteredData;
+  };
+
   const filteredAndTransformedData = transformData(
     data,
     currentProgramme.value,
     selectedRadio,
   );
 
+  const filteredDataForCards = transformDataForCards(data, selectedRadio);
+
   let subcategoriesToShow: { label: string; value: string }[] = [];
+
   if (currentProgramme.value === 'public') {
     subcategoriesToShow = SPECIFIED_PROGRAMMES.filter(program =>
       [
@@ -211,51 +162,144 @@ function AppContent() {
         program.value,
       ),
     ).map(program => ({ label: program.label, value: program.value }));
+  } else if (currentProgramme.value === 'all_programmes') {
+    subcategoriesToShow = PROGRAMMES.filter(
+      program => program.value !== 'all_programmes',
+    ).map(program => ({ label: program.short, value: program.value }));
   }
+
   return (
-    <div className='undp-container flex-div gap-06 flex-wrap flex-hor-align-center padding-04'>
+    <div
+      className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
+      style={{ border: '0.07rem solid var(--gray-400)' }}
+    >
       <Header onSegmentChange={handleSegmentChange} />
-      <div className='flex-div flex-row' style={{ width: '100%' }}>
+      <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
         <div
-          className='flex-div flex-column flex-space-between gap-03 grow'
+          className='flex-div flex-column gap-00 grow'
           style={{
-            width: 'calc(20% - 54px)',
+            width: '25%',
+            borderRight: '0.07rem solid var(--gray-400)',
           }}
         >
-          <div className='flex-div flex-column gap-03'>
-            <FilterCountryGroup
-              onRadioChange={handleRadioChange}
-              selectedRadio={selectedRadio}
-            />
-            {subcategoriesToShow.length > 0 && (
-              <CheckboxGroup
-                options={subcategoriesToShow.map(sub => ({
-                  label: sub.label,
-                  value: sub.value,
-                }))}
-                onChange={handleCheckboxChange}
-                value={selectedCheckboxes}
+          <div className='settings-sections-container'>
+            <button
+              type='button'
+              aria-label='Expand or collapse filters'
+              className='settings-sections-container-title gap-03 margin-bottom-00'
+              onClick={() => {
+                setFilterExpanded(!filterExpanded);
+              }}
+            >
+              <div>
+                {filterExpanded ? (
+                  <CircleChevronDown size={16} />
+                ) : (
+                  <CircleChevronRight size={16} />
+                )}
+              </div>
+              <h6
+                className='undp-typography margin-top-00 margin-bottom-02'
+                style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  letterSpacing: '.03em',
+                }}
+              >
+                Filter By Country Group
+              </h6>
+            </button>
+            <div
+              className='settings-sections-options-container'
+              style={{
+                display: filterExpanded ? 'flex' : 'none',
+              }}
+            >
+              <FilterCountryGroup
+                onRadioChange={handleRadioChange}
+                selectedRadio={selectedRadio}
               />
-            )}
+            </div>
           </div>
-          <Summary totals={programmeTotals} />
+          {subcategoriesToShow.length > 0 && (
+            <div className='settings-sections-container'>
+              <button
+                type='button'
+                aria-label='Expand or collapse filters'
+                className='settings-sections-container-title gap-03 margin-bottom-00'
+                onClick={() => {
+                  setFilterTwoExpanded(!filterTwoExpanded);
+                }}
+              >
+                <div>
+                  {filterTwoExpanded ? (
+                    <CircleChevronDown size={16} />
+                  ) : (
+                    <CircleChevronRight size={16} />
+                  )}
+                </div>
+                <h6
+                  className='undp-typography margin-top-00 margin-bottom-02'
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    letterSpacing: '.03em',
+                  }}
+                >
+                  Filter By programmes
+                </h6>
+              </button>
+              <div
+                className='settings-sections-options-container'
+                style={{
+                  display: filterTwoExpanded ? 'flex' : 'none',
+                }}
+              >
+                <CheckboxGroup
+                  options={subcategoriesToShow.map(sub => ({
+                    label: sub.label,
+                    value: sub.value,
+                  }))}
+                  onChange={handleCheckboxChange}
+                  value={selectedCheckboxes}
+                />
+              </div>
+            </div>
+          )}
+          <div className='flex-div flex-column gap-03' />
         </div>
         <div
           className='flex-div flex-column grow'
           style={{
             width: 'calc(80% - 54px)',
+            backgroundColor: 'var(--gray-100)',
           }}
         >
-          <ChoroplethMap
-            data={filteredAndTransformedData}
-            width={1000}
-            height={550}
-            scale={270}
-            centerPoint={[470, 380]}
+          <Segmented
+            options={['Map', 'Cards']}
+            value={viewMode}
+            onChange={value => setViewMode(value as string)}
+            style={{
+              width: 'fit-content',
+              margin: '0.5rem 0.5rem 0.5rem auto',
+            }}
           />
+          {viewMode === 'Map' ? (
+            <ChoroplethMap
+              data={filteredAndTransformedData}
+              width={1000}
+              height={600}
+              scale={260}
+              centerPoint={[480, 370]}
+            />
+          ) : (
+            <Cards
+              data={filteredDataForCards}
+              programmes={SPECIFIED_PROGRAMMES}
+            />
+          )}
         </div>
       </div>
-      <Cards data={data} programmes={SPECIFIED_PROGRAMMES} />
     </div>
   );
 }
