@@ -269,7 +269,7 @@ function AppContent() {
           <div className='flex-div flex-column gap-03' />
         </div>
         <div
-          className='flex-div flex-column grow'
+          className='flex-div flex-column grow gap-00'
           style={{
             width: 'calc(80% - 54px)',
             backgroundColor: 'var(--gray-100)',
@@ -291,7 +291,7 @@ function AppContent() {
                 width={1000}
                 height={600}
                 scale={260}
-                centerPoint={[480, 350]}
+                centerPoint={[480, 370]}
               />
             </div>
           ) : (

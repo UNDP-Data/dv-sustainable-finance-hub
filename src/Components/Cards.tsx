@@ -19,7 +19,7 @@ const CardContainer = styled.div`
 const Card = styled.div`
   flex: 1 1 calc(25% - 0.75rem); // Four columns
   max-width: calc(25% - 0.75rem);
-  background-color: var(--gray-200);
+  background-color: white;
   display: flex;
   flex-direction: column;
   &:last-of-type {
@@ -29,7 +29,7 @@ const Card = styled.div`
 
 const CountryDiv = styled.div`
   padding: 16px;
-  border-bottom: 0.07rem solid var(--gray-400);
+  border-bottom: 0.07rem solid var(--gray-300);
 `;
 
 const ProgramsDiv = styled.div`
@@ -45,15 +45,16 @@ function Cards(props: Props) {
   const { data, programmes } = props;
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = data.filter(item =>
-    item.country.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredData = data
+    .filter(item =>
+      item.country.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .filter(item => programmes.some(program => item[program.value] === '1'));
 
   return (
-    <div style={{ width: '100%' }} className='margin-top-03'>
+    <div className='padding-04'>
       <Input
         placeholder='Search by country'
-        className='undp-input'
         prefix={<Search size={18} strokeWidth={2.5} color='var(--black)' />}
         onChange={e => setSearchTerm(e.target.value)}
         style={{ width: '100%' }}
@@ -80,7 +81,7 @@ function Cards(props: Props) {
                 {programmesForCountry.length > 0 ? (
                   programmesForCountry.map(program => (
                     <Tag key={program.value} color={program.color}>
-                      {program.label}
+                      {program.short}
                     </Tag>
                   ))
                 ) : (
