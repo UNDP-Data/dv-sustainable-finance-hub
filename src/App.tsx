@@ -171,7 +171,7 @@ function AppContent() {
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
-      style={{ border: '0.07rem solid var(--gray-400)' }}
+      style={{ border: '0.07rem solid var(--gray-400)', maxWidth: '1980px' }}
     >
       <Header onSegmentChange={handleSegmentChange} />
       <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
@@ -285,13 +285,15 @@ function AppContent() {
             }}
           />
           {viewMode === 'Map' ? (
-            <ChoroplethMap
-              data={filteredAndTransformedData}
-              width={1000}
-              height={600}
-              scale={260}
-              centerPoint={[480, 370]}
-            />
+            <div className='flex-div flex-hor-align-center'>
+              <ChoroplethMap
+                data={filteredAndTransformedData}
+                width={1000}
+                height={600}
+                scale={260}
+                centerPoint={[480, 350]}
+              />
+            </div>
           ) : (
             <Cards
               data={filteredDataForCards}
