@@ -52,17 +52,14 @@ function Cards(props: Props) {
     .filter(item => programmes.some(program => item[program.value] === '1'));
 
   return (
-    <div className='padding-04'>
+    <div className='padding-04' style={{ height: '576px', overflow: 'hidden' }}>
       <Input
         placeholder='Search by country'
         prefix={<Search size={18} strokeWidth={2.5} color='var(--black)' />}
         onChange={e => setSearchTerm(e.target.value)}
         style={{ width: '100%' }}
       />
-      <CardContainer
-        className='margin-top-04 undp-scrollbar'
-        style={{ height: '500px' }}
-      >
+      <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item, index) => {
           const programmesForCountry = programmes.filter(
             program => item[program.value] === '1',
