@@ -9,6 +9,12 @@ interface Props {
   programmes: Programme[];
 }
 
+const StyledTag = styled(Tag)`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
 const CardContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -17,11 +23,13 @@ const CardContainer = styled.div`
 `;
 
 const Card = styled.div`
-  flex: 1 1 calc(25% - 0.75rem); // Four columns
-  max-width: calc(25% - 0.75rem);
+  flex: 1 1 250px; /* Flex-grow to occupy available space, minimum width of 250px */
+  max-width: 300px; /* Maximum width to prevent excessive growth */
   background-color: white;
   display: flex;
   flex-direction: column;
+  padding: 16px;
+  border: 1px solid var(--gray-300);
   &:last-of-type {
     margin-right: auto;
   }
@@ -77,9 +85,9 @@ function Cards(props: Props) {
               <ProgramsDiv>
                 {programmesForCountry.length > 0 ? (
                   programmesForCountry.map(program => (
-                    <Tag key={program.value} color={program.color}>
+                    <StyledTag key={program.value} color={program.color}>
                       {program.short}
-                    </Tag>
+                    </StyledTag>
                   ))
                 ) : (
                   <NoProgrammes>No programmes available</NoProgrammes>
