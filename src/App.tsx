@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { json, csv } from 'd3-request';
 import { queue } from 'd3-queue';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
-import { CircleChevronDown, CircleChevronRight } from 'lucide-react';
+import {
+  CircleChevronDown,
+  CircleChevronRight,
+  Globe,
+  LayoutGrid,
+} from 'lucide-react';
 import { Segmented } from 'antd';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import Header from './Components/Header';
@@ -276,12 +281,31 @@ function AppContent() {
           }}
         >
           <Segmented
-            options={['Map', 'Cards']}
+            options={[
+              {
+                label: (
+                  <div className='flex-div flex-vert-align-center gap-02'>
+                    <Globe strokeWidth={1.7} size={16} />
+                    Map
+                  </div>
+                ),
+                value: 'Map',
+              },
+              {
+                label: (
+                  <div className='flex-div flex-vert-align-center gap-02'>
+                    <LayoutGrid strokeWidth={1.7} size={16} />
+                    Cards
+                  </div>
+                ),
+                value: 'Cards',
+              },
+            ]}
             value={viewMode}
-            onChange={value => setViewMode(value as string)}
+            onChange={value => setViewMode(value as string)} // Explicitly cast value to string
             style={{
-              width: 'fit-content',
               margin: '0.5rem 0.5rem 0.5rem auto',
+              width: 'fit-content',
             }}
           />
           {viewMode === 'Map' ? (
