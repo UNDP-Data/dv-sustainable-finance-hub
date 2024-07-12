@@ -23,12 +23,11 @@ const CardContainer = styled.div`
 `;
 
 const Card = styled.div`
-  flex: 1 1 250px; /* Flex-grow to occupy available space, minimum width of 250px */
-  max-width: 300px; /* Maximum width to prevent excessive growth */
+  flex: 1 1 calc(25% - 0.9rem); /* Flex-grow to occupy available space, minimum width of 250px */
+  max-width: 250px; /* Maximum width to prevent excessive growth */
   background-color: white;
   display: flex;
   flex-direction: column;
-  padding: 16px;
   border: 1px solid var(--gray-300);
   &:last-of-type {
     margin-right: auto;
