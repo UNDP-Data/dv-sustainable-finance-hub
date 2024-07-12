@@ -8,6 +8,7 @@ import { useProgramme } from './ProgrammeContext';
 interface Props {
   data: any[];
   taxonomy: { [key: string]: any }[];
+  selectedCheckboxes: string[];
 }
 
 const StyledTag = styled(Tag)`
@@ -45,7 +46,7 @@ const ProgramsDiv = styled.div`
 `;
 
 function Cards(props: Props) {
-  const { data, taxonomy } = props;
+  const { data, taxonomy, selectedCheckboxes } = props;
   const [searchTerm, setSearchTerm] = useState('');
   const { currentProgramme } = useProgramme();
 
@@ -99,9 +100,17 @@ function Cards(props: Props) {
         {filteredData.map((item, index) => {
           const subProgrammesForCountry =
             currentProgramme.value === 'all_programmes'
-              ? subProgrammes.filter(program => item[program.value] === '1')
+              ? subProgrammes.filter(
+                  program =>
+                    item[program.value] === '1' &&
+                    selectedCheckboxes.includes(program.value),
+                )
               : subProgrammes.length > 0
-              ? subProgrammes.filter(program => item[program.value] === '1')
+              ? subProgrammes.filter(
+                  program =>
+                    item[program.value] === '1' &&
+                    selectedCheckboxes.includes(program.value),
+                )
               : [
                   {
                     value: currentProgramme.value,

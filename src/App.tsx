@@ -102,22 +102,30 @@ function AppContent() {
 
   const handleCheckboxChange = useCallback(
     (checkedValues: CheckboxValueType[]) => {
-      setSelectedCheckboxes(checkedValues);
+      setSelectedCheckboxes(checkedValues.map(String));
     },
     [],
   );
 
   const filterData = useCallback(
     (rawData: any[], countryGroup: string) => {
-      return rawData.filter(item => {
+      const filteredByCountry = rawData.filter(item => {
         if (countryGroup === 'allCountries') return true;
         if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
         if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
         if (countryGroup === 'fragile') return item.fragile === '1';
         return item[countryGroup] === '1';
       });
+
+      if (selectedCheckboxes.length === 0) return filteredByCountry;
+
+      return filteredByCountry.filter(item =>
+        selectedCheckboxes.some(
+          sub => typeof sub === 'string' && item[sub] === '1',
+        ),
+      );
     },
-    [sidsCountries, ldcCountries],
+    [sidsCountries, ldcCountries, selectedCheckboxes],
   );
 
   const transformData = useCallback(
@@ -142,6 +150,8 @@ function AppContent() {
     selectedRadio,
   );
 
+  const filteredDataForCards = filterData(data, selectedRadio);
+
   const subcategoriesToShow =
     currentProgramme.value === 'public'
       ? SPECIFIED_PROGRAMMES.filter(program =>
@@ -163,6 +173,11 @@ function AppContent() {
       : currentProgramme.value === 'all_programmes'
       ? PROGRAMMES.filter(program => program.value !== 'all_programmes')
       : [];
+
+  useEffect(() => {
+    const subcategories = subcategoriesToShow.map(sub => sub.value);
+    setSelectedCheckboxes(subcategories);
+  }, [currentProgramme]);
 
   return (
     <div
@@ -297,7 +312,11 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards data={filterData(data, selectedRadio)} taxonomy={taxonomy} />
+            <Cards
+              data={filteredDataForCards}
+              taxonomy={taxonomy}
+              selectedCheckboxes={selectedCheckboxes.map(String)}
+            />
           )}
         </div>
       </div>
