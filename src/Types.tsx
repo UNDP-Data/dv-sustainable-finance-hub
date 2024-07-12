@@ -44,7 +44,7 @@ export interface DonutChartDataType {
 
 export interface ChoroplethMapDataType {
   x: number;
-  countryCode: string;
+  iso: string;
   data?: {
     country: string;
     all_programmes?: any;

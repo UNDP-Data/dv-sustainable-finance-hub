@@ -54,10 +54,10 @@ function Header(props: HeaderProps): JSX.Element {
         style={{ width: '25%' }}
       >
         <p
-          className='undp-typography margin-00 padding-00'
+          className='undp-typography margin-00 padding-00 bold'
           style={{ fontSize: '1rem' }}
         >
-          Sustainable Financial Hub <span className='bold'>Dashboard</span>
+          Sustainable Financial Hub Dashboard
         </p>
         <div className='flex-div flex-row flex-vert-align-center gap-02 margin-00 padding-00'>
           <p

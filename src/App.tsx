@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { json, csv } from 'd3-request';
 import { queue } from 'd3-queue';
 import { CheckboxValueType } from 'antd/es/checkbox/Group';
@@ -29,7 +29,7 @@ function AppContent() {
   const { currentProgramme, setCurrentProgramme } = useProgramme();
   const [filterExpanded, setFilterExpanded] = useState(true);
   const [filterTwoExpanded, setFilterTwoExpanded] = useState(true);
-  const [viewMode, setViewMode] = useState<string>('Map'); // Add state for the view mode
+  const [viewMode, setViewMode] = useState<string>('Map');
 
   useEffect(() => {
     queue()
@@ -47,18 +47,15 @@ function AppContent() {
           return;
         }
 
-        // Extract SIDS and LDC country codes
         const sids = countryTaxonomy
-          .filter((d: any) => d.SIDS === true)
+          .filter((d: any) => d.SIDS)
           .map((d: any) => d['Alpha-3 code']);
         const ldc = countryTaxonomy
-          .filter((d: any) => d.LDC === true)
+          .filter((d: any) => d.LDC)
           .map((d: any) => d['Alpha-3 code']);
-
         setSidsCountries(sids);
         setLdcCountries(ldc);
 
-        // Transform the loaded data
         const transformedData = loadedData.map((item: any) => {
           const allProgrammesSum = SPECIFIED_PROGRAMMES.reduce(
             (sum, program) => sum + (parseInt(item[program.value], 10) || 0),
@@ -89,58 +86,53 @@ function AppContent() {
       });
   }, []);
 
-  const handleSegmentChange = (value: string | number) => {
-    const programme = PROGRAMMES.find(p => p.value === value);
-    if (programme) {
-      setCurrentProgramme(programme);
-    }
-  };
+  const handleSegmentChange = useCallback(
+    (value: string | number) => {
+      const programme = PROGRAMMES.find(p => p.value === value);
+      if (programme) setCurrentProgramme(programme);
+    },
+    [setCurrentProgramme],
+  );
 
-  const handleRadioChange = (value: string) => {
+  const handleRadioChange = useCallback((value: string) => {
     setSelectedRadio(value);
-  };
+  }, []);
 
-  const handleCheckboxChange = (checkedValues: CheckboxValueType[]) => {
-    setSelectedCheckboxes(checkedValues);
-  };
+  const handleCheckboxChange = useCallback(
+    (checkedValues: CheckboxValueType[]) => {
+      setSelectedCheckboxes(checkedValues);
+    },
+    [],
+  );
 
-  const transformData = (
-    rawData: any[],
-    programme: string,
-    countryGroup: string,
-  ): ChoroplethMapDataType[] => {
-    const filteredData = rawData.filter(item => {
-      if (countryGroup === 'allCountries') return true;
-      if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
-      if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
-      if (countryGroup === 'fragile') return item.fragile === '1';
-      return item[countryGroup] === '1';
-    });
+  const filterData = useCallback(
+    (rawData: any[], countryGroup: string) => {
+      return rawData.filter(item => {
+        if (countryGroup === 'allCountries') return true;
+        if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
+        if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
+        if (countryGroup === 'fragile') return item.fragile === '1';
+        return item[countryGroup] === '1';
+      });
+    },
+    [sidsCountries, ldcCountries],
+  );
 
-    return filteredData.map(item => ({
-      x: parseFloat(item[programme]),
-      countryCode: item.iso,
-      data: {
-        country: item.country,
-        ...item,
-      },
-    }));
-  };
-
-  const transformDataForCards = (
-    rawData: any[],
-    countryGroup: string,
-  ): any[] => {
-    const filteredData = rawData.filter(item => {
-      if (countryGroup === 'allCountries') return true;
-      if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
-      if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
-      if (countryGroup === 'fragile') return item.fragile === '1';
-      return item[countryGroup] === '1';
-    });
-
-    return filteredData;
-  };
+  const transformData = useCallback(
+    (
+      rawData: any[],
+      programme: string,
+      countryGroup: string,
+    ): ChoroplethMapDataType[] => {
+      const filteredData = filterData(rawData, countryGroup);
+      return filteredData.map(item => ({
+        x: parseFloat(item[programme]),
+        iso: item.iso,
+        data: { country: item.country, ...item },
+      }));
+    },
+    [filterData],
+  );
 
   const filteredAndTransformedData = transformData(
     data,
@@ -148,30 +140,27 @@ function AppContent() {
     selectedRadio,
   );
 
-  const filteredDataForCards = transformDataForCards(data, selectedRadio);
-
-  let subcategoriesToShow: { label: string; value: string }[] = [];
-
-  if (currentProgramme.value === 'public') {
-    subcategoriesToShow = SPECIFIED_PROGRAMMES.filter(program =>
-      [
-        'public_budget',
-        'public_tax',
-        'public_debt',
-        'public_insurance',
-      ].includes(program.value),
-    ).map(program => ({ label: program.label, value: program.value }));
-  } else if (currentProgramme.value === 'private') {
-    subcategoriesToShow = SPECIFIED_PROGRAMMES.filter(program =>
-      ['private_pipelines', 'private_impact', 'private_environment'].includes(
-        program.value,
-      ),
-    ).map(program => ({ label: program.label, value: program.value }));
-  } else if (currentProgramme.value === 'all_programmes') {
-    subcategoriesToShow = PROGRAMMES.filter(
-      program => program.value !== 'all_programmes',
-    ).map(program => ({ label: program.short, value: program.value }));
-  }
+  const subcategoriesToShow =
+    currentProgramme.value === 'public'
+      ? SPECIFIED_PROGRAMMES.filter(program =>
+          [
+            'public_budget',
+            'public_tax',
+            'public_debt',
+            'public_insurance',
+          ].includes(program.value),
+        )
+      : currentProgramme.value === 'private'
+      ? SPECIFIED_PROGRAMMES.filter(program =>
+          [
+            'private_pipelines',
+            'private_impact',
+            'private_environment',
+          ].includes(program.value),
+        )
+      : currentProgramme.value === 'all_programmes'
+      ? PROGRAMMES.filter(program => program.value !== 'all_programmes')
+      : [];
 
   return (
     <div
@@ -182,19 +171,14 @@ function AppContent() {
       <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
         <div
           className='flex-div flex-column gap-00 grow'
-          style={{
-            width: '25%',
-            borderRight: '0.07rem solid var(--gray-400)',
-          }}
+          style={{ width: '25%', borderRight: '0.07rem solid var(--gray-400)' }}
         >
           <div className='settings-sections-container'>
             <button
               type='button'
               aria-label='Expand or collapse filters'
               className='settings-sections-container-title gap-03 margin-bottom-00'
-              onClick={() => {
-                setFilterExpanded(!filterExpanded);
-              }}
+              onClick={() => setFilterExpanded(!filterExpanded)}
             >
               <div>
                 {filterExpanded ? (
@@ -216,9 +200,7 @@ function AppContent() {
             </button>
             <div
               className='settings-sections-options-container'
-              style={{
-                display: filterExpanded ? 'flex' : 'none',
-              }}
+              style={{ display: filterExpanded ? 'flex' : 'none' }}
             >
               <FilterCountryGroup
                 onRadioChange={handleRadioChange}
@@ -232,9 +214,7 @@ function AppContent() {
                 type='button'
                 aria-label='Expand or collapse filters'
                 className='settings-sections-container-title gap-03 margin-bottom-00'
-                onClick={() => {
-                  setFilterTwoExpanded(!filterTwoExpanded);
-                }}
+                onClick={() => setFilterTwoExpanded(!filterTwoExpanded)}
               >
                 <div>
                   {filterTwoExpanded ? (
@@ -251,18 +231,16 @@ function AppContent() {
                     letterSpacing: '.03em',
                   }}
                 >
-                  Filter By programmes
+                  Filter By Programmes
                 </h6>
               </button>
               <div
                 className='settings-sections-options-container'
-                style={{
-                  display: filterTwoExpanded ? 'flex' : 'none',
-                }}
+                style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
               >
                 <CheckboxGroup
                   options={subcategoriesToShow.map(sub => ({
-                    label: sub.label,
+                    label: sub.short,
                     value: sub.value,
                   }))}
                   onChange={handleCheckboxChange}
@@ -271,7 +249,6 @@ function AppContent() {
               </div>
             </div>
           )}
-          <div className='flex-div flex-column gap-03' />
         </div>
         <div
           className='flex-div flex-column grow gap-00'
@@ -286,8 +263,7 @@ function AppContent() {
               {
                 label: (
                   <div className='flex-div flex-vert-align-center gap-02'>
-                    <Globe strokeWidth={1.7} size={16} />
-                    Map
+                    <Globe strokeWidth={1.7} size={16} /> Map
                   </div>
                 ),
                 value: 'Map',
@@ -295,15 +271,14 @@ function AppContent() {
               {
                 label: (
                   <div className='flex-div flex-vert-align-center gap-02'>
-                    <LayoutGrid strokeWidth={1.7} size={16} />
-                    Cards
+                    <LayoutGrid strokeWidth={1.7} size={16} /> Cards
                   </div>
                 ),
                 value: 'Cards',
               },
             ]}
             value={viewMode}
-            onChange={value => setViewMode(value as string)} // Explicitly cast value to string
+            onChange={value => setViewMode(value as string)}
             style={{
               margin: '0.5rem 0.5rem 0.5rem auto',
               width: 'fit-content',
@@ -320,10 +295,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards
-              data={filteredDataForCards}
-              programmes={SPECIFIED_PROGRAMMES}
-            />
+            <Cards data={filterData(data, selectedRadio)} />
           )}
         </div>
       </div>

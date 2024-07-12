@@ -68,9 +68,7 @@ export function Graph(props: Props) {
       >
         <g ref={mapG}>
           {(World as any).features.map((d: any, i: number) => {
-            const index = data.findIndex(
-              el => el.countryCode === d.properties.ISO3,
-            );
+            const index = data.findIndex(el => el.iso === d.properties.ISO3);
             if (index !== -1 || d.properties.NAME === 'Antarctica') return null;
             return (
               <g key={i}>
@@ -130,7 +128,7 @@ export function Graph(props: Props) {
           })}
           {data.map((d, i) => {
             const index = (World as any).features.findIndex(
-              (el: any) => d.countryCode === el.properties.ISO3,
+              (el: any) => d.iso === el.properties.ISO3,
             );
             let color = 'var(--gray-200)';
             // eslint-disable-next-line no-restricted-globals
@@ -164,7 +162,7 @@ export function Graph(props: Props) {
                   }
                 }}
               >
-                {index === -1 || d.countryCode === 'ATA'
+                {index === -1 || d.iso === 'ATA'
                   ? null
                   : (World as any).features[index].geometry.type ===
                     'MultiPolygon'

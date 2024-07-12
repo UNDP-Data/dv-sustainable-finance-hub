@@ -1,12 +1,12 @@
 import { Search } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Input, Tag } from 'antd';
 import styled from 'styled-components';
-import { Programme } from './Constants';
+import { SPECIFIED_PROGRAMMES, PROGRAMMES } from './Constants';
+import { useProgramme } from './ProgrammeContext';
 
 interface Props {
-  data: any[]; // Use any[] to accommodate the raw data structure
-  programmes: Programme[];
+  data: any[];
 }
 
 const StyledTag = styled(Tag)`
@@ -23,8 +23,8 @@ const CardContainer = styled.div`
 `;
 
 const Card = styled.div`
-  flex: 1 1 calc(25% - 0.9rem); /* Flex-grow to occupy available space, minimum width of 250px */
-  max-width: 250px; /* Maximum width to prevent excessive growth */
+  flex: 1 1 calc(25% - 0.9rem);
+  max-width: 250px;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -43,20 +43,43 @@ const ProgramsDiv = styled.div`
   padding: 16px;
 `;
 
-const NoProgrammes = styled.div`
-  font-size: 12px;
-  color: var(--gray-500);
-`;
-
 function Cards(props: Props) {
-  const { data, programmes } = props;
+  const { data } = props;
   const [searchTerm, setSearchTerm] = useState('');
+  const { currentProgramme } = useProgramme();
 
-  const filteredData = data
-    .filter(item =>
-      item.country.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    .filter(item => programmes.some(program => item[program.value] === '1'));
+  const filteredData = useMemo(() => {
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    return data.filter(item =>
+      item.country.toLowerCase().includes(lowercasedSearchTerm),
+    );
+  }, [data, searchTerm]);
+
+  const subProgrammes = useMemo(() => {
+    if (currentProgramme.value === 'public') {
+      return SPECIFIED_PROGRAMMES.filter(program =>
+        [
+          'public_budget',
+          'public_tax',
+          'public_debt',
+          'public_insurance',
+        ].includes(program.value),
+      );
+    }
+    if (currentProgramme.value === 'private') {
+      return SPECIFIED_PROGRAMMES.filter(program =>
+        ['private_pipelines', 'private_impact', 'private_environment'].includes(
+          program.value,
+        ),
+      );
+    }
+    if (currentProgramme.value === 'all_programmes') {
+      return PROGRAMMES.filter(program =>
+        ['public', 'private', 'frameworks', 'biofin'].includes(program.value),
+      );
+    }
+    return [];
+  }, [currentProgramme.value]);
 
   return (
     <div className='padding-04' style={{ height: '576px', overflow: 'scroll' }}>
@@ -68,9 +91,27 @@ function Cards(props: Props) {
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item, index) => {
-          const programmesForCountry = programmes.filter(
-            program => item[program.value] === '1',
-          );
+          const subProgrammesForCountry =
+            currentProgramme.value === 'all_programmes'
+              ? subProgrammes.filter(program => item[program.value] === '1')
+              : subProgrammes.length > 0
+              ? subProgrammes.filter(program => item[program.value] === '1')
+              : [
+                  {
+                    value: currentProgramme.value,
+                    short: currentProgramme.short,
+                    color: currentProgramme.color,
+                  },
+                ];
+
+          const showCard =
+            currentProgramme.value === 'all_programmes'
+              ? subProgrammesForCountry.length > 0
+              : item[currentProgramme.value] === '1' ||
+                subProgrammesForCountry.length > 0;
+
+          if (!showCard) return null;
+
           return (
             <Card key={index}>
               <CountryDiv>
@@ -82,15 +123,11 @@ function Cards(props: Props) {
                 </h6>
               </CountryDiv>
               <ProgramsDiv>
-                {programmesForCountry.length > 0 ? (
-                  programmesForCountry.map(program => (
-                    <StyledTag key={program.value} color={program.color}>
-                      {program.short}
-                    </StyledTag>
-                  ))
-                ) : (
-                  <NoProgrammes>No programmes available</NoProgrammes>
-                )}
+                {subProgrammesForCountry.map(program => (
+                  <StyledTag key={program.value} color={program.color}>
+                    {program.short}
+                  </StyledTag>
+                ))}
               </ProgramsDiv>
             </Card>
           );
