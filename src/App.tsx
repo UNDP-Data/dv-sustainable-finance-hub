@@ -135,13 +135,49 @@ function AppContent() {
       countryGroup: string,
     ): ChoroplethMapDataType[] => {
       const filteredData = filterData(rawData, countryGroup);
-      return filteredData.map(item => ({
-        x: parseFloat(item[programme]),
-        iso: item.iso,
-        data: { country: item.country, ...item },
-      }));
+
+      return filteredData.map(item => {
+        let value = 0;
+
+        if (programme === 'all_programmes') {
+          if (selectedCheckboxes.includes('public')) {
+            const publicSum = [
+              'public_budget',
+              'public_tax',
+              'public_debt',
+              'public_insurance',
+            ].reduce((sum, sub) => sum + (parseInt(item[sub], 10) || 0), 0);
+            value += publicSum;
+          }
+
+          if (selectedCheckboxes.includes('private')) {
+            const privateSum = [
+              'private_pipelines',
+              'private_impact',
+              'private_environment',
+            ].reduce((sum, sub) => sum + (parseInt(item[sub], 10) || 0), 0);
+            value += privateSum;
+          }
+
+          if (selectedCheckboxes.includes('frameworks')) {
+            value += parseInt(item.frameworks, 10) || 0;
+          }
+
+          if (selectedCheckboxes.includes('biofin')) {
+            value += parseInt(item.biofin, 10) || 0;
+          }
+        } else {
+          value = parseFloat(item[programme]);
+        }
+
+        return {
+          x: value,
+          iso: item.iso,
+          data: { country: item.country, ...item },
+        };
+      });
     },
-    [filterData],
+    [filterData, selectedCheckboxes],
   );
 
   const filteredAndTransformedData = transformData(

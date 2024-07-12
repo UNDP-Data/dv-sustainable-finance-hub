@@ -88,6 +88,57 @@ function Cards(props: Props) {
     return country ? country['Country or Area'] : iso;
   };
 
+  const getProgramTags = (item: any) => {
+    if (currentProgramme.value === 'all_programmes') {
+      const tags: { value: string; short: string; color: string }[] = [];
+
+      if (
+        ['public_budget', 'public_tax', 'public_debt', 'public_insurance'].some(
+          sub => item[sub] === '1',
+        )
+      ) {
+        tags.push({
+          value: 'public',
+          short: 'Public finance',
+          color: '#5DD4F0',
+        });
+      }
+      if (
+        ['private_pipelines', 'private_impact', 'private_environment'].some(
+          sub => item[sub] === '1',
+        )
+      ) {
+        tags.push({
+          value: 'private',
+          short: 'Private finance',
+          color: '#02A38A',
+        });
+      }
+      if (item.frameworks === '1') {
+        tags.push({
+          value: 'frameworks',
+          short: 'Integrated Frameworks',
+          color: '#E78625',
+        });
+      }
+      if (item.biofin === '1') {
+        tags.push({
+          value: 'biofin',
+          short: 'Biodiversity finance',
+          color: '#E0529E',
+        });
+      }
+
+      return tags.filter(tag => selectedCheckboxes.includes(tag.value));
+    }
+
+    return subProgrammes.filter(
+      program =>
+        item[program.value] === '1' &&
+        selectedCheckboxes.includes(program.value),
+    );
+  };
+
   return (
     <div className='padding-04' style={{ height: '576px', overflow: 'scroll' }}>
       <Input
@@ -98,32 +149,9 @@ function Cards(props: Props) {
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item, index) => {
-          const subProgrammesForCountry =
-            currentProgramme.value === 'all_programmes'
-              ? subProgrammes.filter(
-                  program =>
-                    item[program.value] === '1' &&
-                    selectedCheckboxes.includes(program.value),
-                )
-              : subProgrammes.length > 0
-              ? subProgrammes.filter(
-                  program =>
-                    item[program.value] === '1' &&
-                    selectedCheckboxes.includes(program.value),
-                )
-              : [
-                  {
-                    value: currentProgramme.value,
-                    short: currentProgramme.short,
-                    color: currentProgramme.color,
-                  },
-                ];
+          const subProgrammesForCountry = getProgramTags(item);
 
-          const showCard =
-            currentProgramme.value === 'all_programmes'
-              ? subProgrammesForCountry.length > 0
-              : item[currentProgramme.value] === '1' ||
-                subProgrammesForCountry.length > 0;
+          const showCard = subProgrammesForCountry.length > 0;
 
           if (!showCard) return null;
 
