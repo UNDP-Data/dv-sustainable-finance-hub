@@ -57,30 +57,55 @@ function AppContent() {
         setSidsCountries(sids);
         setLdcCountries(ldc);
 
-        const transformedData = loadedData.map((item: any) => {
-          const allProgrammesSum =
-            PROGRAMMES[0].subprogrammes?.reduce(
-              (sum, program) => sum + (parseInt(item[program.value], 10) || 0),
-              0,
-            ) || 0;
+        // Convert string values to numbers
+        const numericData = loadedData.map((item: any) => {
+          const transformedItem = { ...item };
+          Object.keys(transformedItem).forEach(key => {
+            const value = parseInt(transformedItem[key], 10);
+            // eslint-disable-next-line no-restricted-globals
+            transformedItem[key] = isNaN(value) ? transformedItem[key] : value;
+          });
+          return transformedItem;
+        });
 
-          const publicProgramme = PROGRAMMES[0].subprogrammes?.find(
-            p => p.value === 'public',
-          );
-          const publicFinanceSum =
-            publicProgramme?.subprogrammes?.reduce(
-              (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
-              0,
-            ) || 0;
+        const relevantSubprogrammes = [
+          'public_tax',
+          'public_debt',
+          'public_budget',
+          'public_insurance',
+          'private_pipelines',
+          'private_impact',
+          'private_environment',
+          'frameworks',
+          'biofin',
+        ];
 
-          const privateProgramme = PROGRAMMES[0].subprogrammes?.find(
-            p => p.value === 'private',
+        const transformedData = numericData.map((item: any) => {
+          const allProgrammesSum = relevantSubprogrammes.reduce(
+            (sum, program) => sum + (item[program] || 0),
+            0,
           );
-          const privateCapitalSum =
-            privateProgramme?.subprogrammes?.reduce(
-              (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
-              0,
-            ) || 0;
+
+          const publicSubprogrammes = [
+            'public_tax',
+            'public_debt',
+            'public_budget',
+            'public_insurance',
+          ];
+          const publicFinanceSum = publicSubprogrammes.reduce(
+            (sum, sub) => sum + (item[sub] || 0),
+            0,
+          );
+
+          const privateSubprogrammes = [
+            'private_pipelines',
+            'private_impact',
+            'private_environment',
+          ];
+          const privateCapitalSum = privateSubprogrammes.reduce(
+            (sum, sub) => sum + (item[sub] || 0),
+            0,
+          );
 
           return {
             ...item,
@@ -89,6 +114,8 @@ function AppContent() {
             private: privateCapitalSum,
           };
         });
+
+        console.log('Transformed data:', transformedData);
         setData(transformedData);
         setTaxonomy(countryTaxonomy);
       });
@@ -127,17 +154,22 @@ function AppContent() {
         if (countryGroup === 'allCountries') return true;
         if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
         if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
-        if (countryGroup === 'fragile') return item.fragile === '1';
-        return item[countryGroup] === '1';
+        if (countryGroup === 'fragile') return item.fragile > 0;
+        return item[countryGroup] > 0;
       });
+
+      console.log('Filtered by country:', filteredByCountry);
 
       if (selectedCheckboxes.length === 0) return filteredByCountry;
 
-      return filteredByCountry.filter(item =>
+      const filteredByCheckboxes = filteredByCountry.filter(item =>
         selectedCheckboxes.some(
-          sub => typeof sub === 'string' && item[sub] === '1',
+          sub => typeof sub === 'string' && item[sub] > 0,
         ),
       );
+
+      console.log('Filtered by checkboxes:', filteredByCheckboxes);
+      return filteredByCheckboxes;
     },
     [sidsCountries, ldcCountries, selectedCheckboxes],
   );
@@ -154,23 +186,29 @@ function AppContent() {
         let value = 0;
 
         if (programme === 'all_programmes') {
-          const mainProgrammes = PROGRAMMES[0].subprogrammes || [];
-          mainProgrammes.forEach(mainProgramme => {
-            if (selectedCheckboxes.includes(mainProgramme.value)) {
-              value +=
-                mainProgramme.subprogrammes?.reduce(
-                  (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
-                  0,
-                ) || 0;
-            }
-          });
+          const relevantSubprogrammes = [
+            'public_tax',
+            'public_debt',
+            'public_budget',
+            'public_insurance',
+            'private_pipelines',
+            'private_impact',
+            'private_environment',
+            'frameworks',
+            'biofin',
+          ];
+
+          value = relevantSubprogrammes.reduce(
+            (sum, sub) => sum + (item[sub] || 0),
+            0,
+          );
         } else if (currentProgramme.subprogrammes) {
           value = currentProgramme.subprogrammes.reduce(
-            (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
+            (sum, sub) => sum + (item[sub.value] || 0),
             0,
           );
         } else {
-          value = parseFloat(item[programme]);
+          value = item[programme] || 0;
         }
 
         return {
@@ -183,11 +221,19 @@ function AppContent() {
     [filterData, selectedCheckboxes, currentProgramme],
   );
 
+  useEffect(() => {
+    console.log('Current Programme:', currentProgramme);
+  }, [currentProgramme]);
+
   const filteredAndTransformedData = transformData(
     data,
     currentProgramme.value,
     selectedRadio,
   );
+
+  useEffect(() => {
+    console.log('Filtered and Transformed Data:', filteredAndTransformedData);
+  }, [filteredAndTransformedData]);
 
   const filteredDataForCards = filterData(data, selectedRadio);
 
@@ -197,6 +243,10 @@ function AppContent() {
     const subcategories = subcategoriesToShow.map(sub => sub.value);
     setSelectedCheckboxes(subcategories);
   }, [currentProgramme, subcategoriesToShow]);
+
+  useEffect(() => {
+    console.log('Filtered Data for Cards:', filteredDataForCards);
+  }, [filteredDataForCards]);
 
   return (
     <div

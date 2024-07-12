@@ -16,17 +16,18 @@ const StyledSegmented = styled(Segmented)<{ selectedColor: string }>`
     flex: 1;
     color: var(--gray-700);
     display: flex;
-    justify-content: center; /* Center align text */
+    justify-content: center;
     &:not(:last-child) {
-      margin-right: 4px; /* Add gap between items except the last one */
+      margin-right: 4px;
     }
   }
 
   .ant-segmented-item-label {
     white-space: normal;
     display: flex;
-    justify-content: center; /* Center align text */
+    justify-content: center;
     padding: 0 !important;
+    align-items: center;
   }
 
   .ant-segmented-item-selected {
@@ -57,12 +58,16 @@ function Header(props: HeaderProps): JSX.Element {
   const options = [
     {
       label: (
-        <p className='undp-typography label'>{allProgrammesOption?.short}</p>
+        <p className='undp-typography label margin-00'>
+          {allProgrammesOption?.short}
+        </p>
       ),
       value: allProgrammesOption?.value || 'all_programmes',
     },
     ...mainSubprogrammes.map(programme => ({
-      label: <p className='undp-typography label'>{programme.short}</p>,
+      label: (
+        <p className='undp-typography label margin-00'>{programme.short}</p>
+      ),
       value: programme.value,
     })),
   ];

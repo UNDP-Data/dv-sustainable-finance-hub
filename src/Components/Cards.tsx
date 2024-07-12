@@ -70,9 +70,9 @@ function Cards(props: Props) {
         allProgrammes?.subprogrammes
           ?.filter(program => {
             if (program.subprogrammes) {
-              return program.subprogrammes.some(sub => item[sub.value] === '1');
+              return program.subprogrammes.some(sub => item[sub.value] > 0);
             }
-            return item[program.value] === '1';
+            return item[program.value] > 0;
           })
           .map(program => ({
             value: program.value,
@@ -86,7 +86,7 @@ function Cards(props: Props) {
     // Handle cases for individual programmes
     if (currentProgramme.subprogrammes) {
       const subprogrammeTags = currentProgramme.subprogrammes
-        .filter(sub => item[sub.value] === '1')
+        .filter(sub => item[sub.value] > 0)
         .map(sub => sub);
 
       if (subprogrammeTags.length > 0) {
@@ -94,7 +94,7 @@ function Cards(props: Props) {
       }
     }
 
-    if (item[currentProgramme.value] === '1') {
+    if (item[currentProgramme.value] > 0) {
       return [currentProgramme];
     }
 
