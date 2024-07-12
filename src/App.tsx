@@ -12,7 +12,7 @@ import { Segmented } from 'antd';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import Header from './Components/Header';
 import FilterCountryGroup from './Components/Filter';
-import { PROGRAMMES, SPECIFIED_PROGRAMMES } from './Components/Constants';
+import { PROGRAMMES } from './Components/Constants';
 import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
@@ -58,23 +58,29 @@ function AppContent() {
         setLdcCountries(ldc);
 
         const transformedData = loadedData.map((item: any) => {
-          const allProgrammesSum = SPECIFIED_PROGRAMMES.reduce(
-            (sum, program) => sum + (parseInt(item[program.value], 10) || 0),
-            0,
+          const allProgrammesSum =
+            PROGRAMMES[0].subprogrammes?.reduce(
+              (sum, program) => sum + (parseInt(item[program.value], 10) || 0),
+              0,
+            ) || 0;
+
+          const publicProgramme = PROGRAMMES[0].subprogrammes?.find(
+            p => p.value === 'public',
           );
+          const publicFinanceSum =
+            publicProgramme?.subprogrammes?.reduce(
+              (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
+              0,
+            ) || 0;
 
-          const publicFinanceSum = [
-            'public_tax',
-            'public_debt',
-            'public_budget',
-            'public_insurance',
-          ].reduce((sum, key) => sum + (parseInt(item[key], 10) || 0), 0);
-
-          const privateCapitalSum = [
-            'private_pipelines',
-            'private_impact',
-            'private_environment',
-          ].reduce((sum, key) => sum + (parseInt(item[key], 10) || 0), 0);
+          const privateProgramme = PROGRAMMES[0].subprogrammes?.find(
+            p => p.value === 'private',
+          );
+          const privateCapitalSum =
+            privateProgramme?.subprogrammes?.reduce(
+              (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
+              0,
+            ) || 0;
 
           return {
             ...item,
@@ -90,8 +96,16 @@ function AppContent() {
 
   const handleSegmentChange = useCallback(
     (value: string | number) => {
-      const programme = PROGRAMMES.find(p => p.value === value);
-      if (programme) setCurrentProgramme(programme);
+      const allProgrammesOption = PROGRAMMES.find(
+        p => p.value === 'all_programmes',
+      );
+      const programme =
+        allProgrammesOption?.subprogrammes?.find(p => p.value === value) ||
+        PROGRAMMES.find(p => p.value === value);
+
+      if (programme) {
+        setCurrentProgramme(programme);
+      }
     },
     [setCurrentProgramme],
   );
@@ -140,32 +154,21 @@ function AppContent() {
         let value = 0;
 
         if (programme === 'all_programmes') {
-          if (selectedCheckboxes.includes('public')) {
-            const publicSum = [
-              'public_budget',
-              'public_tax',
-              'public_debt',
-              'public_insurance',
-            ].reduce((sum, sub) => sum + (parseInt(item[sub], 10) || 0), 0);
-            value += publicSum;
-          }
-
-          if (selectedCheckboxes.includes('private')) {
-            const privateSum = [
-              'private_pipelines',
-              'private_impact',
-              'private_environment',
-            ].reduce((sum, sub) => sum + (parseInt(item[sub], 10) || 0), 0);
-            value += privateSum;
-          }
-
-          if (selectedCheckboxes.includes('frameworks')) {
-            value += parseInt(item.frameworks, 10) || 0;
-          }
-
-          if (selectedCheckboxes.includes('biofin')) {
-            value += parseInt(item.biofin, 10) || 0;
-          }
+          const mainProgrammes = PROGRAMMES[0].subprogrammes || [];
+          mainProgrammes.forEach(mainProgramme => {
+            if (selectedCheckboxes.includes(mainProgramme.value)) {
+              value +=
+                mainProgramme.subprogrammes?.reduce(
+                  (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
+                  0,
+                ) || 0;
+            }
+          });
+        } else if (currentProgramme.subprogrammes) {
+          value = currentProgramme.subprogrammes.reduce(
+            (sum, sub) => sum + (parseInt(item[sub.value], 10) || 0),
+            0,
+          );
         } else {
           value = parseFloat(item[programme]);
         }
@@ -177,7 +180,7 @@ function AppContent() {
         };
       });
     },
-    [filterData, selectedCheckboxes],
+    [filterData, selectedCheckboxes, currentProgramme],
   );
 
   const filteredAndTransformedData = transformData(
@@ -188,32 +191,12 @@ function AppContent() {
 
   const filteredDataForCards = filterData(data, selectedRadio);
 
-  const subcategoriesToShow =
-    currentProgramme.value === 'public'
-      ? SPECIFIED_PROGRAMMES.filter(program =>
-          [
-            'public_budget',
-            'public_tax',
-            'public_debt',
-            'public_insurance',
-          ].includes(program.value),
-        )
-      : currentProgramme.value === 'private'
-      ? SPECIFIED_PROGRAMMES.filter(program =>
-          [
-            'private_pipelines',
-            'private_impact',
-            'private_environment',
-          ].includes(program.value),
-        )
-      : currentProgramme.value === 'all_programmes'
-      ? PROGRAMMES.filter(program => program.value !== 'all_programmes')
-      : [];
+  const subcategoriesToShow = currentProgramme.subprogrammes || [];
 
   useEffect(() => {
     const subcategories = subcategoriesToShow.map(sub => sub.value);
     setSelectedCheckboxes(subcategories);
-  }, [currentProgramme]);
+  }, [currentProgramme, subcategoriesToShow]);
 
   return (
     <div

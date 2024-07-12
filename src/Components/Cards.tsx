@@ -2,7 +2,7 @@ import { Search } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import { Input, Tag } from 'antd';
 import styled from 'styled-components';
-import { SPECIFIED_PROGRAMMES, PROGRAMMES } from './Constants';
+import { PROGRAMMES } from './Constants';
 import { useProgramme } from './ProgrammeContext';
 
 interface Props {
@@ -57,32 +57,6 @@ function Cards(props: Props) {
     );
   }, [data, searchTerm]);
 
-  const subProgrammes = useMemo(() => {
-    if (currentProgramme.value === 'public') {
-      return SPECIFIED_PROGRAMMES.filter(program =>
-        [
-          'public_budget',
-          'public_tax',
-          'public_debt',
-          'public_insurance',
-        ].includes(program.value),
-      );
-    }
-    if (currentProgramme.value === 'private') {
-      return SPECIFIED_PROGRAMMES.filter(program =>
-        ['private_pipelines', 'private_impact', 'private_environment'].includes(
-          program.value,
-        ),
-      );
-    }
-    if (currentProgramme.value === 'all_programmes') {
-      return PROGRAMMES.filter(program =>
-        ['public', 'private', 'frameworks', 'biofin'].includes(program.value),
-      );
-    }
-    return [];
-  }, [currentProgramme.value]);
-
   const getCountryName = (iso: string) => {
     const country = taxonomy.find(item => item['Alpha-3 code'] === iso);
     return country ? country['Country or Area'] : iso;
@@ -90,53 +64,41 @@ function Cards(props: Props) {
 
   const getProgramTags = (item: any) => {
     if (currentProgramme.value === 'all_programmes') {
-      const tags: { value: string; short: string; color: string }[] = [];
+      const allProgrammes = PROGRAMMES.find(p => p.value === 'all_programmes');
 
-      if (
-        ['public_budget', 'public_tax', 'public_debt', 'public_insurance'].some(
-          sub => item[sub] === '1',
-        )
-      ) {
-        tags.push({
-          value: 'public',
-          short: 'Public finance',
-          color: '#5DD4F0',
-        });
-      }
-      if (
-        ['private_pipelines', 'private_impact', 'private_environment'].some(
-          sub => item[sub] === '1',
-        )
-      ) {
-        tags.push({
-          value: 'private',
-          short: 'Private finance',
-          color: '#02A38A',
-        });
-      }
-      if (item.frameworks === '1') {
-        tags.push({
-          value: 'frameworks',
-          short: 'Integrated Frameworks',
-          color: '#E78625',
-        });
-      }
-      if (item.biofin === '1') {
-        tags.push({
-          value: 'biofin',
-          short: 'Biodiversity finance',
-          color: '#E0529E',
-        });
-      }
-
-      return tags.filter(tag => selectedCheckboxes.includes(tag.value));
+      return (
+        allProgrammes?.subprogrammes
+          ?.filter(program => {
+            if (program.subprogrammes) {
+              return program.subprogrammes.some(sub => item[sub.value] === '1');
+            }
+            return item[program.value] === '1';
+          })
+          .map(program => ({
+            value: program.value,
+            short: program.short,
+            color: program.color,
+          }))
+          .filter(program => selectedCheckboxes.includes(program.value)) || []
+      );
     }
 
-    return subProgrammes.filter(
-      program =>
-        item[program.value] === '1' &&
-        selectedCheckboxes.includes(program.value),
-    );
+    // Handle cases for individual programmes
+    if (currentProgramme.subprogrammes) {
+      const subprogrammeTags = currentProgramme.subprogrammes
+        .filter(sub => item[sub.value] === '1')
+        .map(sub => sub);
+
+      if (subprogrammeTags.length > 0) {
+        return subprogrammeTags;
+      }
+    }
+
+    if (item[currentProgramme.value] === '1') {
+      return [currentProgramme];
+    }
+
+    return [];
   };
 
   return (
@@ -149,9 +111,9 @@ function Cards(props: Props) {
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item, index) => {
-          const subProgrammesForCountry = getProgramTags(item);
+          const programTagsForCountry = getProgramTags(item);
 
-          const showCard = subProgrammesForCountry.length > 0;
+          const showCard = programTagsForCountry.length > 0;
 
           if (!showCard) return null;
 
@@ -166,7 +128,7 @@ function Cards(props: Props) {
                 </h6>
               </CountryDiv>
               <ProgramsDiv>
-                {subProgrammesForCountry.map(program => (
+                {programTagsForCountry.map(program => (
                   <StyledTag key={program.value} color={program.color}>
                     {program.short}
                   </StyledTag>

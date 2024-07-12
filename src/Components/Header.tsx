@@ -16,15 +16,16 @@ const StyledSegmented = styled(Segmented)<{ selectedColor: string }>`
     flex: 1;
     color: var(--gray-700);
     display: flex;
-    justify-content: flex-start;
+    justify-content: center; /* Center align text */
     &:not(:last-child) {
-      margin-right: 4px; // Add gap between items except the last one
+      margin-right: 4px; /* Add gap between items except the last one */
     }
   }
 
   .ant-segmented-item-label {
     white-space: normal;
     display: flex;
+    justify-content: center; /* Center align text */
     padding: 0 !important;
   }
 
@@ -37,12 +38,34 @@ const StyledSegmented = styled(Segmented)<{ selectedColor: string }>`
 `;
 
 interface HeaderProps {
-  onSegmentChange: (value: any) => void; // Callback function prop
+  onSegmentChange: (value: string | number) => void; // Callback function prop
 }
 
 function Header(props: HeaderProps): JSX.Element {
   const { onSegmentChange } = props;
   const { currentProgramme } = useProgramme();
+
+  // Get the "All Programmes" option
+  const allProgrammesOption = PROGRAMMES.find(
+    programme => programme.value === 'all_programmes',
+  );
+
+  // Get all main subprogrammes under 'all_programmes'
+  const mainSubprogrammes = allProgrammesOption?.subprogrammes || [];
+
+  // Prepare the options for the Segmented component
+  const options = [
+    {
+      label: (
+        <p className='undp-typography label'>{allProgrammesOption?.short}</p>
+      ),
+      value: allProgrammesOption?.value || 'all_programmes',
+    },
+    ...mainSubprogrammes.map(programme => ({
+      label: <p className='undp-typography label'>{programme.short}</p>,
+      value: programme.value,
+    })),
+  ];
 
   return (
     <div
@@ -50,7 +73,7 @@ function Header(props: HeaderProps): JSX.Element {
       style={{ width: '100%', borderBottom: '0.07rem solid var(--gray-400)' }}
     >
       <div
-        className='flex-div flex-column  gap-00 margin-00 padding-00'
+        className='flex-div flex-column gap-00 margin-00 padding-00'
         style={{ width: '25%' }}
       >
         <p
@@ -61,7 +84,7 @@ function Header(props: HeaderProps): JSX.Element {
         </p>
         <div className='flex-div flex-row flex-vert-align-center gap-02 margin-00 padding-00'>
           <p
-            className='undp-typograph margin-00 padding-00 small-font'
+            className='undp-typography margin-00 padding-00 small-font'
             style={{ color: 'var(--gray-500)' }}
           >
             About Dashboard
@@ -76,20 +99,9 @@ function Header(props: HeaderProps): JSX.Element {
       </div>
       <StyledSegmented
         selectedColor={currentProgramme.color}
-        options={PROGRAMMES.map(programme => ({
-          label: (
-            <p
-              className='undp-typography label'
-              style={{
-                borderBottom: `4px solid ${programme.color}}`,
-              }}
-            >
-              {programme.short}
-            </p>
-          ),
-          value: programme.value,
-        }))}
+        options={options}
         onChange={onSegmentChange}
+        value={currentProgramme.value}
       />
     </div>
   );
