@@ -20,6 +20,7 @@ import Cards from './Components/Cards';
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
+  const [taxonomy, setTaxonomy] = useState<any[]>([]);
   const [selectedRadio, setSelectedRadio] = useState<string>('allCountries');
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<
     CheckboxValueType[]
@@ -83,6 +84,7 @@ function AppContent() {
           };
         });
         setData(transformedData);
+        setTaxonomy(countryTaxonomy);
       });
   }, []);
 
@@ -295,7 +297,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards data={filterData(data, selectedRadio)} />
+            <Cards data={filterData(data, selectedRadio)} taxonomy={taxonomy} />
           )}
         </div>
       </div>

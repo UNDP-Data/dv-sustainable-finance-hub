@@ -7,6 +7,7 @@ import { useProgramme } from './ProgrammeContext';
 
 interface Props {
   data: any[];
+  taxonomy: { [key: string]: any }[];
 }
 
 const StyledTag = styled(Tag)`
@@ -44,7 +45,7 @@ const ProgramsDiv = styled.div`
 `;
 
 function Cards(props: Props) {
-  const { data } = props;
+  const { data, taxonomy } = props;
   const [searchTerm, setSearchTerm] = useState('');
   const { currentProgramme } = useProgramme();
 
@@ -80,6 +81,11 @@ function Cards(props: Props) {
     }
     return [];
   }, [currentProgramme.value]);
+
+  const getCountryName = (iso: string) => {
+    const country = taxonomy.find(item => item['Alpha-3 code'] === iso);
+    return country ? country['Country or Area'] : iso;
+  };
 
   return (
     <div className='padding-04' style={{ height: '576px', overflow: 'scroll' }}>
@@ -119,7 +125,7 @@ function Cards(props: Props) {
                   style={{ fontSize: '12px' }}
                   className='undp-typography margin-00'
                 >
-                  {item.country}
+                  {getCountryName(item.iso)}
                 </h6>
               </CountryDiv>
               <ProgramsDiv>
