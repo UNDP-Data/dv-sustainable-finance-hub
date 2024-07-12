@@ -278,6 +278,7 @@ function AppContent() {
           style={{
             width: 'calc(80% - 54px)',
             backgroundColor: 'var(--gray-100)',
+            overflow: 'hidden',
           }}
         >
           <Segmented
