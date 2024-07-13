@@ -68,55 +68,7 @@ function AppContent() {
           return transformedItem;
         });
 
-        const relevantSubprogrammes = [
-          'public_tax',
-          'public_debt',
-          'public_budget',
-          'public_insurance',
-          'private_pipelines',
-          'private_impact',
-          'private_environment',
-          'frameworks',
-          'biofin',
-        ];
-
-        const transformedData = numericData.map((item: any) => {
-          const allProgrammesSum = relevantSubprogrammes.reduce(
-            (sum, program) => sum + (item[program] || 0),
-            0,
-          );
-
-          const publicSubprogrammes = [
-            'public_tax',
-            'public_debt',
-            'public_budget',
-            'public_insurance',
-          ];
-          const publicFinanceSum = publicSubprogrammes.reduce(
-            (sum, sub) => sum + (item[sub] || 0),
-            0,
-          );
-
-          const privateSubprogrammes = [
-            'private_pipelines',
-            'private_impact',
-            'private_environment',
-          ];
-          const privateCapitalSum = privateSubprogrammes.reduce(
-            (sum, sub) => sum + (item[sub] || 0),
-            0,
-          );
-
-          return {
-            ...item,
-            all_programmes: allProgrammesSum,
-            public: publicFinanceSum,
-            private: privateCapitalSum,
-          };
-        });
-
-        console.log('Transformed data:', transformedData);
-        setData(transformedData);
+        setData(numericData);
         setTaxonomy(countryTaxonomy);
       });
   }, []);
@@ -169,97 +121,56 @@ function AppContent() {
     [sidsCountries, ldcCountries, selectedCheckboxes],
   );
 
-  const calculateProgrammeCounts = (
-    filteredData: any[],
-    programmes: any[],
-  ): any => {
-    const result: any = {};
-    programmes.forEach(programme => {
-      let sum = 0;
-      if (programme.subprogrammes) {
-        sum = calculateProgrammeCounts(
-          filteredData,
-          programme.subprogrammes,
-        ).total;
-      } else {
-        sum = filteredData.reduce(
-          (acc, item) => acc + (item[programme.value] || 0),
-          0,
-        );
-      }
-      result[programme.value] = sum;
-      result.total = (result.total || 0) + sum;
-    });
-    return result;
-  };
-
-  const calculateCountryGroupCounts = (
-    datum: any[],
-    countryGroups: any[],
-  ): any[] => {
-    return countryGroups.map(group => {
-      const filteredData = filterData(datum, group.value);
-      const countryCount = filteredData.length;
-      return {
-        label: group.label,
-        value: group.value,
-        count: countryCount,
-      };
-    });
-  };
-
-  const filteredData = filterData(data, selectedRadio);
-
-  const sums = calculateProgrammeCounts(
-    filteredData,
-    currentProgramme.subprogrammes || PROGRAMMES,
-  );
-
-  const countryGroupCounts = calculateCountryGroupCounts(data, GROUPS);
-
   const transformData = useCallback(
     (
       rawData: any[],
       programme: string,
       countryGroup: string,
     ): ChoroplethMapDataType[] => {
-      const filteredDatum = filterData(rawData, countryGroup);
+      const filteredData = filterData(rawData, countryGroup);
 
-      return filteredDatum.map(item => {
-        let value = 0;
+      return filteredData
+        .filter(item => {
+          if (programme === 'biofin' || programme === 'frameworks') {
+            return item[programme] > 0;
+          }
+          return true;
+        })
+        .map(item => {
+          let value = 0;
 
-        if (programme === 'all_programmes') {
-          const relevantSubprogrammes = [
-            'public_tax',
-            'public_debt',
-            'public_budget',
-            'public_insurance',
-            'private_pipelines',
-            'private_impact',
-            'private_environment',
-            'frameworks',
-            'biofin',
-          ];
+          if (programme === 'all_programmes') {
+            const relevantSubprogrammes = [
+              'public_tax',
+              'public_debt',
+              'public_budget',
+              'public_insurance',
+              'private_pipelines',
+              'private_impact',
+              'private_environment',
+              'frameworks',
+              'biofin',
+            ];
 
-          value = relevantSubprogrammes.reduce(
-            (sum, subProg) => sum + (item[subProg] || 0),
-            0,
-          );
-        } else if (currentProgramme.subprogrammes) {
-          value = currentProgramme.subprogrammes.reduce(
-            (sum, subProg) => sum + (item[subProg.value] || 0),
-            0,
-          );
-        } else {
-          value = item[programme] || 0;
-        }
+            value = relevantSubprogrammes.reduce(
+              (sum, subProg) => sum + (item[subProg] || 0),
+              0,
+            );
+          } else if (currentProgramme.subprogrammes) {
+            value = currentProgramme.subprogrammes.reduce(
+              (sum, subProg) => sum + (item[subProg.value] || 0),
+              0,
+            );
+          } else {
+            value = item[programme] || 0;
+          }
 
-        return {
-          x: value,
-          iso: item.iso,
-          data: { country: item.country, ...item },
-        };
-      });
+          return {
+            x: value,
+            iso: item.iso,
+            data: { country: item.country, ...item },
+          };
+        });
     },
     [filterData, selectedCheckboxes, currentProgramme],
   );
@@ -270,15 +181,86 @@ function AppContent() {
     selectedRadio,
   );
 
+  const calculateCountryGroupCounts = (
+    rawData: any[],
+    countryGroups: any[],
+    programme: string,
+  ): any[] => {
+    return countryGroups.map(group => {
+      const filteredData = filterData(rawData, group.value);
+      const countryCount = filteredData.filter(item => {
+        if (programme === 'all_programmes') {
+          return (
+            item.public > 0 ||
+            item.private > 0 ||
+            item.frameworks > 0 ||
+            item.biofin > 0
+          );
+        }
+        if (programme === 'public') {
+          return (
+            item.public_tax > 0 ||
+            item.public_debt > 0 ||
+            item.public_budget > 0 ||
+            item.public_insurance > 0
+          );
+        }
+        if (programme === 'private') {
+          return (
+            item.private_pipelines > 0 ||
+            item.private_impact > 0 ||
+            item.private_environment > 0
+          );
+        }
+        return item[programme] > 0;
+      }).length;
+      return {
+        label: group.label,
+        value: group.value,
+        count: countryCount,
+      };
+    });
+  };
+
   const filteredDataForCards = filterData(data, selectedRadio);
 
   const subcategoriesToShow = currentProgramme.subprogrammes || [];
+
+  const calculateProgrammeCounts = (filteredData: any[], programmes: any[]) => {
+    return programmes.map(programme => {
+      if (programme.subprogrammes) {
+        return {
+          ...programme,
+          count: programme.subprogrammes.reduce(
+            (sum: number, subProg: { value: string | number }) =>
+              sum + filteredData.filter(item => item[subProg.value] > 0).length,
+            0,
+          ),
+        };
+      }
+      return {
+        ...programme,
+        count: filteredData.filter(item => item[programme.value] > 0).length,
+      };
+    });
+  };
+
+  const programmeCounts = calculateProgrammeCounts(
+    filteredDataForCards,
+    subcategoriesToShow,
+  );
+
+  const countryGroupCounts = calculateCountryGroupCounts(
+    data,
+    GROUPS,
+    currentProgramme.value,
+  );
 
   useEffect(() => {
     const subcategories = subcategoriesToShow.map(sub => sub.value);
     setSelectedCheckboxes(subcategories);
   }, [currentProgramme, subcategoriesToShow]);
-  console.log(filteredData, countryGroupCounts);
+
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
@@ -357,10 +339,10 @@ function AppContent() {
                 style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
               >
                 <CheckboxGroup
-                  options={subcategoriesToShow.map(sub => ({
-                    label: sub.short,
-                    value: sub.value,
-                    count: sums[sub.value] || 0,
+                  options={programmeCounts.map(prog => ({
+                    label: prog.short,
+                    value: prog.value,
+                    count: prog.count,
                   }))}
                   onChange={handleCheckboxChange}
                   value={selectedCheckboxes}
