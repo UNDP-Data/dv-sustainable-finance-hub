@@ -12,7 +12,7 @@ import { Segmented } from 'antd';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
 import Header from './Components/Header';
 import FilterCountryGroup from './Components/Filter';
-import { PROGRAMMES } from './Components/Constants';
+import { GROUPS, PROGRAMMES } from './Components/Constants';
 import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
@@ -154,25 +154,68 @@ function AppContent() {
         if (countryGroup === 'allCountries') return true;
         if (countryGroup === 'sids') return sidsCountries.includes(item.iso);
         if (countryGroup === 'ldc') return ldcCountries.includes(item.iso);
-        if (countryGroup === 'fragile') return item.fragile > 0;
-        return item[countryGroup] > 0;
+        if (countryGroup === 'fragile') return item.fragile === 1;
+        return item[countryGroup] === 1;
       });
-
-      console.log('Filtered by country:', filteredByCountry);
 
       if (selectedCheckboxes.length === 0) return filteredByCountry;
 
-      const filteredByCheckboxes = filteredByCountry.filter(item =>
+      return filteredByCountry.filter(item =>
         selectedCheckboxes.some(
-          sub => typeof sub === 'string' && item[sub] > 0,
+          sub => typeof sub === 'string' && item[sub] === 1,
         ),
       );
-
-      console.log('Filtered by checkboxes:', filteredByCheckboxes);
-      return filteredByCheckboxes;
     },
     [sidsCountries, ldcCountries, selectedCheckboxes],
   );
+
+  const calculateProgrammeCounts = (
+    filteredData: any[],
+    programmes: any[],
+  ): any => {
+    const result: any = {};
+    programmes.forEach(programme => {
+      let sum = 0;
+      if (programme.subprogrammes) {
+        sum = calculateProgrammeCounts(
+          filteredData,
+          programme.subprogrammes,
+        ).total;
+      } else {
+        sum = filteredData.reduce(
+          (acc, item) => acc + (item[programme.value] || 0),
+          0,
+        );
+      }
+      result[programme.value] = sum;
+      result.total = (result.total || 0) + sum;
+    });
+    return result;
+  };
+
+  const calculateCountryGroupCounts = (
+    datum: any[],
+    countryGroups: any[],
+  ): any[] => {
+    return countryGroups.map(group => {
+      const filteredData = filterData(datum, group.value);
+      const countryCount = filteredData.length;
+      return {
+        label: group.label,
+        value: group.value,
+        count: countryCount,
+      };
+    });
+  };
+
+  const filteredData = filterData(data, selectedRadio);
+
+  const sums = calculateProgrammeCounts(
+    filteredData,
+    currentProgramme.subprogrammes || PROGRAMMES,
+  );
+
+  const countryGroupCounts = calculateCountryGroupCounts(data, GROUPS);
 
   const transformData = useCallback(
     (
@@ -180,9 +223,9 @@ function AppContent() {
       programme: string,
       countryGroup: string,
     ): ChoroplethMapDataType[] => {
-      const filteredData = filterData(rawData, countryGroup);
+      const filteredDatum = filterData(rawData, countryGroup);
 
-      return filteredData.map(item => {
+      return filteredDatum.map(item => {
         let value = 0;
 
         if (programme === 'all_programmes') {
@@ -199,12 +242,12 @@ function AppContent() {
           ];
 
           value = relevantSubprogrammes.reduce(
-            (sum, sub) => sum + (item[sub] || 0),
+            (sum, subProg) => sum + (item[subProg] || 0),
             0,
           );
         } else if (currentProgramme.subprogrammes) {
           value = currentProgramme.subprogrammes.reduce(
-            (sum, sub) => sum + (item[sub.value] || 0),
+            (sum, subProg) => sum + (item[subProg.value] || 0),
             0,
           );
         } else {
@@ -221,19 +264,11 @@ function AppContent() {
     [filterData, selectedCheckboxes, currentProgramme],
   );
 
-  useEffect(() => {
-    console.log('Current Programme:', currentProgramme);
-  }, [currentProgramme]);
-
   const filteredAndTransformedData = transformData(
     data,
     currentProgramme.value,
     selectedRadio,
   );
-
-  useEffect(() => {
-    console.log('Filtered and Transformed Data:', filteredAndTransformedData);
-  }, [filteredAndTransformedData]);
 
   const filteredDataForCards = filterData(data, selectedRadio);
 
@@ -243,11 +278,7 @@ function AppContent() {
     const subcategories = subcategoriesToShow.map(sub => sub.value);
     setSelectedCheckboxes(subcategories);
   }, [currentProgramme, subcategoriesToShow]);
-
-  useEffect(() => {
-    console.log('Filtered Data for Cards:', filteredDataForCards);
-  }, [filteredDataForCards]);
-
+  console.log(filteredData, countryGroupCounts);
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
@@ -291,6 +322,7 @@ function AppContent() {
               <FilterCountryGroup
                 onRadioChange={handleRadioChange}
                 selectedRadio={selectedRadio}
+                groups={countryGroupCounts}
               />
             </div>
           </div>
@@ -317,7 +349,7 @@ function AppContent() {
                     letterSpacing: '.03em',
                   }}
                 >
-                  Filter By Programmes
+                  Filter By SubProgrammes
                 </h6>
               </button>
               <div
@@ -328,6 +360,7 @@ function AppContent() {
                   options={subcategoriesToShow.map(sub => ({
                     label: sub.short,
                     value: sub.value,
+                    count: sums[sub.value] || 0,
                   }))}
                   onChange={handleCheckboxChange}
                   value={selectedCheckboxes}
