@@ -27,7 +27,6 @@ function AppContent() {
   const {
     currentProgramme,
     setCurrentProgramme,
-    taxonomy,
     setTaxonomy,
     selectedCheckboxes,
     setSelectedCheckboxes,
@@ -75,7 +74,7 @@ function AppContent() {
         setData(numericData);
         setTaxonomy(countryTaxonomy);
       });
-  }, []);
+  }, [setTaxonomy]);
 
   const handleSegmentChange = useCallback(
     (value: string | number) => {
@@ -101,7 +100,7 @@ function AppContent() {
     (checkedValues: CheckboxValueType[]) => {
       setSelectedCheckboxes(checkedValues.map(String));
     },
-    [],
+    [setSelectedCheckboxes],
   );
 
   const filterData = useCallback(
@@ -403,11 +402,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards
-              data={filteredDataForCards}
-              taxonomy={taxonomy}
-              selectedCheckboxes={selectedCheckboxes.map(String)}
-            />
+            <Cards data={filteredDataForCards} />
           )}
         </div>
       </div>
