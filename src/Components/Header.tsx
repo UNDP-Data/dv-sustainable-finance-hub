@@ -4,7 +4,9 @@ import { Info } from 'lucide-react';
 import { useProgramme } from './ProgrammeContext';
 import { PROGRAMMES } from './Constants';
 
-const StyledSegmented = styled(Segmented)<{ selectedColor: string }>`
+const StyledSegmented = styled(Segmented).withConfig({
+  shouldForwardProp: prop => !['selectedColor'].includes(prop),
+})<{ selectedColor: string }>`
   background-color: white !important;
   display: flex;
   width: 60%;
