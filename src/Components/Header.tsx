@@ -1,4 +1,4 @@
-import { Segmented, Tooltip } from 'antd';
+import { Segmented, Popover } from 'antd';
 import styled from 'styled-components';
 import { Info } from 'lucide-react';
 import { useProgramme } from './ProgrammeContext';
@@ -72,6 +72,20 @@ function Header(props: HeaderProps): JSX.Element {
     })),
   ];
 
+  const tooltipContent = (
+    <div>
+      <p
+        className='undp-typography margin-00 padding-03 small-font'
+        style={{
+          maxWidth: '20rem',
+        }}
+      >
+        Rotate data from rows to columns or vice versa. Make sure all the values
+        for first column is unique
+      </p>
+    </div>
+  );
+
   return (
     <div
       className='header-container flex-div flex-vert-align-center flex-space-between flex-row margin-00 padding-05'
@@ -87,20 +101,22 @@ function Header(props: HeaderProps): JSX.Element {
         >
           Sustainable Financial Hub Dashboard
         </p>
-        <div className='flex-div flex-row flex-vert-align-center gap-02 margin-00 padding-00'>
-          <p
-            className='undp-typography margin-00 padding-00 small-font'
-            style={{ color: 'var(--gray-500)' }}
-          >
-            About Dashboard
-          </p>
-          <Tooltip
-            title='This is some random text for the tooltip'
-            arrow={false}
-          >
+        <Popover
+          overlayClassName='undp-tooltip'
+          content={tooltipContent}
+          className='undp-tooltip'
+          arrow={false}
+        >
+          <div className='flex-div flex-vert-align-center gap-02'>
+            <p
+              className='undp-typography margin-00 padding-00 small-font'
+              style={{ color: 'var(--gray-500)' }}
+            >
+              About Dashboard
+            </p>
             <Info size={14} style={{ color: 'var(--gray-500' }} />
-          </Tooltip>
-        </div>
+          </div>
+        </Popover>
       </div>
       <StyledSegmented
         selectedColor={currentProgramme.color}
