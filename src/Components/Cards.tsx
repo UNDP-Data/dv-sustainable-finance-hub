@@ -28,15 +28,12 @@ function Cards({ data }: Props) {
   const filteredData = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
     return data.filter(item =>
-      item.country.toLowerCase().includes(lowercasedSearchTerm),
+      item.data.country.toLowerCase().includes(lowercasedSearchTerm),
     );
   }, [data, searchTerm]);
 
   return (
-    <div
-      className='padding-04 undp-scrollbar'
-      style={{ height: '576px', msOverflowY: 'scroll' }}
-    >
+    <div className='padding-04' style={{ height: '576px', overflow: 'scroll' }}>
       <Input
         placeholder='Search by country'
         prefix={<Search size={18} strokeWidth={2.5} color='var(--black)' />}
@@ -45,7 +42,7 @@ function Cards({ data }: Props) {
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item, index) => {
-          const programTagsForCountry = getProgramTags(item);
+          const programTagsForCountry = getProgramTags(item.data);
 
           if (programTagsForCountry.length === 0) return null;
 

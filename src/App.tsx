@@ -132,54 +132,46 @@ function AppContent() {
     ): ChoroplethMapDataType[] => {
       const filteredData = filterData(rawData, countryGroup);
 
-      return filteredData
-        .filter(item => {
-          if (programme === 'biofin' || programme === 'frameworks') {
-            return item[programme] > 0;
-          }
-          return true;
-        })
-        .map(item => {
-          let value = 0;
+      const getRelevantSubprogrammes = () => [
+        'public_tax',
+        'public_debt',
+        'public_budget',
+        'public_insurance',
+        'private_pipelines',
+        'private_impact',
+        'private_environment',
+        'frameworks',
+        'biofin',
+      ];
 
-          if (programme === 'all_programmes') {
-            const relevantSubprogrammes = [
-              'public_tax',
-              'public_debt',
-              'public_budget',
-              'public_insurance',
-              'private_pipelines',
-              'private_impact',
-              'private_environment',
-              'frameworks',
-              'biofin',
-            ];
+      return filteredData.map(item => {
+        let value = 0;
 
-            value = relevantSubprogrammes.reduce(
-              (sum, subProg) => sum + (item[subProg] || 0),
-              0,
-            );
-          } else if (currentProgramme.subprogrammes) {
-            value = currentProgramme.subprogrammes.reduce(
-              (sum: any, subProg: { value: string | number }) =>
-                sum + (item[subProg.value] || 0),
-              0,
-            );
-          } else {
-            value = item[programme] || 0;
-          }
+        if (programme === 'all_programmes') {
+          value = getRelevantSubprogrammes().reduce(
+            (sum, subProg) => sum + (item[subProg] || 0),
+            0,
+          );
+        } else if (currentProgramme.subprogrammes) {
+          value = currentProgramme.subprogrammes.reduce(
+            (sum, subProg) => sum + (item[subProg.value] || 0),
+            0,
+          );
+        } else {
+          value = item[programme] || 0;
+        }
 
-          return {
-            x: value,
-            iso: item.iso,
-            data: { country: item.country, ...item },
-          };
-        });
+        return {
+          x: value,
+          iso: item.iso,
+          data: { country: item.country, ...item },
+        };
+      });
     },
-    [filterData, selectedCheckboxes, currentProgramme],
+    [filterData, currentProgramme],
   );
 
-  const filteredAndTransformedData = transformData(
+  const transformedData = transformData(
     data,
     currentProgramme.value,
     selectedRadio,
@@ -266,6 +258,7 @@ function AppContent() {
     );
     setSelectedCheckboxes(subcategories);
   }, [currentProgramme, subcategoriesToShow]);
+  console.log(transformedData, filteredDataForCards);
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
@@ -393,7 +386,7 @@ function AppContent() {
           {viewMode === 'Map' ? (
             <div className='flex-div flex-hor-align-center'>
               <ChoroplethMap
-                data={filteredAndTransformedData}
+                data={transformedData}
                 width={1000}
                 height={600}
                 scale={250}
@@ -402,7 +395,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards data={filteredDataForCards} />
+            <Cards data={transformedData} />
           )}
         </div>
       </div>
