@@ -17,17 +17,21 @@ import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import { ChoroplethMapDataType } from './Types';
 import Cards from './Components/Cards';
+import { tooltip } from './Components/Tooltip';
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
-  const [taxonomy, setTaxonomy] = useState<any[]>([]);
   const [selectedRadio, setSelectedRadio] = useState<string>('allCountries');
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<
-    CheckboxValueType[]
-  >([]);
   const [sidsCountries, setSidsCountries] = useState<string[]>([]);
   const [ldcCountries, setLdcCountries] = useState<string[]>([]);
-  const { currentProgramme, setCurrentProgramme } = useProgramme();
+  const {
+    currentProgramme,
+    setCurrentProgramme,
+    taxonomy,
+    setTaxonomy,
+    selectedCheckboxes,
+    setSelectedCheckboxes,
+  } = useProgramme();
   const [filterExpanded, setFilterExpanded] = useState(true);
   const [filterTwoExpanded, setFilterTwoExpanded] = useState(true);
   const [viewMode, setViewMode] = useState<string>('Map');
@@ -158,7 +162,8 @@ function AppContent() {
             );
           } else if (currentProgramme.subprogrammes) {
             value = currentProgramme.subprogrammes.reduce(
-              (sum, subProg) => sum + (item[subProg.value] || 0),
+              (sum: any, subProg: { value: string | number }) =>
+                sum + (item[subProg.value] || 0),
               0,
             );
           } else {
@@ -257,10 +262,11 @@ function AppContent() {
   );
 
   useEffect(() => {
-    const subcategories = subcategoriesToShow.map(sub => sub.value);
+    const subcategories = subcategoriesToShow.map(
+      (sub: { value: any }) => sub.value,
+    );
     setSelectedCheckboxes(subcategories);
   }, [currentProgramme, subcategoriesToShow]);
-
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
@@ -355,8 +361,8 @@ function AppContent() {
           className='flex-div flex-column grow gap-00'
           style={{
             width: 'calc(80% - 54px)',
-            backgroundColor: 'var(--gray-100)',
             overflow: 'hidden',
+            backgroundColor: 'var(--gray-100)',
           }}
         >
           <Segmented
@@ -379,7 +385,7 @@ function AppContent() {
               },
             ]}
             value={viewMode}
-            onChange={value => setViewMode(value as string)}
+            onChange={(value: any) => setViewMode(value)}
             style={{
               margin: '0.5rem 0.5rem 0.5rem auto',
               width: 'fit-content',
@@ -393,6 +399,7 @@ function AppContent() {
                 height={600}
                 scale={260}
                 centerPoint={[480, 370]}
+                tooltip={tooltip}
               />
             </div>
           ) : (

@@ -1,13 +1,5 @@
 import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
-
-export interface Programme {
-  label: string;
-  short: string;
-  value: string;
-  color: string;
-  icon: any;
-  subprogrammes?: Programme[];
-}
+import { Programme } from '../Types';
 
 export const PROGRAMMES: Programme[] = [
   {

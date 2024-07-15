@@ -65,6 +65,7 @@ export function Graph(props: Props) {
         height={`${height}px`}
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         ref={mapSvg}
+        style={{ overflow: 'visible' }}
       >
         <g ref={mapG}>
           {(World as any).features.map((d: any, i: number) => {

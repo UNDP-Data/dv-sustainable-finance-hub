@@ -56,6 +56,30 @@ export interface ChoroplethMapDataType {
   };
 }
 
+export interface Programme {
+  label: string;
+  short: string;
+  value: string;
+  color: string;
+  icon: any;
+  subprogrammes?: Programme[];
+}
+
+export interface CountryDataType {
+  iso: string;
+  country: string;
+  public_tax?: number;
+  public_debt?: number;
+  public_budget?: number;
+  public_insurance?: number;
+  private_pipelines?: number;
+  private_impact?: number;
+  private_environment?: number;
+  frameworks?: number;
+  biofin?: number;
+  [key: string]: any; // For any additional dynamic properties
+}
+
 export interface BivariateMapDataType {
   x: number;
   y: number;
