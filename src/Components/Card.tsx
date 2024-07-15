@@ -17,7 +17,8 @@ const StyledTag = styled(Tag)`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  margin-left: 0;
+  margin: 0;
+  padding: 0 0.5rem;
 `;
 
 const CardContainer = styled.div`
@@ -51,7 +52,7 @@ function CardComponent(props: CardProps) {
           {countryName}
         </h6>
       </CountryDiv>
-      <ProgramsDiv className='flex-div flex-wrap gap-03'>
+      <ProgramsDiv className='flex-div flex-wrap gap-02'>
         {programTags.map(program => (
           <StyledTag key={program.value} color={program.color}>
             {program.short}

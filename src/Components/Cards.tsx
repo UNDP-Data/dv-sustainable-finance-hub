@@ -33,7 +33,10 @@ function Cards({ data }: Props) {
   }, [data, searchTerm]);
 
   return (
-    <div className='padding-04' style={{ height: '576px', overflow: 'scroll' }}>
+    <div
+      className='padding-04 undp-scrollbar'
+      style={{ height: '576px', msOverflowY: 'scroll' }}
+    >
       <Input
         placeholder='Search by country'
         prefix={<Search size={18} strokeWidth={2.5} color='var(--black)' />}

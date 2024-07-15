@@ -396,8 +396,8 @@ function AppContent() {
                 data={filteredAndTransformedData}
                 width={1000}
                 height={600}
-                scale={260}
-                centerPoint={[480, 370]}
+                scale={250}
+                centerPoint={[450, 370]}
                 tooltip={tooltip}
               />
             </div>
