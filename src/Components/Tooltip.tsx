@@ -1,23 +1,19 @@
-import CardComponent from './Card';
-import { useSharedLogic } from './utils';
-import { useProgramme } from './ProgrammeContext';
+// import CardComponent from './Card';
+// import { useProgramme } from './ProgrammeContext';
+// import { generateTags } from '../Utils/generateTags';
 
 export const tooltip = (d: any) => {
-  const { taxonomy, selectedCheckboxes } = useProgramme();
-  const { getCountryName, getProgramTags } = useSharedLogic(
-    taxonomy,
-    selectedCheckboxes,
-  );
-
-  const programTagsForCountry = getProgramTags(d.data);
+  // const { selectedCheckboxes } = useProgramme();
+  // const programTagsForCountry = generateTags(d.data, selectedCheckboxes);
 
   return (
     <div>
-      <CardComponent
+      {d.iso}
+      {/* <CardComponent
         key={d.iso}
-        countryName={getCountryName(d.iso)}
-        programTags={programTagsForCountry}
-      />
+        countryName={d.country}
+        tags={programTagsForCountry}
+      /> */}
     </div>
   );
 };

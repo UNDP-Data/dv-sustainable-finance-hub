@@ -133,15 +133,15 @@ export function Graph(props: Props) {
             );
             let color = 'var(--gray-200)';
             // eslint-disable-next-line no-restricted-globals
-            if (index !== -1 && !isNaN(d.x)) {
-              if (d.x > 0) {
+            if (index !== -1) {
+              if (d.x === '1') {
                 color = programmeColor;
               }
             }
             return (
               <g
                 key={i}
-                onMouseEnter={event => {
+                onMouseEnter={(event: any) => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);
@@ -149,7 +149,7 @@ export function Graph(props: Props) {
                     onSeriesMouseOver(d);
                   }
                 }}
-                onMouseMove={event => {
+                onMouseMove={(event: any) => {
                   setMouseOverData(d);
                   setEventY(event.clientY);
                   setEventX(event.clientX);
@@ -187,6 +187,7 @@ export function Graph(props: Props) {
                           <path
                             key={j}
                             d={masterPath}
+                            opacity={d.filtered === '1' ? '1' : 0.3}
                             style={{
                               stroke: 'var(--gray-500)',
                             }}
@@ -212,6 +213,7 @@ export function Graph(props: Props) {
                           <path
                             key={j}
                             d={path}
+                            opacity={d.filtered === '1' ? '1' : 0.3}
                             style={{
                               stroke: 'var(--gray-500)',
                             }}

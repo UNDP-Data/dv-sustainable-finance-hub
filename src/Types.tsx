@@ -43,7 +43,8 @@ export interface DonutChartDataType {
 }
 
 export interface ChoroplethMapDataType {
-  x: number;
+  filtered: any;
+  x: string;
   iso: string;
   data?: {
     country: string;
@@ -61,9 +62,19 @@ export interface Programme {
   short: string;
   value: string;
   color: string;
-  icon: any;
-  subprogrammes?: Programme[];
+  icon?: any;
 }
+
+export type ProgrammeKey =
+  | 'public_tax'
+  | 'public_debt'
+  | 'public_budget'
+  | 'public_insurance'
+  | 'private_pipelines'
+  | 'private_impact'
+  | 'private_environment'
+  | 'frameworks'
+  | 'biofin';
 
 export interface CountryDataType {
   iso: string;

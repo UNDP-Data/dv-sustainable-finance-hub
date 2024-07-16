@@ -1,16 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Tag } from 'antd';
-
-interface ProgramTag {
-  value: string;
-  short: string;
-  color: string;
-}
+import { Programme } from '../Types';
 
 interface CardProps {
   countryName: string;
-  programTags: ProgramTag[];
+  tags: Programme[];
 }
 
 const StyledTag = styled(Tag)`
@@ -43,7 +38,7 @@ const ProgramsDiv = styled.div`
 `;
 
 function CardComponent(props: CardProps) {
-  const { countryName, programTags } = props;
+  const { countryName, tags } = props;
 
   return (
     <CardContainer>
@@ -53,9 +48,9 @@ function CardComponent(props: CardProps) {
         </h6>
       </CountryDiv>
       <ProgramsDiv className='flex-div flex-wrap gap-02'>
-        {programTags.map(program => (
-          <StyledTag key={program.value} color={program.color}>
-            {program.short}
+        {tags.map(tag => (
+          <StyledTag key={tag.value} color={tag.color}>
+            {tag.short}
           </StyledTag>
         ))}
       </ProgramsDiv>

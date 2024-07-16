@@ -43,12 +43,8 @@ export function ChoroplethMap(props: Props) {
 
   const { currentProgramme } = useProgramme();
   const currentProgrammeColor =
-    PROGRAMMES.find(prog =>
-      prog.subprogrammes?.some(
-        subprog => subprog.value === currentProgramme.value,
-      ),
-    )?.subprogrammes?.find(subprog => subprog.value === currentProgramme.value)
-      ?.color || '#006EB5';
+    PROGRAMMES.find(prog => prog.value === currentProgramme.value)?.color ||
+    '#006EB5';
 
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);

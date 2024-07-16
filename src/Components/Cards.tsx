@@ -3,8 +3,7 @@ import { Search } from 'lucide-react';
 import { Input } from 'antd';
 import styled from 'styled-components';
 import CardComponent from './Card';
-import { useSharedLogic } from './utils';
-import { useProgramme } from './ProgrammeContext';
+import { Programme } from '../Types';
 
 const CardContainer = styled.div`
   display: flex;
@@ -14,21 +13,17 @@ const CardContainer = styled.div`
 `;
 
 interface Props {
-  data: any[];
+  data: any;
+  relevantProgrammes: Programme[];
 }
 
-function Cards({ data }: Props) {
+function Cards(props: Props) {
+  const { data, relevantProgrammes } = props;
   const [searchTerm, setSearchTerm] = useState('');
-  const { taxonomy, selectedCheckboxes } = useProgramme();
-  const { getCountryName, getProgramTags } = useSharedLogic(
-    taxonomy,
-    selectedCheckboxes,
-  );
-
   const filteredData = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
-    return data.filter(item =>
-      item.data.country.toLowerCase().includes(lowercasedSearchTerm),
+    return data.filter((item: any) =>
+      item.country.toLowerCase().includes(lowercasedSearchTerm),
     );
   }, [data, searchTerm]);
 
@@ -41,17 +36,20 @@ function Cards({ data }: Props) {
         style={{ width: '100%' }}
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
-        {filteredData.map((item, index) => {
-          const programTagsForCountry = getProgramTags(item.data);
+        {filteredData.map((item: any, index: any) => {
+          const tags = relevantProgrammes
+            .filter(prog => item[prog.value] === '1')
+            .map(prog => ({
+              label: prog.label,
+              value: prog.value,
+              short: prog.short,
+              color: prog.color,
+            }));
 
-          if (programTagsForCountry.length === 0) return null;
+          if (tags.length === 0) return null;
 
           return (
-            <CardComponent
-              key={index}
-              countryName={getCountryName(item.iso)}
-              programTags={programTagsForCountry}
-            />
+            <CardComponent key={index} countryName={item.country} tags={tags} />
           );
         })}
       </CardContainer>

@@ -1,12 +1,18 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useMemo,
+} from 'react';
 import { PROGRAMMES } from './Constants';
 import { Programme } from '../Types';
+import { filterProgrammes } from '../Utils/filterProgrammes';
 
 interface ProgrammeContextProps {
   currentProgramme: Programme;
   setCurrentProgramme: (programme: Programme) => void;
-  taxonomy: { [key: string]: any }[];
-  setTaxonomy: (taxonomy: { [key: string]: any }[]) => void;
   selectedCheckboxes: string[];
   setSelectedCheckboxes: (checkboxes: string[]) => void;
 }
@@ -19,20 +25,28 @@ export function ProgrammeProvider({ children }: { children: ReactNode }) {
   const [currentProgramme, setCurrentProgramme] = useState<Programme>(
     PROGRAMMES[0],
   );
-  const [taxonomy, setTaxonomy] = useState<{ [key: string]: any }[]>([]);
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>(
+    filterProgrammes(PROGRAMMES[0].value).map(prog => prog.value),
+  );
+
+  useEffect(() => {
+    setSelectedCheckboxes(
+      filterProgrammes(currentProgramme.value).map(prog => prog.value),
+    );
+  }, [currentProgramme]);
+
+  const contextValue = useMemo(
+    () => ({
+      currentProgramme,
+      setCurrentProgramme,
+      selectedCheckboxes,
+      setSelectedCheckboxes,
+    }),
+    [currentProgramme, selectedCheckboxes],
+  );
+
   return (
-    <ProgrammeContext.Provider
-      // eslint-disable-next-line react/jsx-no-constructed-context-values
-      value={{
-        currentProgramme,
-        setCurrentProgramme,
-        taxonomy,
-        setTaxonomy,
-        selectedCheckboxes,
-        setSelectedCheckboxes,
-      }}
-    >
+    <ProgrammeContext.Provider value={contextValue}>
       {children}
     </ProgrammeContext.Provider>
   );

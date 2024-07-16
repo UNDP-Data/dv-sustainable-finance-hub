@@ -23,7 +23,12 @@ const StyledCheckboxGroup = styled(Checkbox.Group)`
 `;
 
 interface CheckboxGroupProps {
-  options: { label: string; value: string; count: number }[];
+  options: {
+    short: string;
+    label: string;
+    value: string;
+    count: number;
+  }[];
   onChange: (checkedValues: CheckboxValueType[]) => void;
   value: CheckboxValueType[];
 }
@@ -32,7 +37,7 @@ function CheckboxGroup({ options, onChange, value }: CheckboxGroupProps) {
   const optionsWithCounts = options.map(option => ({
     label: (
       <div className='flex-div flex-space-between'>
-        <div>{option.label} </div>
+        <div>{option.short} </div>
         <p
           style={{
             fontSize: '12px',

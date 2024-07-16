@@ -48,31 +48,14 @@ function Header(props: HeaderProps): JSX.Element {
   const { onSegmentChange } = props;
   const { currentProgramme } = useProgramme();
 
-  // Get the "All Programmes" option
-  const allProgrammesOption = PROGRAMMES.find(
-    programme => programme.value === 'all_programmes',
-  );
-
-  // Get all main subprogrammes under 'all_programmes'
-  const mainSubprogrammes = allProgrammesOption?.subprogrammes || [];
-
-  // Prepare the options for the Segmented component
-  const options = [
-    {
-      label: (
-        <p className='undp-typography label margin-00'>
-          {allProgrammesOption?.short}
-        </p>
-      ),
-      value: allProgrammesOption?.value || 'all_programmes',
-    },
-    ...mainSubprogrammes.map(programme => ({
-      label: (
-        <p className='undp-typography label margin-00'>{programme.short}</p>
-      ),
-      value: programme.value,
-    })),
-  ];
+  const options = PROGRAMMES.filter(programme =>
+    ['all', 'public', 'private', 'frameworks', 'biofin'].includes(
+      programme.value,
+    ),
+  ).map(programme => ({
+    label: <p className='undp-typography label margin-00'>{programme.short}</p>,
+    value: programme.value,
+  }));
 
   const tooltipContent = (
     <div>
