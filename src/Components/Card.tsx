@@ -29,12 +29,7 @@ const CardContainer = styled.div`
 `;
 
 const CountryDiv = styled.div`
-  padding: 16px;
   border-bottom: 0.07rem solid var(--gray-300);
-`;
-
-const ProgramsDiv = styled.div`
-  padding: 1rem;
 `;
 
 function CardComponent(props: CardProps) {
@@ -42,18 +37,18 @@ function CardComponent(props: CardProps) {
 
   return (
     <CardContainer>
-      <CountryDiv>
+      <CountryDiv className='padding-04'>
         <h6 style={{ fontSize: '12px' }} className='undp-typography margin-00'>
           {countryName}
         </h6>
       </CountryDiv>
-      <ProgramsDiv className='flex-div flex-wrap gap-02'>
+      <div className='flex-div flex-wrap gap-02 padding-04'>
         {tags.map(tag => (
           <StyledTag key={tag.value} color={tag.color}>
             {tag.short}
           </StyledTag>
         ))}
-      </ProgramsDiv>
+      </div>
     </CardContainer>
   );
 }

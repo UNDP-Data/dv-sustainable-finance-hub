@@ -225,7 +225,9 @@ function AppContent() {
   };
 
   const countsCheckboxes = calculateCheckboxes(filteredByCountryGroup);
+
   const countsRadio = calculateRadio(filteredByCheckboxes);
+
   const transformCounts = (
     countItems: Record<string, number>,
     groups: {
@@ -255,6 +257,7 @@ function AppContent() {
           x: item[currentProgramme.value],
           iso: item.iso,
           filtered: item.filtered,
+          data: { ...item }, // Nest all original properties under 'data'
         };
       });
     },
@@ -395,7 +398,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards data={data} relevantProgrammes={relevantProgrammes} />
+            <Cards data={data} />
           )}
         </div>
       </div>

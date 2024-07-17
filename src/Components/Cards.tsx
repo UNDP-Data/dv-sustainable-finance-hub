@@ -3,7 +3,8 @@ import { Search } from 'lucide-react';
 import { Input } from 'antd';
 import styled from 'styled-components';
 import CardComponent from './Card';
-import { Programme } from '../Types';
+import { generateTags } from '../Utils/generateTags';
+import { useProgramme } from './ProgrammeContext';
 
 const CardContainer = styled.div`
   display: flex;
@@ -13,12 +14,12 @@ const CardContainer = styled.div`
 `;
 
 interface Props {
-  data: any;
-  relevantProgrammes: Programme[];
+  data: any[];
 }
 
 function Cards(props: Props) {
-  const { data, relevantProgrammes } = props;
+  const { data } = props;
+  const { currentProgramme } = useProgramme();
   const [searchTerm, setSearchTerm] = useState('');
   const filteredData = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
@@ -37,16 +38,8 @@ function Cards(props: Props) {
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item: any, index: any) => {
-          const tags = relevantProgrammes
-            .filter(prog => item[prog.value] === '1')
-            .map(prog => ({
-              label: prog.label,
-              value: prog.value,
-              short: prog.short,
-              color: prog.color,
-            }));
-
-          if (tags.length === 0) return null;
+          const tags = generateTags(item, currentProgramme.value);
+          if (!tags || tags.length === 0) return null;
 
           return (
             <CardComponent key={index} countryName={item.country} tags={tags} />

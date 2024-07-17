@@ -8,7 +8,7 @@ export interface DataItem {
 export const generateTags = (
   item: DataItem,
   currentProgrammeValue: string,
-): Programme[] => {
+): Programme[] | null => {
   const relevantProgrammes = filterProgrammes(currentProgrammeValue);
 
   const tags: Programme[] = relevantProgrammes
@@ -21,5 +21,5 @@ export const generateTags = (
       icon: prog.icon,
     }));
 
-  return tags;
+  return tags.length > 0 ? tags : null;
 };
