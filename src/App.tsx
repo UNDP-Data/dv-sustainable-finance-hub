@@ -16,8 +16,12 @@ import { GROUPS, PROGRAMMES } from './Components/Constants';
 import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
 import CheckboxGroup from './Components/CheckboxGroup';
 import Cards from './Components/Cards';
-import { tooltip } from './Components/Tooltip';
+import { TooltipContent } from './Components/TooltipContent';
 import { filterProgrammes } from './Utils/filterProgrammes';
+
+const tooltip = (d: any) => {
+  return <TooltipContent data={d.data} />;
+};
 
 function AppContent() {
   const [data, setData] = useState<any[]>([]);
@@ -265,6 +269,7 @@ function AppContent() {
   );
 
   const transformedForChartData = transformData(filteredByRadioAndCheckboxes);
+
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'

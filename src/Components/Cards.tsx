@@ -21,12 +21,16 @@ function Cards(props: Props) {
   const { data } = props;
   const { currentProgramme } = useProgramme();
   const [searchTerm, setSearchTerm] = useState('');
+
   const filteredData = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
     return data
       .filter((item: any) => item.filtered === '1')
-      .filter((item: any) =>
-        item.data.country.toLowerCase().includes(lowercasedSearchTerm),
+      .filter(
+        (item: any) =>
+          item.data &&
+          item.data.country &&
+          item.data.country.toLowerCase().includes(lowercasedSearchTerm),
       );
   }, [data, searchTerm]);
 

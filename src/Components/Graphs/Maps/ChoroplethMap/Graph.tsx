@@ -131,13 +131,16 @@ export function Graph(props: Props) {
             const index = (World as any).features.findIndex(
               (el: any) => d.iso === el.properties.ISO3,
             );
-            let color = 'var(--gray-200)';
-            // eslint-disable-next-line no-restricted-globals
-            if (index !== -1) {
-              if (d.x === '1') {
-                color = programmeColor;
-              }
+            let color = 'var(--gray-100)';
+            if (d.x === '1') {
+              color = programmeColor;
             }
+
+            let opacity = '1';
+            if (d.x === '1') {
+              opacity = d.filtered === '1' ? '1' : '0.3';
+            }
+
             return (
               <g
                 key={i}
@@ -187,7 +190,7 @@ export function Graph(props: Props) {
                           <path
                             key={j}
                             d={masterPath}
-                            opacity={d.filtered === '1' ? '1' : 0.3}
+                            opacity={opacity}
                             style={{
                               stroke: 'var(--gray-500)',
                             }}
@@ -213,7 +216,7 @@ export function Graph(props: Props) {
                           <path
                             key={j}
                             d={path}
-                            opacity={d.filtered === '1' ? '1' : 0.3}
+                            opacity={opacity}
                             style={{
                               stroke: 'var(--gray-500)',
                             }}
