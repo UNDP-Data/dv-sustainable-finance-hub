@@ -70,20 +70,6 @@ function AppContent() {
             country: countryMapping[item.iso] || item.country,
             sids: sids.includes(item.iso) ? '1' : '',
             ldc: ldc.includes(item.iso) ? '1' : '',
-            all: [
-              'public_tax',
-              'public_budget',
-              'public_debt',
-              'public_insurance',
-              'public_tax',
-              'public_budget',
-              'public_debt',
-              'public_insurance',
-              'biofin',
-              'frameworks',
-            ].some(key => item[key] === '1')
-              ? '1'
-              : '',
             public: [
               'public_tax',
               'public_budget',
@@ -96,6 +82,19 @@ function AppContent() {
               'private_pipelines',
               'private_impact',
               'private_environment',
+            ].some(key => item[key] === '1')
+              ? '1'
+              : '',
+            all: [
+              'public_tax',
+              'public_budget',
+              'public_debt',
+              'public_insurance',
+              'private_pipelines',
+              'private_impact',
+              'private_environment',
+              'biofin',
+              'frameworks',
             ].some(key => item[key] === '1')
               ? '1'
               : '',
@@ -128,115 +127,126 @@ function AppContent() {
     [setSelectedCheckboxes],
   );
 
-  const filterData = useCallback(
-    (rawData: any[], programmes: string | string[]) => {
-      // Ensure programmes is always an array
-      const programmesArray = Array.isArray(programmes)
-        ? programmes
-        : [programmes];
+  const filterData = useCallback((rawData: any[], programme: string) => {
+    return rawData.map(item => {
+      const isFiltered = item[programme] === '1';
 
-      return rawData.map(item => {
-        // Check if any of the programme columns match '1' or have a value greater than 0
-        const isFiltered = programmesArray.some(
-          programme => item[programme] === '1' || item[programme] > 0,
-        );
+      return {
+        ...item,
+        filtered: isFiltered ? '1' : '0',
+      };
+    });
+  }, []);
 
-        return {
-          ...item,
-          filtered: isFiltered ? '1' : '0',
-        };
+  const filteredByCurrentProgramme = filterData(data, currentProgramme.value);
+
+  const filteredByCountryGroup = filterData(
+    filteredByCurrentProgramme,
+    selectedRadio,
+  );
+
+  const filterByCheckboxes = useCallback(
+    (filteredData: any[], checkboxes: string[]) => {
+      return filteredData.map(item => {
+        if (item.filtered === '1') {
+          const isFiltered = checkboxes.some(
+            checkbox => item[checkbox] === '1',
+          );
+          return {
+            ...item,
+            filtered: isFiltered ? '1' : '0',
+          };
+        }
+        return item;
       });
     },
     [],
   );
 
-  const filteredByCountryGroup = filterData(data, selectedRadio);
-
-  const filteredByCurrentProgramme = filterData(
+  const filteredByRadioAndCheckboxes = filterByCheckboxes(
     filteredByCountryGroup,
-    currentProgramme.value,
+    selectedCheckboxes,
   );
-
-  const filteredByProgramme = filterData(
+  const filteredByCheckboxes = filterByCheckboxes(
     filteredByCurrentProgramme,
     selectedCheckboxes,
   );
 
-  console.log(selectedCheckboxes, filteredByProgramme);
-
   const relevantProgrammes = filterProgrammes(currentProgramme.value);
 
   // calculate counts
-  const calculateCounts = (
-    datum: any[],
-    relevantProg: { value: string; short: string; color: string }[],
-  ) => {
-    const counts: {
-      countryGroups: {
-        all: number;
-        sids: number;
-        ldc: number;
-        fragile: number;
-      };
-      programmes: Record<string, number>;
-    } = {
-      countryGroups: {
-        all: 0,
-        sids: 0,
-        ldc: 0,
-        fragile: 0,
-      },
-      programmes: {},
+  const calculateRadio = (datum: any[]) => {
+    const countryGroupCounts = {
+      all: 0,
+      sids: 0,
+      ldc: 0,
+      fragile: 0,
     };
-
-    // Initialize counts.programmes based on relevantProgrammes
-    relevantProg.forEach(prog => {
-      counts.programmes[prog.value] = 0;
-    });
 
     datum.forEach(item => {
       if (item.filtered === '1') {
-        // Count country groups
-        counts.countryGroups.all += 1;
-        if (item.sids === '1') counts.countryGroups.sids += 1;
-        if (item.ldc === '1') counts.countryGroups.ldc += 1;
-        if (item.fragile === '1') counts.countryGroups.fragile += 1;
+        countryGroupCounts.all += 1;
+        if (item.sids === '1') countryGroupCounts.sids += 1;
+        if (item.ldc === '1') countryGroupCounts.ldc += 1;
+        if (item.fragile === '1') countryGroupCounts.fragile += 1;
+      }
+    });
 
-        // Count relevant programmes
-        relevantProg.forEach(prog => {
-          if (item[prog.value] === '1') {
-            counts.programmes[prog.value] += 1;
+    return countryGroupCounts;
+  };
+
+  const calculateCheckboxes = (datum: any[]) => {
+    const programmeCounts = {
+      public: 0,
+      public_tax: 0,
+      public_debt: 0,
+      public_budget: 0,
+      public_insurance: 0,
+      private: 0,
+      private_pipelines: 0,
+      private_impact: 0,
+      private_environment: 0,
+      frameworks: 0,
+      biofin: 0,
+      // Add other programmes if needed
+    };
+
+    datum.forEach(item => {
+      if (item.filtered === '1') {
+        Object.keys(programmeCounts).forEach(prog => {
+          if (item[prog] === '1') {
+            programmeCounts[prog as keyof typeof programmeCounts] += 1;
           }
         });
       }
     });
 
-    return counts;
+    return programmeCounts;
   };
 
-  const counts = calculateCounts(
-    filteredByCurrentProgramme,
-    relevantProgrammes,
-  );
-
-  const transformCounts = (countsData: any) => {
-    const programmeOptions = relevantProgrammes.map(programme => ({
-      label: programme.label,
-      short: programme.short,
-      value: programme.value,
-      count: countsData.programmes[programme.value],
-    }));
-
-    const countryGroupOptions = GROUPS.map(group => ({
+  const countsCheckboxes = calculateCheckboxes(filteredByCountryGroup);
+  const countsRadio = calculateRadio(filteredByCheckboxes);
+  const transformCounts = (
+    countItems: Record<string, number>,
+    groups: {
+      short: any;
+      label: string;
+      value: string;
+    }[],
+  ) => {
+    return groups.map(group => ({
+      short: group.short,
       label: group.label,
       value: group.value,
-      count: countsData.countryGroups[group.value] || 0,
+      count: countItems[group.value],
     }));
-
-    return { programmeOptions, countryGroupOptions };
   };
 
-  const transformedCounts = transformCounts(counts);
+  const transformedCountsCheckboxes = transformCounts(
+    countsCheckboxes,
+    relevantProgrammes,
+  );
+  const transformedCountsRadio = transformCounts(countsRadio, GROUPS);
 
   const transformData = useCallback(
     (filteredData: any[]) => {
@@ -251,8 +261,7 @@ function AppContent() {
     [currentProgramme.value],
   );
 
-  const transformedData = transformData(filteredByProgramme);
-  console.log(transformedData);
+  const transformedForChartData = transformData(filteredByRadioAndCheckboxes);
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
@@ -296,7 +305,7 @@ function AppContent() {
               <FilterCountryGroup
                 onRadioChange={handleRadioChange}
                 selectedRadio={selectedRadio}
-                groups={transformedCounts.countryGroupOptions}
+                groups={transformedCountsRadio}
               />
             </div>
           </div>
@@ -332,7 +341,7 @@ function AppContent() {
                   style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
                 >
                   <CheckboxGroup
-                    options={transformedCounts.programmeOptions}
+                    options={transformedCountsCheckboxes}
                     onChange={handleCheckboxChange}
                     value={selectedCheckboxes}
                   />
@@ -377,7 +386,7 @@ function AppContent() {
           {viewMode === 'Map' ? (
             <div className='flex-div flex-hor-align-center'>
               <ChoroplethMap
-                data={transformedData}
+                data={transformedForChartData}
                 width={1000}
                 height={600}
                 scale={250}

@@ -88,8 +88,12 @@ export const PROGRAMMES = [
 ];
 
 export const GROUPS = [
-  { label: 'All countries', value: 'all' },
-  { label: 'Fragile and affected', value: 'fragile' },
-  { label: 'LDC', value: 'ldc' },
-  { label: 'SIDS', value: 'sids' },
+  { label: 'All countries', short: 'All countries', value: 'all' },
+  {
+    label: 'Fragile and affected',
+    short: 'Fragile and affected',
+    value: 'fragile',
+  },
+  { label: 'LDC', short: 'LDC', value: 'ldc' },
+  { label: 'SIDS', short: 'SIDS', value: 'sids' },
 ];
