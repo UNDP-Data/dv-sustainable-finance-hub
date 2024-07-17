@@ -23,9 +23,11 @@ function Cards(props: Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const filteredData = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
-    return data.filter((item: any) =>
-      item.country.toLowerCase().includes(lowercasedSearchTerm),
-    );
+    return data
+      .filter((item: any) => item.filtered === '1')
+      .filter((item: any) =>
+        item.data.country.toLowerCase().includes(lowercasedSearchTerm),
+      );
   }, [data, searchTerm]);
 
   return (
@@ -38,11 +40,15 @@ function Cards(props: Props) {
       />
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((item: any, index: any) => {
-          const tags = generateTags(item, currentProgramme.value);
+          const tags = generateTags(item.data, currentProgramme.value);
           if (!tags || tags.length === 0) return null;
 
           return (
-            <CardComponent key={index} countryName={item.country} tags={tags} />
+            <CardComponent
+              key={index}
+              countryName={item.data.country}
+              tags={tags}
+            />
           );
         })}
       </CardContainer>

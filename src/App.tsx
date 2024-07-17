@@ -398,7 +398,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards data={data} />
+            <Cards data={transformedForChartData} />
           )}
         </div>
       </div>
