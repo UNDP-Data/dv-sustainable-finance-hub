@@ -291,42 +291,6 @@ function AppContent() {
           className='flex-div flex-column gap-00 grow'
           style={{ width: '25%', borderRight: '0.07rem solid var(--gray-400)' }}
         >
-          <div className='settings-sections-container'>
-            <button
-              type='button'
-              aria-label='Expand or collapse filters'
-              className='settings-sections-container-title gap-03 margin-bottom-00'
-              onClick={() => setFilterExpanded(!filterExpanded)}
-            >
-              <div>
-                {filterExpanded ? (
-                  <CircleChevronDown size={16} />
-                ) : (
-                  <CircleChevronRight size={16} />
-                )}
-              </div>
-              <h6
-                className='undp-typography margin-top-00 margin-bottom-02'
-                style={{
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  letterSpacing: '.03em',
-                }}
-              >
-                Filter By Country Group
-              </h6>
-            </button>
-            <div
-              className='settings-sections-options-container'
-              style={{ display: filterExpanded ? 'flex' : 'none' }}
-            >
-              <FilterCountryGroup
-                onRadioChange={handleRadioChange}
-                selectedRadio={selectedRadio}
-                groups={transformedCountsRadio}
-              />
-            </div>
-          </div>
           {currentProgramme.value !== 'biofin' &&
             currentProgramme.value !== 'frameworks' && (
               <div className='settings-sections-container'>
@@ -366,6 +330,42 @@ function AppContent() {
                 </div>
               </div>
             )}
+          <div className='settings-sections-container'>
+            <button
+              type='button'
+              aria-label='Expand or collapse filters'
+              className='settings-sections-container-title gap-03 margin-bottom-00'
+              onClick={() => setFilterExpanded(!filterExpanded)}
+            >
+              <div>
+                {filterExpanded ? (
+                  <CircleChevronDown size={16} />
+                ) : (
+                  <CircleChevronRight size={16} />
+                )}
+              </div>
+              <h6
+                className='undp-typography margin-top-00 margin-bottom-02'
+                style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  letterSpacing: '.03em',
+                }}
+              >
+                Filter By Country Group
+              </h6>
+            </button>
+            <div
+              className='settings-sections-options-container'
+              style={{ display: filterExpanded ? 'flex' : 'none' }}
+            >
+              <FilterCountryGroup
+                onRadioChange={handleRadioChange}
+                selectedRadio={selectedRadio}
+                groups={transformedCountsRadio}
+              />
+            </div>
+          </div>
         </div>
         <div
           className='flex-div flex-column grow gap-00'
