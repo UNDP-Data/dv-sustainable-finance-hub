@@ -18,7 +18,6 @@ const StyledSegmented = styled(Segmented).withConfig({
     flex: 1;
     color: var(--gray-700);
     display: flex;
-    justify-content: center;
     &:not(:last-child) {
       margin-right: 4px;
     }
@@ -27,9 +26,7 @@ const StyledSegmented = styled(Segmented).withConfig({
   .ant-segmented-item-label {
     white-space: normal;
     display: flex;
-    justify-content: center;
-    padding: 0 !important;
-    align-items: center;
+    padding: 0 0 8px 0 !important;
   }
 
   .ant-segmented-item-selected {
@@ -41,11 +38,18 @@ const StyledSegmented = styled(Segmented).withConfig({
 `;
 
 interface HeaderProps {
-  onSegmentChange: (value: string | number) => void; // Callback function prop
+  onSegmentChange: (value: string | number) => void;
+  countsCheckboxes: {
+    all: number;
+    public: number;
+    private: number;
+    frameworks: number;
+    biofin: number;
+  };
 }
 
 function Header(props: HeaderProps): JSX.Element {
-  const { onSegmentChange } = props;
+  const { onSegmentChange, countsCheckboxes } = props;
   const { currentProgramme } = useProgramme();
 
   const options = PROGRAMMES.filter(programme =>
@@ -53,7 +57,17 @@ function Header(props: HeaderProps): JSX.Element {
       programme.value,
     ),
   ).map(programme => ({
-    label: <p className='undp-typography label margin-00'>{programme.short}</p>,
+    label: (
+      <div
+        className='flex-div flex-column gap-00'
+        style={{ width: '100%', alignItems: 'flex-start' }}
+      >
+        <h3 className='undp-typography margin-00'>
+          {countsCheckboxes[programme.value as keyof typeof countsCheckboxes]}
+        </h3>
+        <p className='undp-typography label margin-00'>{programme.short}</p>
+      </div>
+    ),
     value: programme.value,
   }));
 

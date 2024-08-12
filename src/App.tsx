@@ -212,7 +212,7 @@ function AppContent() {
       private_environment: 0,
       frameworks: 0,
       biofin: 0,
-      // Add other programmes if needed
+      all: 0, // This will store the sum of private, public, biofin, and frameworks
     };
 
     datum.forEach(item => {
@@ -225,11 +225,18 @@ function AppContent() {
       }
     });
 
+    // Sum the counts for private, public, biofin, and frameworks and assign to `all`
+    programmeCounts.all =
+      programmeCounts.public +
+      programmeCounts.private +
+      programmeCounts.frameworks +
+      programmeCounts.biofin;
+
     return programmeCounts;
   };
 
   const countsCheckboxes = calculateCheckboxes(filteredByCountryGroup);
-
+  console.log('countcheckboxes', countsCheckboxes);
   const countsRadio = calculateRadio(filteredByCheckboxes);
 
   const transformCounts = (
@@ -275,7 +282,10 @@ function AppContent() {
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
       style={{ border: '0.07rem solid var(--gray-400)', maxWidth: '1980px' }}
     >
-      <Header onSegmentChange={handleSegmentChange} />
+      <Header
+        onSegmentChange={handleSegmentChange}
+        countsCheckboxes={countsCheckboxes}
+      />
       <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
         <div
           className='flex-div flex-column gap-00 grow'
