@@ -42,13 +42,15 @@ function CardComponent(props: CardProps) {
           {countryName}
         </h6>
       </CountryDiv>
-      <div className='flex-div flex-wrap gap-02 padding-04'>
-        {tags.map(tag => (
-          <StyledTag key={tag.value} color={tag.color}>
-            {tag.short}
-          </StyledTag>
-        ))}
-      </div>
+      {tags.length > 0 && (
+        <div className='flex-div flex-wrap gap-02 padding-04'>
+          {tags.map(tag => (
+            <StyledTag key={tag.value} color={tag.color}>
+              {tag.short}
+            </StyledTag>
+          ))}
+        </div>
+      )}
     </CardContainer>
   );
 }

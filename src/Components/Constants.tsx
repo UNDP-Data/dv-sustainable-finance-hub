@@ -1,6 +1,7 @@
 import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
+import { Programme } from '../Types';
 
-export const PROGRAMMES = [
+export const PROGRAMMES: Programme[] = [
   {
     label: 'All Programmes',
     short: 'All Programmes',

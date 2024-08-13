@@ -1,7 +1,6 @@
 import { Segmented, Popover } from 'antd';
 import styled from 'styled-components';
 import { Info } from 'lucide-react';
-import { useProgramme } from './ProgrammeContext';
 import { PROGRAMMES } from './Constants';
 
 const StyledSegmented = styled(Segmented).withConfig({
@@ -39,18 +38,11 @@ const StyledSegmented = styled(Segmented).withConfig({
 
 interface HeaderProps {
   onSegmentChange: (value: string | number) => void;
-  countsCheckboxes: {
-    all: number;
-    public: number;
-    private: number;
-    frameworks: number;
-    biofin: number;
-  };
+  currentProgramme: { value: string; color: string };
 }
 
 function Header(props: HeaderProps): JSX.Element {
-  const { onSegmentChange, countsCheckboxes } = props;
-  const { currentProgramme } = useProgramme();
+  const { onSegmentChange, currentProgramme } = props;
 
   const options = PROGRAMMES.filter(programme =>
     ['all', 'public', 'private', 'frameworks', 'biofin'].includes(
@@ -62,9 +54,6 @@ function Header(props: HeaderProps): JSX.Element {
         className='flex-div flex-column gap-00'
         style={{ width: '100%', alignItems: 'flex-start' }}
       >
-        <h3 className='undp-typography margin-00'>
-          {countsCheckboxes[programme.value as keyof typeof countsCheckboxes]}
-        </h3>
         <p className='undp-typography label margin-00'>{programme.short}</p>
       </div>
     ),
