@@ -3,14 +3,15 @@ import { geoEqualEarth } from 'd3-geo';
 import { zoom } from 'd3-zoom';
 import { select } from 'd3-selection';
 import World from '../MapData/worldMap.json';
-import { ChoroplethMapDataType } from '../../../../Types';
+// import { ChoroplethMapDataType } from '../../../../Types';
 import { Tooltip } from '../../../Elements/Tooltip';
+import { Country } from '../../../../Utils/countryFilters';
 
 interface Props {
   width: number;
   height: number;
-  colors: string[];
-  data: ChoroplethMapDataType[];
+  colors: string;
+  data: Country[];
   scale: number;
   centerPoint: [number, number];
   tooltip?: (_d: any) => JSX.Element;
@@ -56,7 +57,7 @@ export function Graph(props: Props) {
     mapSvgSelect.call(zoomBehaviour as any);
   }, [svgHeight, svgWidth]);
 
-  const programmeColor = colors[0];
+  const programmeColor = colors;
 
   return (
     <>
@@ -132,13 +133,13 @@ export function Graph(props: Props) {
               (el: any) => d.iso === el.properties.ISO3,
             );
             let color = 'var(--gray-100)';
-            if (d.x === '1') {
-              color = programmeColor;
+            if (d.initialFilter) {
+              color = d.filtered ? programmeColor : 'var(--gray-500)';
             }
 
             let opacity = '1';
-            if (d.x === '1') {
-              opacity = d.filtered === '1' ? '1' : '0.3';
+            if (d.initialFilter) {
+              opacity = d.filtered ? '1' : '0.3';
             }
 
             return (

@@ -1,7 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { json, csv } from 'd3-request';
 import { queue } from 'd3-queue';
-import { CheckboxValueType } from 'antd/es/checkbox/Group';
 import {
   CircleChevronDown,
   CircleChevronRight,
@@ -10,31 +9,87 @@ import {
 } from 'lucide-react';
 import { Segmented } from 'antd';
 import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
-import Header from './Components/Header';
-import FilterCountryGroup from './Components/Filter';
-import { GROUPS, PROGRAMMES } from './Components/Constants';
-import { ProgrammeProvider, useProgramme } from './Components/ProgrammeContext';
-import CheckboxGroup from './Components/CheckboxGroup';
+import { ProgrammeProvider } from './Components/ProgrammeContext';
 import Cards from './Components/Cards';
 import { TooltipContent } from './Components/TooltipContent';
-import { filterProgrammes } from './Utils/filterProgrammes';
+import {
+  Country,
+  filterCountries,
+  FilterFunction,
+  programIncludesFilter,
+  programStartsWithFilter,
+  filterByType,
+  countCountriesByPrograms,
+  countCountriesByType,
+} from './Utils/countryFilters';
+import Header from './Components/Header';
+import ProgrammeTree from './Components/ProgrammeTree';
+import { PROGRAMMES } from './Components/Constants';
+import FilterCountryGroup from './Components/Filter';
 
-const tooltip = (d: any) => {
-  return <TooltipContent data={d.data} />;
-};
+const baseTreeData = [
+  {
+    title: 'Public Finance',
+    key: 'public',
+    data: { fullLabel: 'Public Finance for the SDGs' },
+    children: [
+      { title: 'Tax for the SDGs', key: 'public_tax' },
+      { title: 'Budget for the SDGs', key: 'public_budget' },
+      { title: 'Debt for the SDGs', key: 'public_debt' },
+      { title: 'Insurance and risk finance', key: 'public_insurance' },
+    ],
+  },
+  {
+    title: 'Private finance',
+    key: 'private',
+    data: { fullLabel: 'Private Finance for the SDGs' },
+    children: [
+      {
+        title: 'Originating pipelines',
+        key: 'private_pipelines',
+      },
+      { title: 'Managing for impact', key: 'private_impact' },
+      { title: 'Enabling environment', key: 'private_environment' },
+    ],
+  },
+  { title: 'Biodiversity finance', key: 'biofin' },
+  {
+    title: 'INFFs',
+    key: 'frameworks',
+    data: { fullLabel: 'Integrated National Financing Frameworks' },
+  },
+];
+
+const ALL_PROGRAMS = [
+  'public_tax',
+  'public_budget',
+  'public_debt',
+  'public_insurance',
+  'private_pipelines',
+  'private_impact',
+  'private_environment',
+  'biofin',
+  'frameworks',
+];
+
+const ALL_CHECKED_KEYS = ['public', 'private', 'biofin', 'frameworks'];
 
 function AppContent() {
-  const [data, setData] = useState<any[]>([]);
-  const [selectedRadio, setSelectedRadio] = useState<string>('all');
-  const {
-    currentProgramme,
-    setCurrentProgramme,
-    selectedCheckboxes,
-    setSelectedCheckboxes,
-  } = useProgramme();
+  const [data, setData] = useState<Country[]>([]);
+  const [checkedKeys, setCheckedKeys] = useState<string[]>(ALL_CHECKED_KEYS);
+
+  // Initialize with the "All Programmes" object
+  const allProgrammes = PROGRAMMES.find(programme => programme.value === 'all');
+
+  if (!allProgrammes) {
+    throw new Error('The "All Programmes" option is missing in PROGRAMMES');
+  }
+
+  const [currentProgramme, setCurrentProgramme] = useState(allProgrammes);
   const [filterExpanded, setFilterExpanded] = useState(true);
   const [filterTwoExpanded, setFilterTwoExpanded] = useState(true);
   const [viewMode, setViewMode] = useState<string>('Map');
+  const [selectedType, setSelectedType] = useState<string>('all');
 
   useEffect(() => {
     queue()
@@ -67,41 +122,44 @@ function AppContent() {
           {},
         );
 
-        // Add sids, ldc, public, and private columns
-        const transformedData = loadedData.map((item: any) => {
+        const transformedData: Country[] = loadedData.map((d: any) => {
+          const programs: string[] = [];
+
+          Object.keys(d).forEach(key => {
+            // Check if the key is a recognized program and is active
+            if (ALL_PROGRAMS.includes(key) && d[key] === '1') {
+              programs.push(key);
+            }
+          });
+
+          const { iso } = d;
+          const name = countryMapping[iso] || d.country;
+
+          // Initialize the type as an array
+          const type: string[] = [];
+
+          // Add 'SIDS' if the ISO is in the sids list
+          if (sids.includes(iso)) {
+            type.push('SIDS');
+          }
+
+          // Add 'LDC' if the ISO is in the ldc list
+          if (ldc.includes(iso)) {
+            type.push('LDC');
+          }
+
+          // Add 'Fragile and Affected' if the 'fragile' column is '1'
+          if (d.fragile === '1') {
+            type.push('Fragile and Affected');
+          }
+
           return {
-            ...item,
-            country: countryMapping[item.iso] || item.country,
-            sids: sids.includes(item.iso) ? '1' : '',
-            ldc: ldc.includes(item.iso) ? '1' : '',
-            public: [
-              'public_tax',
-              'public_budget',
-              'public_debt',
-              'public_insurance',
-            ].some(key => item[key] === '1')
-              ? '1'
-              : '',
-            private: [
-              'private_pipelines',
-              'private_impact',
-              'private_environment',
-            ].some(key => item[key] === '1')
-              ? '1'
-              : '',
-            all: [
-              'public_tax',
-              'public_budget',
-              'public_debt',
-              'public_insurance',
-              'private_pipelines',
-              'private_impact',
-              'private_environment',
-              'biofin',
-              'frameworks',
-            ].some(key => item[key] === '1')
-              ? '1'
-              : '',
+            name,
+            iso,
+            programs,
+            type, // type is now an array of strings
+            filtered: false,
+            initialFilter: false,
           };
         });
 
@@ -111,176 +169,162 @@ function AppContent() {
 
   const handleSegmentChange = useCallback(
     (value: string | number) => {
-      const programme = PROGRAMMES.find(p => p.value === value);
+      const selectedProgramme =
+        PROGRAMMES.find(p => p.value === value) || allProgrammes;
 
-      if (programme) {
-        setCurrentProgramme(programme);
+      // Set the full Programme object
+      setCurrentProgramme(selectedProgramme);
+
+      if (selectedProgramme.value === 'all') {
+        setCheckedKeys(ALL_CHECKED_KEYS);
+      } else if (
+        selectedProgramme.value === 'biofin' ||
+        selectedProgramme.value === 'frameworks'
+      ) {
+        // Set the checked keys directly for biofin or frameworks
+        setCheckedKeys([selectedProgramme.value]);
+      } else {
+        const updatedKeys = baseTreeData
+          .filter(
+            item => item.key === selectedProgramme.value || item.key === 'all',
+          )
+          .flatMap(item => item.children?.map(child => child.key) || []);
+        setCheckedKeys(updatedKeys);
       }
     },
-    [setCurrentProgramme],
+    [allProgrammes],
   );
 
   const handleRadioChange = useCallback((value: string) => {
-    setSelectedRadio(value);
+    setSelectedType(value);
   }, []);
-
+  // Handle checkbox change
   const handleCheckboxChange = useCallback(
-    (checkedValues: CheckboxValueType[]) => {
-      setSelectedCheckboxes(checkedValues.map(String));
-    },
-    [setSelectedCheckboxes],
-  );
-
-  const filterData = useCallback((rawData: any[], programme: string) => {
-    return rawData.map(item => {
-      const isFiltered = item[programme] === '1';
-
-      return {
-        ...item,
-        filtered: isFiltered ? '1' : '0',
-      };
-    });
-  }, []);
-
-  const filteredByCurrentProgramme = filterData(data, currentProgramme.value);
-
-  const filteredByCountryGroup = filterData(
-    filteredByCurrentProgramme,
-    selectedRadio,
-  );
-
-  const filterByCheckboxes = useCallback(
-    (filteredData: any[], checkboxes: string[]) => {
-      return filteredData.map(item => {
-        if (item.filtered === '1') {
-          const isFiltered = checkboxes.some(
-            checkbox => item[checkbox] === '1',
-          );
-          return {
-            ...item,
-            filtered: isFiltered ? '1' : '0',
-          };
-        }
-        return item;
-      });
+    (
+      checkedKeysValue: string[] | { checked: string[]; halfChecked: string[] },
+    ) => {
+      const keys = Array.isArray(checkedKeysValue)
+        ? checkedKeysValue
+        : checkedKeysValue.checked;
+      setCheckedKeys(keys);
     },
     [],
   );
 
-  const filteredByRadioAndCheckboxes = filterByCheckboxes(
-    filteredByCountryGroup,
-    selectedCheckboxes,
-  );
-  const filteredByCheckboxes = filterByCheckboxes(
-    filteredByCurrentProgramme,
-    selectedCheckboxes,
-  );
+  // Filters
+  function generateFilterFunctions(
+    anySelectedKeys: string[],
+  ): FilterFunction[] {
+    const filters: FilterFunction[] = [];
 
-  const relevantProgrammes = filterProgrammes(currentProgramme.value);
-
-  // calculate counts
-  const calculateRadio = (datum: any[]) => {
-    const countryGroupCounts = {
-      all: 0,
-      sids: 0,
-      ldc: 0,
-      fragile: 0,
-    };
-
-    datum.forEach(item => {
-      if (item.filtered === '1') {
-        countryGroupCounts.all += 1;
-        if (item.sids === '1') countryGroupCounts.sids += 1;
-        if (item.ldc === '1') countryGroupCounts.ldc += 1;
-        if (item.fragile === '1') countryGroupCounts.fragile += 1;
+    // Iterate over the selected keys
+    anySelectedKeys.forEach(key => {
+      if (key === 'public' || key === 'private') {
+        // Add a filter function for the whole category
+        filters.push(programStartsWithFilter(key));
+      } else {
+        // Add a filter function for a specific program
+        filters.push(programIncludesFilter(key));
       }
     });
 
-    return countryGroupCounts;
-  };
+    return filters;
+  }
 
-  const calculateCheckboxes = (datum: any[]) => {
-    const programmeCounts = {
-      public: 0,
-      public_tax: 0,
-      public_debt: 0,
-      public_budget: 0,
-      public_insurance: 0,
-      private: 0,
-      private_pipelines: 0,
-      private_impact: 0,
-      private_environment: 0,
-      frameworks: 0,
-      biofin: 0,
-      // Add other programmes if needed
-    };
-
-    datum.forEach(item => {
-      if (item.filtered === '1') {
-        Object.keys(programmeCounts).forEach(prog => {
-          if (item[prog] === '1') {
-            programmeCounts[prog as keyof typeof programmeCounts] += 1;
-          }
-        });
-      }
-    });
-
-    return programmeCounts;
-  };
-
-  const countsCheckboxes = calculateCheckboxes(filteredByCountryGroup);
-
-  const countsRadio = calculateRadio(filteredByCheckboxes);
-
-  const transformCounts = (
-    countItems: Record<string, number>,
-    groups: {
-      short: any;
-      label: string;
-      value: string;
-    }[],
-  ) => {
-    return groups.map(group => ({
-      short: group.short,
-      label: group.label,
-      value: group.value,
-      count: countItems[group.value],
-    }));
-  };
-
-  const transformedCountsCheckboxes = transformCounts(
-    countsCheckboxes,
-    relevantProgrammes,
+  const filters = generateFilterFunctions(checkedKeys);
+  const result = filterCountries(data, filters, selectedType);
+  const countsByProgram = countCountriesByPrograms(
+    result.filter(c => filterByType(c, selectedType)),
   );
-  const transformedCountsRadio = transformCounts(countsRadio, GROUPS);
 
-  const transformData = useCallback(
-    (filteredData: any[]) => {
-      return filteredData.map(item => {
-        return {
-          x: item[currentProgramme.value],
-          iso: item.iso,
-          filtered: item.filtered,
-          data: { ...item }, // Nest all original properties under 'data'
-        };
-      });
+  const programCountries = result.filter(c =>
+    filters.some(filterFunc => filterFunc(c)),
+  );
+  const countsByType = countCountriesByType(programCountries);
+
+  countsByType.all = programCountries.length;
+  console.log(countsByProgram);
+  console.log(countsByType);
+
+  const tooltip = (d: any) => {
+    return <TooltipContent iso={d.iso} data={result} />;
+  };
+
+  const groups = [
+    { label: 'All countries', value: 'all', count: countsByType.all },
+    {
+      fullLabel: 'Small Island Developing States',
+      label: 'SIDS',
+      value: 'SIDS',
+      count: countsByType.SIDS,
     },
-    [currentProgramme.value],
-  );
-
-  const transformedForChartData = transformData(filteredByRadioAndCheckboxes);
+    {
+      fullLabel: 'Least Developed Countries',
+      label: 'LDCs',
+      value: 'LDC',
+      count: countsByType.LDC,
+    },
+    {
+      fullLabel: 'Fragile and conflict-affected situations',
+      label: 'Fragile and conflict-affected',
+      value: 'Fragile and Affected',
+      count: countsByType['Fragile and Affected'],
+    },
+  ];
 
   return (
     <div
       className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
       style={{ border: '0.07rem solid var(--gray-400)', maxWidth: '1980px' }}
     >
-      <Header onSegmentChange={handleSegmentChange} />
+      <Header
+        onSegmentChange={handleSegmentChange}
+        currentProgramme={currentProgramme}
+        countPrograms={countsByProgram}
+      />
       <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
         <div
           className='flex-div flex-column gap-00 grow'
           style={{ width: '25%', borderRight: '0.07rem solid var(--gray-400)' }}
         >
+          <div className='settings-sections-container'>
+            <button
+              type='button'
+              aria-label='Expand or collapse filters'
+              className='settings-sections-container-title gap-03 margin-bottom-00'
+              onClick={() => setFilterTwoExpanded(!filterTwoExpanded)}
+            >
+              <div>
+                {filterTwoExpanded ? (
+                  <CircleChevronDown size={16} />
+                ) : (
+                  <CircleChevronRight size={16} />
+                )}
+              </div>
+              <h6
+                className='undp-typography margin-top-00 margin-bottom-02'
+                style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  letterSpacing: '.03em',
+                }}
+              >
+                Filter By SubProgrammes
+              </h6>
+            </button>
+            <div
+              className='settings-sections-options-container padding-top-03'
+              style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
+            >
+              <ProgrammeTree
+                checkedKeys={checkedKeys}
+                onCheck={handleCheckboxChange}
+                currentProgramme={currentProgramme.value}
+                baseTreeData={baseTreeData}
+                countsByProgram={countsByProgram}
+              />
+            </div>
+          </div>
           <div className='settings-sections-container'>
             <button
               type='button'
@@ -307,55 +351,16 @@ function AppContent() {
               </h6>
             </button>
             <div
-              className='settings-sections-options-container'
+              className='settings-sections-options-container padding-top-03'
               style={{ display: filterExpanded ? 'flex' : 'none' }}
             >
               <FilterCountryGroup
+                selectedRadio={selectedType}
                 onRadioChange={handleRadioChange}
-                selectedRadio={selectedRadio}
-                groups={transformedCountsRadio}
+                groups={groups}
               />
             </div>
           </div>
-          {currentProgramme.value !== 'biofin' &&
-            currentProgramme.value !== 'frameworks' && (
-              <div className='settings-sections-container'>
-                <button
-                  type='button'
-                  aria-label='Expand or collapse filters'
-                  className='settings-sections-container-title gap-03 margin-bottom-00'
-                  onClick={() => setFilterTwoExpanded(!filterTwoExpanded)}
-                >
-                  <div>
-                    {filterTwoExpanded ? (
-                      <CircleChevronDown size={16} />
-                    ) : (
-                      <CircleChevronRight size={16} />
-                    )}
-                  </div>
-                  <h6
-                    className='undp-typography margin-top-00 margin-bottom-02'
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      letterSpacing: '.03em',
-                    }}
-                  >
-                    Filter By SubProgrammes
-                  </h6>
-                </button>
-                <div
-                  className='settings-sections-options-container'
-                  style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
-                >
-                  <CheckboxGroup
-                    options={transformedCountsCheckboxes}
-                    onChange={handleCheckboxChange}
-                    value={selectedCheckboxes}
-                  />
-                </div>
-              </div>
-            )}
         </div>
         <div
           className='flex-div flex-column grow gap-00'
@@ -394,16 +399,21 @@ function AppContent() {
           {viewMode === 'Map' ? (
             <div className='flex-div flex-hor-align-center'>
               <ChoroplethMap
-                data={transformedForChartData}
+                data={result}
                 width={1000}
                 height={600}
                 scale={250}
                 centerPoint={[450, 370]}
                 tooltip={tooltip}
+                colors={currentProgramme.color}
               />
             </div>
           ) : (
-            <Cards data={transformedForChartData} />
+            <Cards
+              data={result}
+              countsByType={countsByType}
+              selectedType={selectedType}
+            />
           )}
         </div>
       </div>

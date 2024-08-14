@@ -3,8 +3,9 @@ import { Search } from 'lucide-react';
 import { Input } from 'antd';
 import styled from 'styled-components';
 import CardComponent from './Card';
-import { generateTags } from '../Utils/generateTags';
-import { useProgramme } from './ProgrammeContext';
+import { Programme } from '../Types';
+import { Country } from '../Utils/countryFilters';
+import { PROGRAMMES } from './Constants';
 
 const CardContainer = styled.div`
   display: flex;
@@ -14,25 +15,26 @@ const CardContainer = styled.div`
 `;
 
 interface Props {
-  data: any[];
+  data: Country[];
+  countsByType: { [key: string]: number }; // Counts by program
+  selectedType: string;
 }
 
-function Cards(props: Props) {
-  const { data } = props;
-  const { currentProgramme } = useProgramme();
+function Cards({ data, countsByType, selectedType }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredData = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
     return data
-      .filter((item: any) => item.filtered === '1')
-      .filter(
-        (item: any) =>
-          item.data &&
-          item.data.country &&
-          item.data.country.toLowerCase().includes(lowercasedSearchTerm),
+      .filter((country: Country) => country.filtered)
+      .filter((country: Country) =>
+        country.name.toLowerCase().includes(lowercasedSearchTerm),
       );
   }, [data, searchTerm]);
+
+  const getProgrammeDetails = (progValue: string): Programme | undefined => {
+    return PROGRAMMES.find(programme => programme.value === progValue);
+  };
 
   return (
     <div
@@ -45,17 +47,21 @@ function Cards(props: Props) {
         onChange={e => setSearchTerm(e.target.value)}
         style={{ width: '100%' }}
       />
+      <h6 className='undp-typography margin-top-05 margin-bottom-02 small-font'>
+        {selectedType} countries ({countsByType[selectedType]})
+      </h6>
       <CardContainer className='margin-top-04 undp-scrollbar'>
-        {filteredData.map((item: any, index: any) => {
-          const tags = generateTags(item.data, currentProgramme.value);
-          if (!tags || tags.length === 0) return null;
+        {filteredData.map((country: Country, index: number) => {
+          // Generate tags by looking up each program in PROGRAMMES
+          const tags: Programme[] = country.programs
+            .map(getProgrammeDetails)
+            .filter((prog): prog is Programme => prog !== undefined);
+
+          // Only render the card if there are tags
+          if (tags.length === 0) return null;
 
           return (
-            <CardComponent
-              key={index}
-              countryName={item.data.country}
-              tags={tags}
-            />
+            <CardComponent key={index} countryName={country.name} tags={tags} />
           );
         })}
       </CardContainer>

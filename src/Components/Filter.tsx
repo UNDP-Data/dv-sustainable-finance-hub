@@ -25,11 +25,29 @@ const StyledRadioGroup = styled(Radio.Group)`
     }
   }
 `;
+const StyledTag = styled.div`
+  border-radius: 2px;
+  border: 1px solid var(--gray-400);
+  background-color: var(--gray-100);
+  padding: 0px 8px;
+  margin: 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  min-width: 16px;
+  justify-content: center;
+  }
+`;
 
 interface CountryGroupProps {
   onRadioChange: (value: string) => void;
   selectedRadio: string;
-  groups: { label: string; value: string; count?: number }[];
+  groups: {
+    fullLabel?: string;
+    label: string;
+    value: string;
+    count?: number;
+  }[];
 }
 
 function FilterCountryGroup(props: CountryGroupProps): JSX.Element {
@@ -47,20 +65,11 @@ function FilterCountryGroup(props: CountryGroupProps): JSX.Element {
             className='flex-div flex-space-between'
             style={{ width: '100%' }}
           >
-            <div>{group.label}</div>
+            <div title={group.fullLabel ? group.fullLabel : group.label}>
+              {group.label}
+            </div>
             {group.count !== undefined ? (
-              <p
-                style={{
-                  fontSize: '12px',
-                  lineHeight: '200%',
-                  backgroundColor: 'var(--gray-300)',
-                  borderRadius: '100px',
-                  padding: '0 8px',
-                  margin: '0',
-                }}
-              >
-                {group.count}
-              </p>
+              <StyledTag>{group.count}</StyledTag>
             ) : (
               ''
             )}

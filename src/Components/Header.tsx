@@ -1,7 +1,6 @@
 import { Segmented, Popover } from 'antd';
 import styled from 'styled-components';
 import { Info } from 'lucide-react';
-import { useProgramme } from './ProgrammeContext';
 import { PROGRAMMES } from './Constants';
 
 const StyledSegmented = styled(Segmented).withConfig({
@@ -18,7 +17,6 @@ const StyledSegmented = styled(Segmented).withConfig({
     flex: 1;
     color: var(--gray-700);
     display: flex;
-    justify-content: center;
     &:not(:last-child) {
       margin-right: 4px;
     }
@@ -27,33 +25,46 @@ const StyledSegmented = styled(Segmented).withConfig({
   .ant-segmented-item-label {
     white-space: normal;
     display: flex;
-    justify-content: center;
-    padding: 0 !important;
-    align-items: center;
+    padding: 0 0 8px 0 !important;
   }
 
   .ant-segmented-item-selected {
     border-bottom: 0.5rem solid ${({ selectedColor }) => selectedColor};
     box-shadow: none;
-    font-weight: 600;
     font-size: 14px;
+  }
+
+  .ant-segmented-item-selected:hover {
+    background-color: white;
   }
 `;
 
 interface HeaderProps {
-  onSegmentChange: (value: string | number) => void; // Callback function prop
+  onSegmentChange: (value: string | number) => void;
+  currentProgramme: { value: string; color: string };
+  countPrograms: { [key: string]: number };
 }
 
 function Header(props: HeaderProps): JSX.Element {
-  const { onSegmentChange } = props;
-  const { currentProgramme } = useProgramme();
+  const { onSegmentChange, currentProgramme, countPrograms } = props;
 
   const options = PROGRAMMES.filter(programme =>
     ['all', 'public', 'private', 'frameworks', 'biofin'].includes(
       programme.value,
     ),
   ).map(programme => ({
-    label: <p className='undp-typography label margin-00'>{programme.short}</p>,
+    label: (
+      <div
+        className='flex-div flex-column gap-00'
+        style={{ width: '100%', alignItems: 'flex-start' }}
+        title={programme.label}
+      >
+        <h3 className='undp-typography margin-00'>
+          {countPrograms[programme.value] || 0}
+        </h3>
+        <p className='undp-typography label margin-00'>{programme.short}</p>
+      </div>
+    ),
     value: programme.value,
   }));
 
@@ -65,8 +76,8 @@ function Header(props: HeaderProps): JSX.Element {
           maxWidth: '20rem',
         }}
       >
-        Rotate data from rows to columns or vice versa. Make sure all the values
-        for first column is unique
+        This dashboard shows UNDP’s work on sustainable finance across the
+        world. You can filter the information by service or topic.
       </p>
     </div>
   );
@@ -84,7 +95,7 @@ function Header(props: HeaderProps): JSX.Element {
           className='undp-typography margin-00 padding-00 bold'
           style={{ fontSize: '1rem' }}
         >
-          Sustainable Financial Hub Dashboard
+          UNDP’s work on sustainable finance
         </p>
         <Popover
           overlayClassName='undp-tooltip'

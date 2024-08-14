@@ -1,15 +1,16 @@
 import { Leaf, School, BriefcaseBusiness, Flag, Shell } from 'lucide-react';
+import { Programme } from '../Types';
 
-export const PROGRAMMES = [
+export const PROGRAMMES: Programme[] = [
   {
-    label: 'All Programmes',
-    short: 'All Programmes',
+    label: 'All programmes',
+    short: 'All programmes',
     value: 'all',
     color: '#006EB5',
     icon: Leaf,
   },
   {
-    label: 'Public finance for the SDGs',
+    label: 'Public Finance for the SDGs',
     short: 'Public finance',
     value: 'public',
     color: '#5DD4F0',
@@ -44,7 +45,7 @@ export const PROGRAMMES = [
     icon: Flag,
   },
   {
-    label: 'Unlocking private capital and aligning for the SDGs',
+    label: 'Public Finance for the SDGs',
     short: 'Private finance',
     value: 'private',
     color: '#02A38A',
@@ -58,8 +59,8 @@ export const PROGRAMMES = [
     icon: Shell,
   },
   {
-    label: 'Managing for Impact',
-    short: 'Managing for Impact',
+    label: 'Managing for impact',
+    short: 'Managing for impact',
     value: 'private_impact',
     color: '#02A38A',
     icon: Leaf,
@@ -73,27 +74,16 @@ export const PROGRAMMES = [
   },
   {
     label: 'Integrated National Financing Frameworks',
-    short: 'Integrated Frameworks',
+    short: 'INFFs',
     value: 'frameworks',
     color: '#E78625',
     icon: Flag,
   },
   {
-    label: 'Biodiversity Finance',
+    label: 'Biodiversity finance',
     short: 'Biodiversity finance',
     value: 'biofin',
     color: '#E0529E',
     icon: Shell,
   },
-];
-
-export const GROUPS = [
-  { label: 'All countries', short: 'All countries', value: 'all' },
-  {
-    label: 'Fragile and affected',
-    short: 'Fragile and affected',
-    value: 'fragile',
-  },
-  { label: 'LDC', short: 'LDC', value: 'ldc' },
-  { label: 'SIDS', short: 'SIDS', value: 'sids' },
 ];

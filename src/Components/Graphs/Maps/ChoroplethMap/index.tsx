@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Graph } from './Graph';
-import { ChoroplethMapDataType } from '../../../../Types';
 import { GraphFooter } from '../../../Elements/GraphFooter';
 import { GraphHeader } from '../../../Elements/GraphHeader';
-import { PROGRAMMES } from '../../../Constants';
-import { useProgramme } from '../../../ProgrammeContext';
+import { Country } from '../../../../Utils/countryFilters';
 
 interface Props {
   graphTitle?: string;
@@ -14,7 +12,8 @@ interface Props {
   width?: number;
   height?: number;
   source?: string;
-  data: ChoroplethMapDataType[];
+  colors: string;
+  data: Country[];
   scale?: number;
   centerPoint?: [number, number];
   backgroundColor?: string | boolean;
@@ -28,6 +27,7 @@ export function ChoroplethMap(props: Props) {
     data,
     graphTitle,
     source,
+    colors,
     graphDescription,
     sourceLink,
     height,
@@ -40,11 +40,6 @@ export function ChoroplethMap(props: Props) {
     tooltip,
     onSeriesMouseOver,
   } = props;
-
-  const { currentProgramme } = useProgramme();
-  const currentProgrammeColor =
-    PROGRAMMES.find(prog => prog.value === currentProgramme.value)?.color ||
-    '#006EB5';
 
   const [svgWidth, setSvgWidth] = useState(0);
   const [svgHeight, setSvgHeight] = useState(0);
@@ -107,7 +102,7 @@ export function ChoroplethMap(props: Props) {
               height={height || svgHeight}
               scale={scale || 180}
               centerPoint={centerPoint || [470, 315]}
-              colors={[currentProgrammeColor]}
+              colors={colors}
               tooltip={tooltip}
               onSeriesMouseOver={onSeriesMouseOver}
             />
