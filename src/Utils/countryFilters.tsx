@@ -19,6 +19,8 @@ export const countCountriesByPrograms = (
   countries: Country[],
 ): ProgramCounts => {
   const counts: ProgramCounts = {};
+
+  // Initialize counts for 'public' and 'private'
   if (!counts.public) {
     counts.public = 0;
   }
@@ -26,6 +28,7 @@ export const countCountriesByPrograms = (
     counts.private = 0;
   }
 
+  // Count occurrences of each program
   countries.forEach(country => {
     country.programs.forEach(program => {
       if (!counts[program]) {
@@ -33,13 +36,25 @@ export const countCountriesByPrograms = (
       }
       counts[program] += 1;
     });
-    if (country.programs.filter(p => p.startsWith('public')).length > 0) {
+
+    // Count countries with 'public' or 'private' programs
+    if (country.programs.some(p => p.startsWith('public'))) {
       counts.public += 1;
     }
-    if (country.programs.filter(p => p.startsWith('private')).length > 0) {
+    if (country.programs.some(p => p.startsWith('private'))) {
       counts.private += 1;
     }
   });
+
+  // Calculate the sum of all program counts
+  counts.all = Object.keys(counts).reduce((sum, program) => {
+    // Exclude 'public', 'private', and 'all' from the sum
+    if (program !== 'public' && program !== 'private') {
+      // eslint-disable-next-line no-param-reassign
+      sum += counts[program];
+    }
+    return sum;
+  }, 0);
 
   return counts;
 };

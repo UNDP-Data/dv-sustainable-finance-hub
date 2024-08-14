@@ -267,6 +267,7 @@ function AppContent() {
       <Header
         onSegmentChange={handleSegmentChange}
         currentProgramme={currentProgramme}
+        countPrograms={countsByProgram}
       />
       <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
         <div

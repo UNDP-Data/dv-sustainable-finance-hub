@@ -31,18 +31,22 @@ const StyledSegmented = styled(Segmented).withConfig({
   .ant-segmented-item-selected {
     border-bottom: 0.5rem solid ${({ selectedColor }) => selectedColor};
     box-shadow: none;
-    font-weight: 600;
     font-size: 14px;
+  }
+
+  .ant-segmented-item-selected:hover {
+    background-color: white;
   }
 `;
 
 interface HeaderProps {
   onSegmentChange: (value: string | number) => void;
   currentProgramme: { value: string; color: string };
+  countPrograms: { [key: string]: number };
 }
 
 function Header(props: HeaderProps): JSX.Element {
-  const { onSegmentChange, currentProgramme } = props;
+  const { onSegmentChange, currentProgramme, countPrograms } = props;
 
   const options = PROGRAMMES.filter(programme =>
     ['all', 'public', 'private', 'frameworks', 'biofin'].includes(
@@ -54,6 +58,9 @@ function Header(props: HeaderProps): JSX.Element {
         className='flex-div flex-column gap-00'
         style={{ width: '100%', alignItems: 'flex-start' }}
       >
+        <h3 className='undp-typography margin-00'>
+          {countPrograms[programme.value] || 0}
+        </h3>
         <p className='undp-typography label margin-00'>{programme.short}</p>
       </div>
     ),
