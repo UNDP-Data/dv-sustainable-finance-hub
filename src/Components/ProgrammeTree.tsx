@@ -43,6 +43,20 @@ const StyledTree = styled(Tree)`
     background-color: var(--dark-red);
   }
 
+   // Hovered state
+    .ant-tree-node-content-wrapper:hover {
+      background-color: transparent !important;
+    }
+    .ant-tree-node-content-wrapper-open {
+      background-color: transparent !important;
+    }
+
+    // Selected state
+    .ant-tree-node-selected .ant-tree-node-content-wrapper {
+      background-color: transparent !important;
+    }
+  }
+
   .ant-tree-treenode {
     padding: 4px 0;
     border-bottom: 0.07rem solid var(--gray-300);
