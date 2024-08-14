@@ -25,6 +25,17 @@ const StyledRadioGroup = styled(Radio.Group)`
     }
   }
 `;
+const StyledTag = styled.div`
+  border-radius: 2px;
+  border: 1px solid var(--gray-400);
+  background-color: var(--gray-100);
+  padding: 0px 8px;
+  margin: 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  }
+`;
 
 interface CountryGroupProps {
   onRadioChange: (value: string) => void;
@@ -49,18 +60,7 @@ function FilterCountryGroup(props: CountryGroupProps): JSX.Element {
           >
             <div>{group.label}</div>
             {group.count !== undefined ? (
-              <p
-                style={{
-                  fontSize: '12px',
-                  lineHeight: '200%',
-                  backgroundColor: 'var(--gray-300)',
-                  borderRadius: '100px',
-                  padding: '0 8px',
-                  margin: '0',
-                }}
-              >
-                {group.count}
-              </p>
+              <StyledTag>{group.count}</StyledTag>
             ) : (
               ''
             )}

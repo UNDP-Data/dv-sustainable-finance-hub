@@ -18,10 +18,14 @@ import {
   FilterFunction,
   programIncludesFilter,
   programStartsWithFilter,
+  filterByType,
+  countCountriesByPrograms,
+  countCountriesByType,
 } from './Utils/countryFilters';
 import Header from './Components/Header';
 import ProgrammeTree from './Components/ProgrammeTree';
 import { PROGRAMMES } from './Components/Constants';
+import FilterCountryGroup from './Components/Filter';
 
 const baseTreeData = [
   {
@@ -80,10 +84,10 @@ function AppContent() {
   }
 
   const [currentProgramme, setCurrentProgramme] = useState(allProgrammes);
-
   const [filterExpanded, setFilterExpanded] = useState(true);
   const [filterTwoExpanded, setFilterTwoExpanded] = useState(true);
   const [viewMode, setViewMode] = useState<string>('Map');
+  const [selectedType, setSelectedType] = useState<string>('all');
 
   useEffect(() => {
     queue()
@@ -129,19 +133,29 @@ function AppContent() {
           const { iso } = d;
           const name = countryMapping[iso] || d.country;
 
-          let type: 'SIDS' | 'LDC' | 'Fragile and Affected' =
-            'Fragile and Affected';
+          // Initialize the type as an array
+          const type: string[] = [];
+
+          // Add 'SIDS' if the ISO is in the sids list
           if (sids.includes(iso)) {
-            type = 'SIDS';
-          } else if (ldc.includes(iso)) {
-            type = 'LDC';
+            type.push('SIDS');
+          }
+
+          // Add 'LDC' if the ISO is in the ldc list
+          if (ldc.includes(iso)) {
+            type.push('LDC');
+          }
+
+          // Add 'Fragile and Affected' if the 'fragile' column is '1'
+          if (d.fragile === '1') {
+            type.push('Fragile and Affected');
           }
 
           return {
             name,
             iso,
             programs,
-            type,
+            type, // type is now an array of strings
             filtered: false,
             initialFilter: false,
           };
@@ -179,6 +193,9 @@ function AppContent() {
     [allProgrammes],
   );
 
+  const handleRadioChange = useCallback((value: string) => {
+    setSelectedType(value);
+  }, []);
   // Handle checkbox change
   const handleCheckboxChange = useCallback(
     (
@@ -213,11 +230,34 @@ function AppContent() {
   }
 
   const filters = generateFilterFunctions(checkedKeys);
-  const result = filterCountries(data, filters);
+  const result = filterCountries(data, filters, selectedType);
+  const countsByProgram = countCountriesByPrograms(
+    result.filter(c => filterByType(c, selectedType)),
+  );
+
+  const programCountries = result.filter(c =>
+    filters.some(filterFunc => filterFunc(c)),
+  );
+  const countsByType = countCountriesByType(programCountries);
+
+  countsByType.all = programCountries.length;
+  console.log(countsByProgram);
+  console.log(countsByType);
 
   const tooltip = (d: any) => {
     return <TooltipContent iso={d.iso} data={result} />;
   };
+
+  const groups = [
+    { label: 'All', value: 'all', count: countsByType.all },
+    { label: 'SIDS', value: 'SIDS', count: countsByType.SIDS },
+    { label: 'LDC', value: 'LDC', count: countsByType.LDC },
+    {
+      label: 'Fragile and Affected',
+      value: 'Fragile and Affected',
+      count: countsByType['Fragile and Affected'],
+    },
+  ];
 
   return (
     <div
@@ -259,7 +299,7 @@ function AppContent() {
               </h6>
             </button>
             <div
-              className='settings-sections-options-container'
+              className='settings-sections-options-container padding-top-03'
               style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
             >
               <ProgrammeTree
@@ -295,6 +335,16 @@ function AppContent() {
                 Filter By Country Group
               </h6>
             </button>
+            <div
+              className='settings-sections-options-container padding-top-03'
+              style={{ display: filterExpanded ? 'flex' : 'none' }}
+            >
+              <FilterCountryGroup
+                selectedRadio={selectedType}
+                onRadioChange={handleRadioChange}
+                groups={groups}
+              />
+            </div>
           </div>
         </div>
         <div

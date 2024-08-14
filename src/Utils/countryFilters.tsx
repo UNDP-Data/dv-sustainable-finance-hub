@@ -3,7 +3,7 @@ export interface Country {
   name: string;
   iso: string; // 3-letter ISO code
   programs: string[]; // List of programs
-  type: 'SIDS' | 'LDC' | 'Fragile and Affected';
+  type: string[];
   filtered: boolean;
   initialFilter: boolean;
 }
@@ -11,9 +11,67 @@ export interface Country {
 // FilterFunction type
 export type FilterFunction = (country: Country) => boolean;
 
+export interface ProgramCounts {
+  [program: string]: number;
+}
+
+export const countCountriesByPrograms = (
+  countries: Country[],
+): ProgramCounts => {
+  const counts: ProgramCounts = {};
+  if (!counts.public) {
+    counts.public = 0;
+  }
+  if (!counts.private) {
+    counts.private = 0;
+  }
+
+  countries.forEach(country => {
+    country.programs.forEach(program => {
+      if (!counts[program]) {
+        counts[program] = 0;
+      }
+      counts[program] += 1;
+    });
+    if (country.programs.filter(p => p.startsWith('public')).length > 0) {
+      counts.public += 1;
+    }
+    if (country.programs.filter(p => p.startsWith('private')).length > 0) {
+      counts.private += 1;
+    }
+  });
+
+  return counts;
+};
+
+export const countCountriesByType = (countries: Country[]): ProgramCounts => {
+  const counts: ProgramCounts = {};
+
+  countries.forEach(country => {
+    country.type.forEach(t => {
+      if (!counts[t]) {
+        counts[t] = 0;
+      }
+      counts[t] += 1;
+    });
+  });
+
+  return counts;
+};
+
+export const filterByType = (country: Country, shownType: string): boolean => {
+  switch (shownType) {
+    case 'all':
+      return true;
+    default:
+      return country.type.includes(shownType);
+  }
+};
+
 export function filterCountries(
   countries: Country[],
   filters: FilterFunction[],
+  shownType: string,
 ): Country[] {
   return countries.map(country => {
     // Create a shallow copy of the country object to avoid mutating the function parameter
@@ -23,9 +81,9 @@ export function filterCountries(
     updatedCountry.initialFilter = updatedCountry.programs.length > 0;
 
     // Set the filtered property based on the current filters
-    updatedCountry.filtered = filters.some(filterFunc =>
-      filterFunc(updatedCountry),
-    );
+    updatedCountry.filtered =
+      filters.some(filterFunc => filterFunc(updatedCountry)) &&
+      filterByType(updatedCountry, shownType);
 
     return updatedCountry;
   });
