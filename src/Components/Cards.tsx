@@ -16,9 +16,11 @@ const CardContainer = styled.div`
 
 interface Props {
   data: Country[];
+  countsByType: { [key: string]: number }; // Counts by program
+  selectedType: string;
 }
 
-function Cards({ data }: Props) {
+function Cards({ data, countsByType, selectedType }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredData = useMemo(() => {
@@ -45,6 +47,9 @@ function Cards({ data }: Props) {
         onChange={e => setSearchTerm(e.target.value)}
         style={{ width: '100%' }}
       />
+      <h6 className='undp-typography margin-top-05 margin-bottom-02 small-font'>
+        {selectedType} countries ({countsByType[selectedType]})
+      </h6>
       <CardContainer className='margin-top-04 undp-scrollbar'>
         {filteredData.map((country: Country, index: number) => {
           // Generate tags by looking up each program in PROGRAMMES

@@ -395,7 +395,11 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards data={result} />
+            <Cards
+              data={result}
+              countsByType={countsByType}
+              selectedType={selectedType}
+            />
           )}
         </div>
       </div>
