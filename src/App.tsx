@@ -31,6 +31,7 @@ const baseTreeData = [
   {
     title: 'Public Finance',
     key: 'public',
+    data: { fullLabel: 'Public Finance for the SDGs' },
     children: [
       { title: 'Tax for the SDGs', key: 'public_tax' },
       { title: 'Budget for the SDGs', key: 'public_budget' },
@@ -41,6 +42,7 @@ const baseTreeData = [
   {
     title: 'Private finance',
     key: 'private',
+    data: { fullLabel: 'Private Finance for the SDGs' },
     children: [
       {
         title: 'Originating pipelines',
@@ -54,6 +56,7 @@ const baseTreeData = [
   {
     title: 'INFFs',
     key: 'frameworks',
+    data: { fullLabel: 'Integrated National Financing Frameworks' },
   },
 ];
 
@@ -249,9 +252,20 @@ function AppContent() {
 
   const groups = [
     { label: 'All countries', value: 'all', count: countsByType.all },
-    { label: 'SIDS', value: 'SIDS', count: countsByType.SIDS },
-    { label: 'LDCs', value: 'LDC', count: countsByType.LDC },
     {
+      fullLabel: 'Small Island Developing States',
+      label: 'SIDS',
+      value: 'SIDS',
+      count: countsByType.SIDS,
+    },
+    {
+      fullLabel: 'Least Developed Countries',
+      label: 'LDCs',
+      value: 'LDC',
+      count: countsByType.LDC,
+    },
+    {
+      fullLabel: 'Fragile and conflict-affected situations',
       label: 'Fragile and conflict-affected',
       value: 'Fragile and Affected',
       count: countsByType['Fragile and Affected'],

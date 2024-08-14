@@ -7,8 +7,14 @@ interface ProgrammeTreeProps {
   checkedKeys: any; // Array of checked keys
   onCheck: any; // Function to handle check events
   currentProgramme: string; // The currently selected programme
-  baseTreeData: DataNode[];
+  baseTreeData: ExtendedDataNode[];
   countsByProgram: { [key: string]: number }; // Counts by program
+}
+
+interface ExtendedDataNode extends DataNode {
+  data?: {
+    fullLabel?: string;
+  };
 }
 
 const StyledTree = styled(Tree)`
@@ -101,9 +107,14 @@ function ProgrammeTree({
   countsByProgram,
 }: ProgrammeTreeProps) {
   // Function to add counts to the tree node titles
-  const addCountsToTreeData = (treeData: DataNode[]): DataNode[] => {
+  const addCountsToTreeData = (
+    treeData: ExtendedDataNode[],
+  ): ExtendedDataNode[] => {
     return treeData.map(item => {
-      const count = countsByProgram[item.key] || 0; // Get count for this item
+      const count = countsByProgram[item.key] || 0;
+      const label = String(item.title);
+      const fullLabel = item.data?.fullLabel;
+
       const updatedTitle = (
         <span
           style={{
@@ -111,8 +122,9 @@ function ProgrammeTree({
             justifyContent: 'space-between',
             width: '100%',
           }}
+          title={fullLabel ? String(fullLabel) : label}
         >
-          <span style={{ marginRight: 'auto' }}>{String(item.title)}</span>
+          {label}
           <StyledTag>{count}</StyledTag>
         </span>
       );

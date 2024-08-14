@@ -42,7 +42,12 @@ const StyledTag = styled.div`
 interface CountryGroupProps {
   onRadioChange: (value: string) => void;
   selectedRadio: string;
-  groups: { label: string; value: string; count?: number }[];
+  groups: {
+    fullLabel?: string;
+    label: string;
+    value: string;
+    count?: number;
+  }[];
 }
 
 function FilterCountryGroup(props: CountryGroupProps): JSX.Element {
@@ -60,7 +65,9 @@ function FilterCountryGroup(props: CountryGroupProps): JSX.Element {
             className='flex-div flex-space-between'
             style={{ width: '100%' }}
           >
-            <div>{group.label}</div>
+            <div title={group.fullLabel ? group.fullLabel : group.label}>
+              {group.label}
+            </div>
             {group.count !== undefined ? (
               <StyledTag>{group.count}</StyledTag>
             ) : (

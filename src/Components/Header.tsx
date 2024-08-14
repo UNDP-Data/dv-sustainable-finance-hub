@@ -57,6 +57,7 @@ function Header(props: HeaderProps): JSX.Element {
       <div
         className='flex-div flex-column gap-00'
         style={{ width: '100%', alignItems: 'flex-start' }}
+        title={programme.label}
       >
         <h3 className='undp-typography margin-00'>
           {countPrograms[programme.value] || 0}
