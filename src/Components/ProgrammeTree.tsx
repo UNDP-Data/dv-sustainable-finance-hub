@@ -8,18 +8,24 @@ interface ProgrammeTreeProps {
   onCheck: any; // Function to handle check events
   currentProgramme: string; // The currently selected programme
   baseTreeData: DataNode[];
+  countsByProgram: { [key: string]: number }; // Counts by program
 }
 
-// Styled component to customize the Tree checkboxes
 const StyledTree = styled(Tree)`
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Ensure content is scrollable if it overflows */
+
   .ant-tree-checkbox-inner {
-    border: var(--dark-red) 2px solid !important; /* Change the border color to red */
-    background-color: white !important; /* Change the checkbox background to black */
+    border: var(--dark-red) 2px solid !important;
+    background-color: white !important;
   }
 
   .ant-tree-checkbox-checked .ant-tree-checkbox-inner {
     border: black;
   }
+
   .ant-tree-checkbox-inner:hover {
     border: black;
     background-color: rgba(238, 64, 45, 0.2) !important;
@@ -30,8 +36,46 @@ const StyledTree = styled(Tree)`
   }
 
   .ant-tree-checkbox-disabled .ant-tree-checkbox-inner {
-    border-color: #d9d9d9 !important; /* Change the border color to grey when disabled */
+    border-color: #d9d9d9 !important;
   }
+
+  .ant-tree-checkbox-indeterminate .ant-tree-checkbox-inner:after {
+    background-color: var(--dark-red);
+  }
+
+  .ant-tree-treenode {
+    padding: 4px 0;
+    border-bottom: 0.07rem solid var(--gray-300);
+    width: 100% !important;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .ant-tree-title {
+      width: 100% !important;
+    }
+
+    .ant-tree-node-content-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100% !important;
+    }
+  }
+`;
+
+const StyledTag = styled.div`
+  border-radius: 2px;
+  border: 1px solid var(--gray-400);
+  background-color: var(--gray-100);
+  padding: 0px 8px;
+  margin: 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  min-width: 16px;
+  justify-content: center;
 `;
 
 // Static tree data
@@ -40,16 +84,49 @@ function ProgrammeTree({
   onCheck,
   currentProgramme,
   baseTreeData,
+  countsByProgram,
 }: ProgrammeTreeProps) {
+  // Function to add counts to the tree node titles
+  const addCountsToTreeData = (treeData: DataNode[]): DataNode[] => {
+    return treeData.map(item => {
+      const count = countsByProgram[item.key] || 0; // Get count for this item
+      const updatedTitle = (
+        <span
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <span style={{ marginRight: 'auto' }}>{String(item.title)}</span>
+          <StyledTag>{count}</StyledTag>
+        </span>
+      );
+
+      if (item.children) {
+        return {
+          ...item,
+          title: updatedTitle,
+          children: addCountsToTreeData(item.children), // Recursively update children
+        };
+      }
+
+      return {
+        ...item,
+        title: updatedTitle,
+      };
+    });
+  };
+
   // Function to get tree data based on the current programme
   const getTreeData = () => {
+    const updatedTreeData = addCountsToTreeData(baseTreeData);
+
     if (currentProgramme === 'all') {
-      // Enable all nodes when 'all' is selected
-      return baseTreeData;
+      return updatedTreeData;
     }
 
-    return baseTreeData.map(item => {
-      // If the current programme is biofin or frameworks, enable only that item
+    return updatedTreeData.map(item => {
       if (item.key === 'biofin' || item.key === 'frameworks') {
         return {
           ...item,
@@ -57,7 +134,6 @@ function ProgrammeTree({
         };
       }
 
-      // For items with children, disable all other items except the current programme
       if (item.children) {
         return {
           ...item,
@@ -70,7 +146,6 @@ function ProgrammeTree({
         };
       }
 
-      // Disable items that don't match the current programme
       return {
         ...item,
         disabled: item.key !== currentProgramme,

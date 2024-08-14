@@ -75,8 +75,8 @@ function Header(props: HeaderProps): JSX.Element {
           maxWidth: '20rem',
         }}
       >
-        Rotate data from rows to columns or vice versa. Make sure all the values
-        for first column is unique
+        This dashboard shows UNDP’s work on sustainable finance across the
+        world. You can filter the information by service or topic.
       </p>
     </div>
   );
@@ -94,7 +94,7 @@ function Header(props: HeaderProps): JSX.Element {
           className='undp-typography margin-00 padding-00 bold'
           style={{ fontSize: '1rem' }}
         >
-          Sustainable Financial Hub Dashboard
+          UNDP’s work on sustainable finance
         </p>
         <Popover
           overlayClassName='undp-tooltip'

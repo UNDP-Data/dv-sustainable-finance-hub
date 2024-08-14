@@ -34,6 +34,8 @@ const StyledTag = styled.div`
   font-size: 12px;
   display: flex;
   align-items: center;
+  min-width: 16px;
+  justify-content: center;
   }
 `;
 

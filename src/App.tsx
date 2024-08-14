@@ -32,28 +32,27 @@ const baseTreeData = [
     title: 'Public Finance',
     key: 'public',
     children: [
-      { title: 'Tax for SDGs', key: 'public_tax' },
-      { title: 'Budget for SDGs', key: 'public_budget' },
-      { title: 'Debt for SDGs', key: 'public_debt' },
-      { title: 'Insurance & Risk Finance', key: 'public_insurance' },
+      { title: 'Tax for the SDGs', key: 'public_tax' },
+      { title: 'Budget for the SDGs', key: 'public_budget' },
+      { title: 'Debt for the SDGs', key: 'public_debt' },
+      { title: 'Insurance and risk finance', key: 'public_insurance' },
     ],
   },
   {
-    title:
-      'Unlocking Private Capital and Aligning Business Operations for the SDG',
+    title: 'Private finance',
     key: 'private',
     children: [
       {
-        title: 'Originating SDG-aligned investment pipelines',
+        title: 'Originating pipelines',
         key: 'private_pipelines',
       },
-      { title: 'Managing for Impact', key: 'private_impact' },
-      { title: 'Enabling Environment', key: 'private_environment' },
+      { title: 'Managing for impact', key: 'private_impact' },
+      { title: 'Enabling environment', key: 'private_environment' },
     ],
   },
-  { title: 'Biodiversity Finance', key: 'biofin' },
+  { title: 'Biodiversity finance', key: 'biofin' },
   {
-    title: 'Integrated National Financing Frameworks',
+    title: 'INFFs',
     key: 'frameworks',
   },
 ];
@@ -249,11 +248,11 @@ function AppContent() {
   };
 
   const groups = [
-    { label: 'All', value: 'all', count: countsByType.all },
+    { label: 'All countries', value: 'all', count: countsByType.all },
     { label: 'SIDS', value: 'SIDS', count: countsByType.SIDS },
-    { label: 'LDC', value: 'LDC', count: countsByType.LDC },
+    { label: 'LDCs', value: 'LDC', count: countsByType.LDC },
     {
-      label: 'Fragile and Affected',
+      label: 'Fragile and conflict-affected',
       value: 'Fragile and Affected',
       count: countsByType['Fragile and Affected'],
     },
@@ -308,6 +307,7 @@ function AppContent() {
                 onCheck={handleCheckboxChange}
                 currentProgramme={currentProgramme.value}
                 baseTreeData={baseTreeData}
+                countsByProgram={countsByProgram}
               />
             </div>
           </div>
