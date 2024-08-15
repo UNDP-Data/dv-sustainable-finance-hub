@@ -52,21 +52,32 @@ function Header(props: HeaderProps): JSX.Element {
     ['all', 'public', 'private', 'frameworks', 'biofin'].includes(
       programme.value,
     ),
-  ).map(programme => ({
-    label: (
-      <div
-        className='flex-div flex-column gap-00'
-        style={{ width: '100%', alignItems: 'flex-start' }}
-        title={programme.label}
-      >
-        <h3 className='undp-typography margin-00'>
-          {countPrograms[programme.value] || 0}
-        </h3>
-        <p className='undp-typography label margin-00'>{programme.short}</p>
-      </div>
-    ),
-    value: programme.value,
-  }));
+  ).map(programme => {
+    // Determine the count to display based on the program value
+    let countValue = 0;
+    if (programme.value === 'public') {
+      countValue = countPrograms.totalPublicPrograms || 0;
+    } else if (programme.value === 'private') {
+      countValue = countPrograms.totalPrivatePrograms || 0;
+    } else {
+      countValue = countPrograms[programme.value] || 0;
+    }
+
+    // Return the label and value for each option
+    return {
+      label: (
+        <div
+          className='flex-div flex-column gap-00'
+          style={{ width: '100%', alignItems: 'flex-start' }}
+          title={programme.label}
+        >
+          <h3 className='undp-typography margin-00'>{countValue}</h3>
+          <p className='undp-typography label margin-00'>{programme.short}</p>
+        </div>
+      ),
+      value: programme.value,
+    };
+  });
 
   const tooltipContent = (
     <div>

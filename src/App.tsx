@@ -52,12 +52,12 @@ const baseTreeData = [
       { title: 'Enabling environment', key: 'private_environment' },
     ],
   },
-  { title: 'Biodiversity finance', key: 'biofin' },
   {
     title: 'INFFs',
     key: 'frameworks',
     data: { fullLabel: 'Integrated National Financing Frameworks' },
   },
+  { title: 'Biodiversity finance', key: 'biofin' },
 ];
 
 const ALL_PROGRAMS = [
@@ -72,7 +72,19 @@ const ALL_PROGRAMS = [
   'frameworks',
 ];
 
-const ALL_CHECKED_KEYS = ['public', 'private', 'biofin', 'frameworks'];
+const ALL_CHECKED_KEYS = [
+  'public',
+  'private',
+  'biofin',
+  'frameworks',
+  'public_tax',
+  'public_budget',
+  'public_debt',
+  'public_insurance',
+  'private_pipelines',
+  'private_impact',
+  'private_environment',
+];
 
 function AppContent() {
   const [data, setData] = useState<Country[]>([]);
@@ -235,6 +247,7 @@ function AppContent() {
   const result = filterCountries(data, filters, selectedType);
   const countsByProgram = countCountriesByPrograms(
     result.filter(c => filterByType(c, selectedType)),
+    checkedKeys,
   );
 
   const programCountries = result.filter(c =>
@@ -309,7 +322,7 @@ function AppContent() {
                   letterSpacing: '.03em',
                 }}
               >
-                Filter By SubProgrammes
+                Filter Countries By Programmes
               </h6>
             </button>
             <div
@@ -347,7 +360,7 @@ function AppContent() {
                   letterSpacing: '.03em',
                 }}
               >
-                Filter By Country Group
+                Filter Countries By Group
               </h6>
             </button>
             <div
