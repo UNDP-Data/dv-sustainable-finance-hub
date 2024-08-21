@@ -34,8 +34,6 @@ export const countCountriesByPrograms = (
   // Initialize counts for 'public', 'private', and totals
   if (!counts.public) counts.public = 0;
   if (!counts.private) counts.private = 0;
-  if (!counts.totalPublicPrograms) counts.totalPublicPrograms = 0;
-  if (!counts.totalPrivatePrograms) counts.totalPrivatePrograms = 0;
 
   // Count occurrences of each program
   countries.forEach(country => {
@@ -47,13 +45,6 @@ export const countCountriesByPrograms = (
       // Only count the program if it is in the selectedPrograms list
       if (selectedPrograms.includes(program)) {
         counts[program] += 1;
-
-        // Increment the total count for public/private programs if they start with the respective prefix
-        if (program.startsWith('public')) {
-          counts.totalPublicPrograms += 1;
-        } else if (program.startsWith('private')) {
-          counts.totalPrivatePrograms += 1;
-        }
       }
     });
 
@@ -76,17 +67,16 @@ export const countCountriesByPrograms = (
     }
   });
 
-  // Calculate the sum of all program counts, excluding certain keys
-  counts.all = Object.keys(counts).reduce((sum, program) => {
-    if (
-      program !== 'public' &&
-      program !== 'private' &&
-      program !== 'totalPublicPrograms' &&
-      program !== 'totalPrivatePrograms'
-    ) {
+  counts.all = countries.reduce((sum, country) => {
+    const hasSpecificProgram = country.programs.some(program =>
+      selectedPrograms.includes(program),
+    );
+
+    if (hasSpecificProgram) {
       // eslint-disable-next-line no-param-reassign
-      sum += counts[program];
+      sum += 1;
     }
+
     return sum;
   }, 0);
 

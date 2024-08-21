@@ -55,13 +55,7 @@ function Header(props: HeaderProps): JSX.Element {
   ).map(programme => {
     // Determine the count to display based on the program value
     let countValue = 0;
-    if (programme.value === 'public') {
-      countValue = countPrograms.totalPublicPrograms || 0;
-    } else if (programme.value === 'private') {
-      countValue = countPrograms.totalPrivatePrograms || 0;
-    } else {
-      countValue = countPrograms[programme.value] || 0;
-    }
+    countValue = countPrograms[programme.value] || 0;
 
     // Return the label and value for each option
     return {
