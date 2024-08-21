@@ -3,15 +3,15 @@ import { Programme } from '../Types';
 
 export const PROGRAMMES: Programme[] = [
   {
-    label: 'All programmes',
-    short: 'All programmes',
+    label: 'Countries with programmes',
+    short: 'Total number of countries',
     value: 'all',
     color: '#006EB5',
     icon: Leaf,
   },
   {
     label: 'Public Finance for the SDGs',
-    short: 'Public finance',
+    short: 'with public finance',
     value: 'public',
     color: '#5DD4F0',
     icon: School,
@@ -46,7 +46,7 @@ export const PROGRAMMES: Programme[] = [
   },
   {
     label: 'Public Finance for the SDGs',
-    short: 'Private finance',
+    short: 'with private finance',
     value: 'private',
     color: '#02A38A',
     icon: BriefcaseBusiness,
@@ -74,14 +74,14 @@ export const PROGRAMMES: Programme[] = [
   },
   {
     label: 'Integrated National Financing Frameworks',
-    short: 'INFFs',
+    short: 'with INFFs',
     value: 'frameworks',
     color: '#E78625',
     icon: Flag,
   },
   {
     label: 'Biodiversity finance',
-    short: 'Biodiversity finance',
+    short: 'with biodiversity finance',
     value: 'biofin',
     color: '#E0529E',
     icon: Shell,

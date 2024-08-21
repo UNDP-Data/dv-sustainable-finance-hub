@@ -66,7 +66,12 @@ function Header(props: HeaderProps): JSX.Element {
           title={programme.label}
         >
           <h3 className='undp-typography margin-00'>{countValue}</h3>
-          <p className='undp-typography label margin-00'>{programme.short}</p>
+          <p
+            style={{ textAlign: 'left', lineHeight: '1.3' }}
+            className='undp-typography label margin-00'
+          >
+            {programme.short}
+          </p>
         </div>
       ),
       value: programme.value,

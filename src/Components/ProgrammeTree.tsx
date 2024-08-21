@@ -183,7 +183,6 @@ function ProgrammeTree({
     <StyledTree
       checkable
       className='undp-checkbox'
-      defaultExpandAll
       checkedKeys={checkedKeys}
       treeData={getTreeData()} // Dynamically adjust tree data based on the current programme
       onCheck={onCheck}
