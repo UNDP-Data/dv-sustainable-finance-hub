@@ -383,32 +383,40 @@ function AppContent() {
             backgroundColor: 'var(--gray-100)',
           }}
         >
-          <Segmented
-            options={[
-              {
-                label: (
-                  <div className='flex-div flex-vert-align-center gap-02'>
-                    <Globe strokeWidth={1.7} size={16} /> Map
-                  </div>
-                ),
-                value: 'Map',
-              },
-              {
-                label: (
-                  <div className='flex-div flex-vert-align-center gap-02'>
-                    <LayoutGrid strokeWidth={1.7} size={16} /> Cards
-                  </div>
-                ),
-                value: 'Cards',
-              },
-            ]}
-            value={viewMode}
-            onChange={(value: any) => setViewMode(value)}
-            style={{
-              margin: '0.5rem 0.5rem 0.5rem auto',
-              width: 'fit-content',
-            }}
-          />
+          <div
+            className='flex-div flex-row flex-vert-align-center
+ flex-space-between padding-left-02 padding-right-02'
+          >
+            <h6 className='undp-typography small-font margin-00 margin-left-03'>
+              countries ({countsByType[selectedType]})
+            </h6>
+            <Segmented
+              options={[
+                {
+                  label: (
+                    <div className='flex-div flex-vert-align-center gap-02'>
+                      <Globe strokeWidth={1.7} size={16} /> Map
+                    </div>
+                  ),
+                  value: 'Map',
+                },
+                {
+                  label: (
+                    <div className='flex-div flex-vert-align-center gap-02'>
+                      <LayoutGrid strokeWidth={1.7} size={16} /> Cards
+                    </div>
+                  ),
+                  value: 'Cards',
+                },
+              ]}
+              value={viewMode}
+              onChange={(value: any) => setViewMode(value)}
+              style={{
+                margin: '0.5rem 0.5rem 0.5rem auto',
+                width: 'fit-content',
+              }}
+            />
+          </div>
           {viewMode === 'Map' ? (
             <div className='flex-div flex-hor-align-center'>
               <ChoroplethMap
@@ -422,11 +430,7 @@ function AppContent() {
               />
             </div>
           ) : (
-            <Cards
-              data={result}
-              countsByType={countsByType}
-              selectedType={selectedType}
-            />
+            <Cards data={result} />
           )}
         </div>
       </div>
