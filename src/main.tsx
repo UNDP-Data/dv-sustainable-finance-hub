@@ -15,7 +15,7 @@ const getEl = (embedSelector: string) => {
   return embedSelector;
 };
 
-const vizApp = getEl('[data-viz-app]');
+const vizApp = getEl('[data-viz]');
 if (vizApp) {
   const rootEmbed = ReactDOM.createRoot(vizApp);
   rootEmbed.render(
