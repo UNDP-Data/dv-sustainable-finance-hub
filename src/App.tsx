@@ -342,6 +342,7 @@ function App() {
                   { chartConfigId: 'x', columnId: 'all' },
                 ])}
                 height={650}
+                graphTitle={`{{{<h6 class='undp-viz-typography'>Countries (${filteredData.length})</h6>}}}`}
                 backgroundColor='var(--gray-200)'
                 mapNoDataColor='#D4D6D8'
                 mapBorderColor='#A9B1B7'
