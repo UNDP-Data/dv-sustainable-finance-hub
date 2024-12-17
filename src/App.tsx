@@ -1,448 +1,379 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { json, csv } from 'd3-request';
-import { queue } from 'd3-queue';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  CircleChevronDown,
-  CircleChevronRight,
-  Globe,
-  LayoutGrid,
-} from 'lucide-react';
-import { Segmented } from 'antd';
-import { ChoroplethMap } from './Components/Graphs/Maps/ChoroplethMap';
-import { ProgrammeProvider } from './Components/ProgrammeContext';
-import Cards from './Components/Cards';
-import { TooltipContent } from './Components/TooltipContent';
-import {
-  Country,
-  filterCountries,
-  FilterFunction,
-  programIncludesFilter,
-  programStartsWithFilter,
-  filterByType,
-  countCountriesByPrograms,
-  countCountriesByType,
-} from './Utils/countryFilters';
-import Header from './Components/Header';
-import ProgrammeTree from './Components/ProgrammeTree';
-import { PROGRAMMES } from './Components/Constants';
-import FilterCountryGroup from './Components/Filter';
+  ChoroplethMap,
+  fetchAndParseCSV,
+  transformDataForGraph,
+  DataCards,
+} from '@undp-data/undp-visualization-library';
+import '@undp-data/undp-visualization-library/dist/style.css';
+import { Select, Segmented, Radio } from 'antd';
+import { Globe, LayoutGrid } from 'lucide-react';
+import styled from 'styled-components';
+import { Cards } from './Cards';
+import './styles.css';
 
-const baseTreeData = [
-  {
-    title: 'Public Finance',
-    key: 'public',
-    data: { fullLabel: 'Public Finance for the SDGs' },
-    children: [
-      { title: 'Tax for the SDGs', key: 'public_tax' },
-      { title: 'Budget for the SDGs', key: 'public_budget' },
-      { title: 'Debt for the SDGs', key: 'public_debt' },
-      { title: 'Insurance and risk finance', key: 'public_insurance' },
-    ],
-  },
-  {
-    title: 'Private finance',
-    key: 'private',
-    data: { fullLabel: 'Private Finance for the SDGs' },
-    children: [
-      {
-        title: 'Originating pipelines',
-        key: 'private_pipelines',
-      },
-      { title: 'Managing for impact', key: 'private_impact' },
-      { title: 'Enabling environment', key: 'private_environment' },
-    ],
-  },
-  {
-    title: 'INFFs',
-    key: 'frameworks',
-    data: { fullLabel: 'Integrated National Financing Frameworks' },
-  },
-  { title: 'Biodiversity finance', key: 'biofin' },
-];
+const { Option } = Select;
 
-const ALL_PROGRAMS = [
-  'public_tax',
-  'public_budget',
-  'public_debt',
-  'public_insurance',
-  'private_pipelines',
-  'private_impact',
-  'private_environment',
-  'biofin',
-  'frameworks',
-];
+const ViewContainer = styled.div<{ isVisible: boolean }>`
+  display: ${({ isVisible }) => (isVisible ? 'block' : 'none')};
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+`;
 
-const ALL_CHECKED_KEYS = [
-  'public',
-  'private',
-  'biofin',
-  'frameworks',
-  'public_tax',
-  'public_budget',
-  'public_debt',
-  'public_insurance',
-  'private_pipelines',
-  'private_impact',
-  'private_environment',
-];
-
-function AppContent() {
-  const [data, setData] = useState<Country[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<string[]>(ALL_CHECKED_KEYS);
-
-  // Initialize with the "All Programmes" object
-  const allProgrammes = PROGRAMMES.find(programme => programme.value === 'all');
-
-  if (!allProgrammes) {
-    throw new Error('The "All Programmes" option is missing in PROGRAMMES');
+const StyledSegmented = styled(Segmented)`
+  .ant-segmented-item {
+    color: #666; /* Darker text color for non-selected items */
+    background-color: var(
+      --gray-300
+    ); /* Background color for non-selected items */
   }
 
-  const [currentProgramme, setCurrentProgramme] = useState(allProgrammes);
-  const [filterExpanded, setFilterExpanded] = useState(true);
-  const [filterTwoExpanded, setFilterTwoExpanded] = useState(true);
-  const [viewMode, setViewMode] = useState<string>('Map');
-  const [selectedType, setSelectedType] = useState<string>('all');
+  .ant-segmented-item-selected {
+    color: #666; /* Text color for the selected item */
+    background-color: #fff; /* Background color for the selected item */
+  }
+
+  .ant-segmented-item:hover {
+    color: #333; /* Darker text color on hover */
+  }
+`;
+
+function App() {
+  const [data, setData] = useState<any[] | null>(null);
+  const [taxonomy, setTaxonomy] = useState<any[] | null>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
+    null,
+  );
+  const [selectedWorkArea, setSelectedWorkArea] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('all_countries');
+  const [viewMode, setViewMode] = useState<'Map' | 'Cards'>('Map');
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    queue()
-      .defer(
-        csv,
-        'https://raw.githubusercontent.com/UNDP-Data/dv-sustainable-finance-hub-data-repo/main/SFH_data.csv',
-      )
-      .defer(
-        json,
-        'https://raw.githubusercontent.com/UNDP-Data/country-taxonomy-from-azure/main/country_territory_groups.json',
-      )
-      .await((err: any, loadedData: any[], countryTaxonomy: any[]) => {
-        if (err) {
-          console.error('Error loading data:', err);
-          return;
-        }
+    const loadData = async () => {
+      try {
+        const d = (await fetchAndParseCSV('/data.csv')) as any[];
 
-        const sids = countryTaxonomy
-          .filter((d: any) => d.SIDS)
-          .map((d: any) => d['Alpha-3 code']);
-        const ldc = countryTaxonomy
-          .filter((d: any) => d.LDC)
-          .map((d: any) => d['Alpha-3 code']);
+        // Prefilter data based on the 'all' column
+        const prefilteredData = d.filter(row => row.all >= 1);
+        setData(prefilteredData);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    loadData();
+  }, []);
 
-        const countryMapping = countryTaxonomy.reduce(
-          (acc: any, country: any) => {
-            acc[country['Alpha-3 code']] = country['Country or Area'];
-            return acc;
-          },
-          {},
+  useEffect(() => {
+    const loadTaxonomy = async () => {
+      try {
+        const response = await fetch(
+          'https://raw.githubusercontent.com/UNDP-Data/country-taxonomy-from-azure/main/country_territory_groups.json',
         );
-
-        const transformedData: Country[] = loadedData.map((d: any) => {
-          const programs: string[] = [];
-
-          Object.keys(d).forEach(key => {
-            // Check if the key is a recognized program and is active
-            if (ALL_PROGRAMS.includes(key) && d[key] === '1') {
-              programs.push(key);
-            }
-          });
-
-          const { iso } = d;
-          const name = countryMapping[iso] || d.country;
-
-          // Initialize the type as an array
-          const type: string[] = [];
-
-          // Add 'SIDS' if the ISO is in the sids list
-          if (sids.includes(iso)) {
-            type.push('SIDS');
-          }
-
-          // Add 'LDC' if the ISO is in the ldc list
-          if (ldc.includes(iso)) {
-            type.push('LDC');
-          }
-
-          // Add 'Fragile and Affected' if the 'fragile' column is '1'
-          if (d.fragile === '1') {
-            type.push('Fragile and Affected');
-          }
-
-          return {
-            name,
-            iso,
-            programs,
-            type, // type is now an array of strings
-            filtered: false,
-            initialFilter: false,
-          };
-        });
-
-        setData(transformedData);
-      });
+        const taxonomyData = await response.json();
+        setTaxonomy(taxonomyData);
+      } catch (error) {
+        console.error('Error loading taxonomy data:', error);
+      }
+    };
+    loadTaxonomy();
   }, []);
 
-  const handleSegmentChange = useCallback(
-    (value: string | number) => {
-      const selectedProgramme =
-        PROGRAMMES.find(p => p.value === value) || allProgrammes;
+  // Compute highlighted countries directly based on selectedCategory
+  const filteredData = useMemo(() => {
+    if (!data || !taxonomy) return [];
 
-      // Set the full Programme object
-      setCurrentProgramme(selectedProgramme);
+    const sidsCodes = taxonomy
+      .filter((country: any) => country.SIDS === true)
+      .map((country: any) => country['Alpha-3 code']);
+    const ldcCodes = taxonomy
+      .filter((country: any) => country.LDC === true)
+      .map((country: any) => country['Alpha-3 code']);
 
-      if (selectedProgramme.value === 'all') {
-        setCheckedKeys(ALL_CHECKED_KEYS);
-      } else if (
-        selectedProgramme.value === 'biofin' ||
-        selectedProgramme.value === 'frameworks'
-      ) {
-        // Set the checked keys directly for biofin or frameworks
-        setCheckedKeys([selectedProgramme.value]);
-      } else {
-        const updatedKeys = baseTreeData
-          .filter(
-            item => item.key === selectedProgramme.value || item.key === 'all',
-          )
-          .flatMap(item => item.children?.map(child => child.key) || []);
-        setCheckedKeys(updatedKeys);
-      }
-    },
-    [allProgrammes],
-  );
+    return data.filter(row => {
+      const matchesCategory =
+        selectedCategory === 'all_countries' ||
+        (selectedCategory === 'sids' && sidsCodes.includes(row.iso)) ||
+        (selectedCategory === 'ldcs' && ldcCodes.includes(row.iso)) ||
+        (selectedCategory === 'fragile' && row.fragile === 1);
 
-  const handleRadioChange = useCallback((value: string) => {
-    setSelectedType(value);
-  }, []);
-  // Handle checkbox change
-  const handleCheckboxChange = useCallback(
-    (
-      checkedKeysValue: string[] | { checked: string[]; halfChecked: string[] },
-    ) => {
-      const keys = Array.isArray(checkedKeysValue)
-        ? checkedKeysValue
-        : checkedKeysValue.checked;
-      setCheckedKeys(keys);
-    },
-    [],
-  );
+      const matchesService =
+        !selectedService ||
+        (selectedService === 'public' && row.public) ||
+        (selectedService === 'private' && row.private) ||
+        (selectedService === 'inffs' && row.inffs) ||
+        (selectedService === 'academy' && row.academy);
 
-  // Filters
-  function generateFilterFunctions(
-    anySelectedKeys: string[],
-  ): FilterFunction[] {
-    const filters: FilterFunction[] = [];
+      const matchesSubcategory =
+        !selectedSubcategory || row[selectedSubcategory];
 
-    // Iterate over the selected keys
-    anySelectedKeys.forEach(key => {
-      if (key === 'public' || key === 'private') {
-        // Add a filter function for the whole category
-        filters.push(programStartsWithFilter(key));
-      } else {
-        // Add a filter function for a specific program
-        filters.push(programIncludesFilter(key));
-      }
+      const matchesWorkArea = !selectedWorkArea || row[selectedWorkArea];
+
+      return (
+        matchesCategory &&
+        matchesService &&
+        matchesSubcategory &&
+        matchesWorkArea
+      );
     });
+  }, [
+    data,
+    taxonomy,
+    selectedCategory,
+    selectedService,
+    selectedSubcategory,
+    selectedWorkArea,
+  ]);
 
-    return filters;
+  // Use filteredData to derive highlightedCountries
+  const highlightedCountries = useMemo(() => {
+    return filteredData.map(row => row.iso);
+  }, [filteredData]);
+
+  if (!data || !taxonomy) {
+    return (
+      <div className='undp-loader-container undp-container'>
+        <div className='undp-loader' />
+      </div>
+    );
   }
 
-  const filters = generateFilterFunctions(checkedKeys);
-  const result = filterCountries(data, filters, selectedType);
-  const countsByProgram = countCountriesByPrograms(
-    result.filter(c => filterByType(c, selectedType)),
-    checkedKeys,
+  console.log('data original', data);
+  console.log(
+    'data transformed',
+    transformDataForGraph(data, 'choroplethMap', [
+      { chartConfigId: 'countryCode', columnId: 'iso' },
+      { chartConfigId: 'x', columnId: 'all' },
+    ]),
   );
-
-  const programCountries = result.filter(c =>
-    filters.some(filterFunc => filterFunc(c)),
-  );
-  const countsByType = countCountriesByType(programCountries);
-
-  countsByType.all = programCountries.length;
-  console.log(countsByProgram);
-  console.log(countsByType);
-
-  const tooltip = (d: any) => {
-    return <TooltipContent iso={d.iso} data={result} />;
-  };
-
-  const groups = [
-    { label: 'All countries', value: 'all', count: countsByType.all },
-    {
-      fullLabel: 'Small Island Developing States',
-      label: 'SIDS',
-      value: 'SIDS',
-      count: countsByType.SIDS,
-    },
-    {
-      fullLabel: 'Least Developed Countries',
-      label: 'LDCs',
-      value: 'LDC',
-      count: countsByType.LDC,
-    },
-    {
-      fullLabel: 'Fragile and conflict-affected situations',
-      label: 'Fragile and conflict-affected',
-      value: 'Fragile and Affected',
-      count: countsByType['Fragile and Affected'],
-    },
-  ];
 
   return (
-    <div
-      className='undp-container flex-div gap-00 flex-wrap flex-hor-align-center'
-      style={{ border: '0.07rem solid var(--gray-400)', maxWidth: '1980px' }}
-    >
-      <Header
-        onSegmentChange={handleSegmentChange}
-        currentProgramme={currentProgramme}
-        countPrograms={countsByProgram}
-      />
-      <div className='flex-div flex-row gap-00' style={{ width: '100%' }}>
+    <div className='undp-container' style={{ maxWidth: '1980px' }}>
+      <div className='padding-05 margin-05' ref={containerRef}>
+        <h2 className='undp-typography bold'>
+          UNDP’s work on sustainable finance
+        </h2>
+        <Cards
+          dataStatCard={data}
+          values={['all', 'public', 'private_impact', 'inffs', 'academy']}
+          titles={[
+            'Sustainable Finance Programmes',
+            'Public Finance for the SDGs',
+            'Private Finance for the SDGs',
+            'INFFs',
+            'Biodiversity finance',
+            'SDG Finance Academy',
+          ]}
+          desc={[
+            'Number of Countries in 2024',
+            'Number of Countries in 2024',
+            'Number of Countries in 2024',
+            'Integrated National Financing Frameworks',
+            'Number of Countries in 2024',
+            'Number of Countries in 2024',
+          ]}
+        />
         <div
-          className='flex-div flex-column gap-00 grow'
-          style={{ width: '25%', borderRight: '0.07rem solid var(--gray-400)' }}
-        >
-          <div className='settings-sections-container'>
-            <button
-              type='button'
-              aria-label='Expand or collapse filters'
-              className='settings-sections-container-title gap-03 margin-bottom-00'
-              onClick={() => setFilterTwoExpanded(!filterTwoExpanded)}
-            >
-              <div>
-                {filterTwoExpanded ? (
-                  <CircleChevronDown size={16} />
-                ) : (
-                  <CircleChevronRight size={16} />
-                )}
-              </div>
-              <h6
-                className='undp-typography margin-top-00 margin-bottom-02'
-                style={{
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  letterSpacing: '.03em',
-                }}
-              >
-                Filter Countries By Programmes
-              </h6>
-            </button>
-            <div
-              className='settings-sections-options-container padding-top-03'
-              style={{ display: filterTwoExpanded ? 'flex' : 'none' }}
-            >
-              <ProgrammeTree
-                checkedKeys={checkedKeys}
-                onCheck={handleCheckboxChange}
-                currentProgramme={currentProgramme.value}
-                baseTreeData={baseTreeData}
-                countsByProgram={countsByProgram}
-              />
-            </div>
-          </div>
-          <div className='settings-sections-container'>
-            <button
-              type='button'
-              aria-label='Expand or collapse filters'
-              className='settings-sections-container-title gap-03 margin-bottom-00'
-              onClick={() => setFilterExpanded(!filterExpanded)}
-            >
-              <div>
-                {filterExpanded ? (
-                  <CircleChevronDown size={16} />
-                ) : (
-                  <CircleChevronRight size={16} />
-                )}
-              </div>
-              <h6
-                className='undp-typography margin-top-00 margin-bottom-02'
-                style={{
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  letterSpacing: '.03em',
-                }}
-              >
-                Filter Countries By Group
-              </h6>
-            </button>
-            <div
-              className='settings-sections-options-container padding-top-03'
-              style={{ display: filterExpanded ? 'flex' : 'none' }}
-            >
-              <FilterCountryGroup
-                selectedRadio={selectedType}
-                onRadioChange={handleRadioChange}
-                groups={groups}
-              />
-            </div>
-          </div>
-        </div>
-        <div
-          className='flex-div flex-column grow gap-00'
+          id='vizArea'
           style={{
-            width: 'calc(80% - 54px)',
-            overflow: 'hidden',
-            backgroundColor: 'var(--gray-100)',
+            display: 'inline-flex',
+            width: '100%',
+            border: '0.07rem solid var(--gray-400)',
           }}
         >
+          {/* Left Sidebar */}
           <div
-            className='flex-div flex-row flex-vert-align-center
- flex-space-between padding-left-02 padding-right-02'
+            className='flex-div flex-column'
+            style={{
+              width: '20%',
+              gap: '1rem',
+              borderRight: '0.07rem solid var(--gray-400)',
+              padding: '1.25rem',
+            }}
           >
-            <h6 className='undp-typography small-font margin-00 margin-left-03'>
-              countries ({countsByType[selectedType]})
-            </h6>
-            <Segmented
-              options={[
-                {
-                  label: (
-                    <div className='flex-div flex-vert-align-center gap-02'>
-                      <Globe strokeWidth={1.7} size={16} /> Map
-                    </div>
-                  ),
-                  value: 'Map',
-                },
-                {
-                  label: (
-                    <div className='flex-div flex-vert-align-center gap-02'>
-                      <LayoutGrid strokeWidth={1.7} size={16} /> Cards
-                    </div>
-                  ),
-                  value: 'Cards',
-                },
-              ]}
-              value={viewMode}
-              onChange={(value: any) => setViewMode(value)}
-              style={{
-                margin: '0.5rem 0.5rem 0.5rem auto',
-                width: 'fit-content',
-              }}
-            />
+            <div>
+              <p className='undp-typography small-font margin-00'>
+                Select service
+              </p>
+              <Select
+                value={selectedService}
+                className='undp-select margin-top-03 margin-bottom-00'
+                onChange={value => {
+                  setSelectedService(value);
+                  setSelectedSubcategory(null); // Reset subcategory when service changes
+                }}
+              >
+                <Option value={null}>All Services</Option>
+                <Option value='public'>Public Finance for the SDGs</Option>
+                <Option value='private'>Private Finance for the SDGs</Option>
+                <Option value='inffs'>
+                  Integrated National Financing Frameworks
+                </Option>
+                <Option value='academy'>SDG Finance Academy</Option>
+              </Select>
+
+              {selectedService === 'public' && (
+                <div>
+                  <p
+                    className='undp-typography small-font margin-top-05'
+                    style={{ marginBottom: '0' }}
+                  >
+                    Select public subcategory
+                  </p>
+                  <Select
+                    value={selectedSubcategory}
+                    className='undp-select margin-top-03'
+                    onChange={value => setSelectedSubcategory(value)}
+                  >
+                    <Option value={null}>All Subcategories</Option>
+                    <Option value='public_tax'>Tax for the SDGs</Option>
+                    <Option value='public_debt'>Debt for the SDGs</Option>
+                    <Option value='public_budget'>Budget for the SDGs</Option>
+                    <Option value='public_insurance'>
+                      Insurance and risk finance
+                    </Option>
+                  </Select>
+                </div>
+              )}
+
+              {selectedService === 'private' && (
+                <div>
+                  <p className='undp-typography small-font margin-00'>
+                    Select private subcategory
+                  </p>
+                  <Select
+                    value={selectedSubcategory}
+                    className='undp-select margin-top-03'
+                    onChange={value => setSelectedSubcategory(value)}
+                  >
+                    <Option value={null}>All Subcategories</Option>
+                    <Option value='private_pipelines'>
+                      Originating pipelines
+                    </Option>
+                    <Option value='private_impact'>Managing for impact</Option>
+                    <Option value='private_environment'>
+                      Enabling environment
+                    </Option>
+                  </Select>
+                </div>
+              )}
+
+              <p className='undp-typography small-font margin-00 margin-top-05'>
+                Select work area
+              </p>
+              <Select
+                value={selectedWorkArea}
+                className='undp-select margin-top-03'
+                onChange={value => setSelectedWorkArea(value)}
+              >
+                <Option value={null}>All Work Areas</Option>
+                <Option value='biofin'>Biodiversity finance</Option>
+                <Option value='gender_equality'>Gender equality</Option>
+                <Option value='climate_finance'>Climate finance</Option>
+              </Select>
+            </div>
+
+            <div>
+              <p className='undp-typography small-font margin-00 padding-bottom-02'>
+                Select country group
+              </p>
+              <Radio.Group
+                onChange={e => setSelectedCategory(e.target.value)}
+                value={selectedCategory}
+                className='undp-radio'
+              >
+                <Radio value='all_countries'>All Countries</Radio>
+                <Radio value='sids'>SIDS</Radio>
+                <Radio value='ldcs'>LDCs</Radio>
+                <Radio value='fragile'>Fragile and conflict-affected</Radio>
+              </Radio.Group>
+            </div>
           </div>
-          {viewMode === 'Map' ? (
-            <div className='flex-div flex-hor-align-center'>
-              <ChoroplethMap
-                data={result}
-                width={1000}
-                height={600}
-                scale={250}
-                centerPoint={[450, 370]}
-                tooltip={tooltip}
-                colors={currentProgramme.color}
+
+          {/* Right Content Area */}
+          <div
+            style={{
+              width: '80%',
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'center',
+              backgroundColor: 'var(--gray-200)',
+              minHeight: '916px',
+            }}
+          >
+            <div
+              style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}
+            >
+              <StyledSegmented
+                options={[
+                  {
+                    label: (
+                      <div className='flex-div flex-vert-align-center gap-02'>
+                        <Globe strokeWidth={1.7} size={16} /> Map
+                      </div>
+                    ),
+                    value: 'Map',
+                  },
+                  {
+                    label: (
+                      <div className='flex-div flex-vert-align-center gap-02'>
+                        <LayoutGrid strokeWidth={1.7} size={16} /> Cards
+                      </div>
+                    ),
+                    value: 'Cards',
+                  },
+                ]}
+                value={viewMode}
+                onChange={(value: any) => setViewMode(value)}
+                style={{
+                  margin: '0.5rem 0.5rem 0.5rem auto',
+                  width: 'fit-content',
+                }}
               />
             </div>
-          ) : (
-            <Cards data={result} />
-          )}
+
+            {/* Map View */}
+            <ViewContainer isVisible={viewMode === 'Map'}>
+              <ChoroplethMap
+                data={transformDataForGraph(data, 'choroplethMap', [
+                  { chartConfigId: 'countryCode', columnId: 'iso' },
+                  { chartConfigId: 'x', columnId: 'all' },
+                ])}
+                height={650}
+                backgroundColor='var(--gray-200)'
+                mapNoDataColor='#D4D6D8'
+                mapBorderColor='#A9B1B7'
+                scale={280}
+                tooltip="<div class='customCard customTooltip'><div class='customCardTop'><p class='undp-viz-typography' style='font-size:20px;font-weight:bold;'>{{data.country}}</p>{{#if data.services}}<div><p class='undp-viz-typography'>Services:</p><div class='chips'>{{#if data.public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if data.private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if data.inffs}}<div class='chip inffs-chip'>INFFs</div>{{/if}}{{#if data.academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if data.work_areas}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if data.biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><p class='small-font note'>Click to learn more (in progress)</p></div>"
+                padding='1.25rem'
+                centerPoint={[10, 25]}
+                showAntarctica={false}
+                zoomScaleExtend={[1, 1]}
+                domain={[0, 0.5, 0.7]}
+                showColorScale={false}
+                highlightedCountryCodes={highlightedCountries}
+              />
+            </ViewContainer>
+
+            {/* Cards View */}
+            <ViewContainer isVisible={viewMode === 'Cards'}>
+              <DataCards
+                data={filteredData}
+                padding='3rem 1.25rem 0 1.25rem'
+                height={800}
+                cardSearchColumns={['country']}
+                cardTemplate="<div class='customCard'><div class='customCardTop'><p class='undp-viz-typography' style='font-size: 20px;'>{{country}}</p>{{#if services}}<div><p class='undp-viz-typography'>Services:</p><div class='chips'>{{#if public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if inffs}}<div class='chip inffs-chip'>INFFs</div></br>{{/if}}{{#if academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if work_areas}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><div class='cta-button'>Read more</div></div>"
+                backgroundColor='var(--gray-100)'
+                cardBackgroundColor='#fff'
+                cardDetailView="<div style='padding:24px;'><h5 class='undp-viz-typography'>{{country}}</h5><table class='modal-table' style='width:100%;border-collapse:collapse;'><thead><tr><th class='undp-viz-typography' style='text-align:left;'>SERVICES/WORK AREAS</th><th class='undp-viz-typography' style='text-align:left;'>SUBCATEGORIES</th><th class='undp-viz-typography' style='text-align:left;'>NOTES</th></tr></thead><tbody>{{#if private}}<tr><td><div class='chip private-chip'>Private</div></td><td>{{#if private_impact}}<div class='chip chip-sub private-chip-sub'>Managing for impact</div>{{/if}}{{#if private_pipelines}}<div class='chip chip-sub private-chip-sub'>Originating pipelines</div>{{/if}}{{#if private_environment}}<div class='chip chip-sub private-chip-sub'>Enabling environment</div>{{/if}}</td><td>{{private_note}}</td></tr>{{/if}}{{#if public}}<tr><td><div class='chip public-chip'>Public</div></td><td>{{#if public_tax}}<div class='chip chip-sub public-chip-sub'>Tax for the SDGs</div>{{/if}}{{#if public_debt}}<div class='chip chip-sub public-chip-sub'>Debt for the SDGs</div>{{/if}}{{#if public_budget}}<div class='chip chip-sub public-chip-sub'>Budget for the SDGs</div>{{/if}}{{#if public_insurance}}<div class='chip chip-sub public-chip-sub'>Insurance and risk finance</div>{{/if}}</td><td>{{public_note}}</td></tr>{{/if}}{{#if inffs}}<tr><td><div class='chip inffs-chip'>INFFs</div></td><td></td><td>{{inffs_note}}</td></tr>{{/if}}{{#if biofin}}<tr><td><div class='chip biofin-chip'>Biodiversity</div></td><td></td><td>{{biofin_note}}</td></tr>{{/if}}{{#if climate_finance}}<tr><td><div class='chip climate-finance-chip'>Climate</div></td><td></td><td>{{climate_finance_note}}</td></tr>{{/if}}</tbody></table></div>"
+              />
+            </ViewContainer>
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function App() {
-  return (
-    <ProgrammeProvider>
-      <AppContent />
-    </ProgrammeProvider>
   );
 }
 

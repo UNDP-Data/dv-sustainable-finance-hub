@@ -1,7 +1,7 @@
 # Project Title
 #### Project description [Click here to see the interface]({{link to the site here}}).
 
-Doc for the starter kit can be found [here](https://orange-bay-04736e710.4.azurestaticapps.net/)
+Doc for the UI kit can be found [here](https://icy-moss-09ab08f10.4.azurestaticapps.net/)
 
 ## Table of Contents
 * [Link for the visualization](#section-01)
@@ -37,7 +37,7 @@ Apart from the mentioned `div` above the following `script` and `link` needs to 
 ```
 
 ## Pages on DFx Where the Visualization is Used<a name="section-03"></a>
-_All the pages on the DFx or other places like viva topics etc. where this visualization is embedded or used._
+_All the pages on the DFx or other places like viva topics etc. where this visualization is embeded or used._
 
 ## Related Repos<a name="section-04"></a>
 * [__name of the data repo__](link to data repo): This is the data sheet for visualization
