@@ -56,8 +56,10 @@ function App() {
       try {
         const d = (await fetchAndParseCSV('/data.csv')) as any[];
 
-        // Prefilter data based on the 'all' column
-        const prefilteredData = d.filter(row => row.all >= 1);
+        const prefilteredData = d.filter(
+          row => row.services_or_work_areas_total === 1,
+        );
+        console.log(prefilteredData);
         setData(prefilteredData);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -97,7 +99,7 @@ function App() {
         selectedCategory === 'all_countries' ||
         (selectedCategory === 'sids' && sidsCodes.includes(row.iso)) ||
         (selectedCategory === 'ldcs' && ldcCodes.includes(row.iso)) ||
-        (selectedCategory === 'fragile' && row.fragile === 1);
+        (selectedCategory === 'fragile' && row.fragile_country === 1);
 
       const matchesService =
         !selectedService ||
@@ -140,14 +142,7 @@ function App() {
     );
   }
 
-  console.log('data original', data);
-  console.log(
-    'data transformed',
-    transformDataForGraph(data, 'choroplethMap', [
-      { chartConfigId: 'countryCode', columnId: 'iso' },
-      { chartConfigId: 'x', columnId: 'all' },
-    ]),
-  );
+  console.log(data);
 
   return (
     <div className='undp-container' style={{ maxWidth: '1980px' }}>
@@ -157,7 +152,13 @@ function App() {
         </h2>
         <Cards
           dataStatCard={data}
-          values={['all', 'public', 'private_impact', 'inffs', 'academy']}
+          values={[
+            'services_or_work_areas_total',
+            'public',
+            'private',
+            'inffs',
+            'academy',
+          ]}
           titles={[
             'Sustainable Finance Programmes',
             'Public Finance for the SDGs',
@@ -304,7 +305,7 @@ function App() {
             }}
           >
             <div
-              style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}
+              style={{ position: 'absolute', right: '0.25rem', top: '0.25rem' }}
             >
               <StyledSegmented
                 options={[
@@ -339,15 +340,18 @@ function App() {
               <ChoroplethMap
                 data={transformDataForGraph(data, 'choroplethMap', [
                   { chartConfigId: 'countryCode', columnId: 'iso' },
-                  { chartConfigId: 'x', columnId: 'all' },
+                  {
+                    chartConfigId: 'x',
+                    columnId: 'services_or_work_areas_total',
+                  },
                 ])}
                 height={650}
-                graphTitle={`{{{<h6 class='undp-viz-typography'>Countries (${filteredData.length})</h6>}}}`}
+                graphTitle={`{{{<h6 class='undp-viz-typography margin-00'>${filteredData.length} countries</h6>}}}`}
                 backgroundColor='var(--gray-200)'
                 mapNoDataColor='#D4D6D8'
                 mapBorderColor='#A9B1B7'
                 scale={280}
-                tooltip="<div class='customCard customTooltip'><div class='customCardTop'><p class='undp-viz-typography' style='font-size:20px;font-weight:bold;'>{{data.country}}</p>{{#if data.services}}<div><p class='undp-viz-typography'>Services:</p><div class='chips'>{{#if data.public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if data.private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if data.inffs}}<div class='chip inffs-chip'>INFFs</div>{{/if}}{{#if data.academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if data.work_areas}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if data.biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><p class='small-font note'>Click to learn more (in progress)</p></div>"
+                tooltip="<div class='customCard customTooltip'><div class='customCardTop'><p class='undp-viz-typography' style='font-size:20px;font-weight:bold;'>{{data.country}}</p>{{#if data.services_total}}<div><p class='undp-viz-typography'>Services:</p><div class='chips'>{{#if data.public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if data.private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if data.inffs}}<div class='chip inffs-chip'>INFFs</div>{{/if}}{{#if data.academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if data.work_areas_total}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if data.biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><p class='small-font note'>Click to learn more (in progress)</p></div>"
                 padding='1.25rem'
                 centerPoint={[10, 25]}
                 showAntarctica={false}
@@ -362,10 +366,11 @@ function App() {
             <ViewContainer isVisible={viewMode === 'Cards'}>
               <DataCards
                 data={filteredData}
-                padding='3rem 1.25rem 0 1.25rem'
+                padding='1.25rem 1.25rem 0 1.25rem'
                 height={800}
+                graphTitle={`{{{<h6 class='undp-viz-typography margin-00'>${filteredData.length} countries</h6>}}}`}
                 cardSearchColumns={['country']}
-                cardTemplate="<div class='customCard'><div class='customCardTop'><p class='undp-viz-typography' style='font-size: 20px;'>{{country}}</p>{{#if services}}<div><p class='undp-viz-typography'>Services:</p><div class='chips'>{{#if public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if inffs}}<div class='chip inffs-chip'>INFFs</div></br>{{/if}}{{#if academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if work_areas}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><div class='cta-button'>Read more</div></div>"
+                cardTemplate="<div class='customCard'><div class='customCardTop'><p class='undp-viz-typography' style='font-size: 20px;'>{{country}}</p>{{#if services_total}}<div><p class='undp-viz-typography'>Services:</p><div class='chips'>{{#if public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if inffs}}<div class='chip inffs-chip'>INFFs</div></br>{{/if}}{{#if academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if work_areas_total}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><div class='cta-button'>Read more</div></div>"
                 backgroundColor='var(--gray-100)'
                 cardBackgroundColor='#fff'
                 cardDetailView="<div style='padding:24px;'><h5 class='undp-viz-typography'>{{country}}</h5><table class='modal-table' style='width:100%;border-collapse:collapse;'><thead><tr><th class='undp-viz-typography' style='text-align:left;'>SERVICES/WORK AREAS</th><th class='undp-viz-typography' style='text-align:left;'>SUBCATEGORIES</th><th class='undp-viz-typography' style='text-align:left;'>NOTES</th></tr></thead><tbody>{{#if private}}<tr><td><div class='chip private-chip'>Private</div></td><td>{{#if private_impact}}<div class='chip chip-sub private-chip-sub'>Managing for impact</div>{{/if}}{{#if private_pipelines}}<div class='chip chip-sub private-chip-sub'>Originating pipelines</div>{{/if}}{{#if private_environment}}<div class='chip chip-sub private-chip-sub'>Enabling environment</div>{{/if}}</td><td>{{private_note}}</td></tr>{{/if}}{{#if public}}<tr><td><div class='chip public-chip'>Public</div></td><td>{{#if public_tax}}<div class='chip chip-sub public-chip-sub'>Tax for the SDGs</div>{{/if}}{{#if public_debt}}<div class='chip chip-sub public-chip-sub'>Debt for the SDGs</div>{{/if}}{{#if public_budget}}<div class='chip chip-sub public-chip-sub'>Budget for the SDGs</div>{{/if}}{{#if public_insurance}}<div class='chip chip-sub public-chip-sub'>Insurance and risk finance</div>{{/if}}</td><td>{{public_note}}</td></tr>{{/if}}{{#if inffs}}<tr><td><div class='chip inffs-chip'>INFFs</div></td><td></td><td>{{inffs_note}}</td></tr>{{/if}}{{#if biofin}}<tr><td><div class='chip biofin-chip'>Biodiversity</div></td><td></td><td>{{biofin_note}}</td></tr>{{/if}}{{#if climate_finance}}<tr><td><div class='chip climate-finance-chip'>Climate</div></td><td></td><td>{{climate_finance_note}}</td></tr>{{/if}}</tbody></table></div>"
