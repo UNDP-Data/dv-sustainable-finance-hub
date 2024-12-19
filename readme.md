@@ -1,8 +1,6 @@
-# Project Title
+# Sustainable Finance Hub Dashboard
 
-#### Project description [Click here to see the interface]({{https://lemon-tree-0968b0103.5.azurestaticapps.net/}}).
-
-Doc for the UI kit can be found [here](https://icy-moss-09ab08f10.4.azurestaticapps.net/)
+#### This project aims to provide interactive visualizations for exploring and analyzing Sustainable Finance Hub data. [Click here to see the interface]({{https://lemon-tree-0968b0103.5.azurestaticapps.net/}}).
 
 ## Table of Contents
 
@@ -20,11 +18,13 @@ Doc for the UI kit can be found [here](https://icy-moss-09ab08f10.4.azurestatica
 
 ## Link for the visualization<a name="section-01"></a>
 
-[{{link to the site here}}]({{link to the site here}})
+<!-- [{{link to the site here}}]({{link to the site here}}) -->
+
+_In progress_
 
 ## Deployment<a name="deployment"></a>
 
-The Production site deployed using Azure Static Web App and work flow can be found [here]({{https://lemon-tree-0968b0103.5.azurestaticapps.net/}})
+The Production site deployed using Azure Static Web App and work flow can be found [here]({{https://github.com/UNDP-Data/dv-sustainable-finance-hub/blob/main/.github/workflows/azure-static-web-apps-lemon-tree-0968b0103.yml}})
 
 ## Steps to Integrating the Visualization in the Data Future Platform or Any Other Page<a name="section-02"></a>
 
@@ -37,7 +37,7 @@ Add the following div in the page
 Apart from the mentioned `div` above the following `script` and `link` needs to be added to the `head` or in the embed code
 
 ```
-<script defer="defer" type="module" src="<Link to the Visualization Mentioned Above>/index.js"></script>
+<script defer="defer" type="module" src="https://lemon-tree-0968b0103.5.azurestaticapps.net/index.js"></script>
 <link rel="stylesheet" href="https://undp-data.github.io/stylesheets-for-viz/style/mainStyleSheet.css" />
 <link rel="stylesheet" href="https://undp-data.github.io/stylesheets-for-viz/style/StyleForGraphingInterface.css" />
 <link rel="stylesheet" href="https://undp-data.github.io/stylesheets-for-viz/style/StyleForGraph.css" />
@@ -45,11 +45,11 @@ Apart from the mentioned `div` above the following `script` and `link` needs to 
 
 ## Pages on DFx Where the Visualization is Used<a name="section-03"></a>
 
-_All the pages on the DFx or other places like viva topics etc. where this visualization is embeded or used._
+_In progress_
 
 ## Related Repos<a name="section-04"></a>
 
-- [__name of the data repo__](link to data repo): This is the data sheet for visualization
+- [**dv-sustainable-finance-hub-data-repository**](dv-sustainable-finance-hub-data-repository): This is the data sheet for visualization
 - [**stylesheet-for-viz**](https://github.com/UNDP-Data/stylesheets-for-viz): Repo which defines the css settings for the project
 
 ## Global CSS for UI and Graphs<a name="section-05"></a>

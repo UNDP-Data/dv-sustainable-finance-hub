@@ -54,7 +54,9 @@ function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const d = (await fetchAndParseCSV('/data.csv')) as any[];
+        const d = (await fetchAndParseCSV(
+          'https://raw.githubusercontent.com/UNDP-Data/dv-sustainable-finance-hub-data-repository/refs/heads/main/data.csv',
+        )) as any[];
 
         const prefilteredData = d.filter(
           row => row.services_or_work_areas_total === 1,
