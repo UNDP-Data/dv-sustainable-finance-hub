@@ -1,6 +1,6 @@
 # Sustainable Finance Hub Dashboard
 
-#### This project aims to provide interactive visualizations for exploring and analyzing Sustainable Finance Hub data. [Click here to see the interface]({{https://lemon-tree-0968b0103.5.azurestaticapps.net/}}).
+This project aims to provide interactive visualizations for exploring and analyzing Sustainable Finance Hub data. [Click here to see the interface](https://lemon-tree-0968b0103.5.azurestaticapps.net/).
 
 ## Table of Contents
 
@@ -18,13 +18,11 @@
 
 ## Link for the visualization<a name="section-01"></a>
 
-<!-- [{{link to the site here}}]({{link to the site here}}) -->
-
-_In progress_
+[https://lemon-tree-0968b0103.5.azurestaticapps.net/](https://lemon-tree-0968b0103.5.azurestaticapps.net/)
 
 ## Deployment<a name="deployment"></a>
 
-The Production site deployed using Azure Static Web App and work flow can be found [here]({{https://github.com/UNDP-Data/dv-sustainable-finance-hub/blob/main/.github/workflows/azure-static-web-apps-lemon-tree-0968b0103.yml}})
+The Production site deployed using Azure Static Web App and work flow can be found [here](https://github.com/UNDP-Data/dv-sustainable-finance-hub/blob/main/.github/workflows/azure-static-web-apps-lemon-tree-0968b0103.yml)
 
 ## Steps to Integrating the Visualization in the Data Future Platform or Any Other Page<a name="section-02"></a>
 
@@ -43,7 +41,7 @@ Apart from the mentioned `div` above the following `script` and `link` needs to 
 <link rel="stylesheet" href="https://undp-data.github.io/stylesheets-for-viz/style/StyleForGraph.css" />
 ```
 
-## Pages on DFx Where the Visualization is Used<a name="section-03"></a>
+## Pages Where the Visualization is Used<a name="section-03"></a>
 
 _In progress_
 
