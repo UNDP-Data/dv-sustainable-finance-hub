@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@undp-data/undp-visualization-library": "^1.0.26",
+    "@undp-data/undp-visualization-library": "^1.0.28",
     "antd": "^5.18.3",
     "lucide-react": "^0.309.0",
     "react": "^18.2.0",
