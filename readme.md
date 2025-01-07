@@ -47,8 +47,9 @@ _In progress_
 
 ## Related Repos<a name="section-04"></a>
 
-- [**dv-sustainable-finance-hub-data-repository**](dv-sustainable-finance-hub-data-repository): This is the data sheet for visualization
+- [**dv-sustainable-finance-hub-data-repository**](https://github.com/UNDP-Data/dv-sustainable-finance-hub-data-repository): This is the data sheet for visualization
 - [**stylesheet-for-viz**](https://github.com/UNDP-Data/stylesheets-for-viz): Repo which defines the css settings for the project
+- [**undp-visualization-library**](https://github.com/UNDP-Data/undp-visualization-library): the Viz library is used for maps and cards.
 
 ## Global CSS for UI and Graphs<a name="section-05"></a>
 
@@ -64,9 +65,9 @@ _In progress_
 
 - **React**: Used as MVC framework.
 - **styled-components**: Utilizes tagged template literals and the power of CSS, allows to write actual CSS code to style the components in JS/TS.
-- **Various D3 Libraries**: Used for visualizations, adding interaction and reading the csv data file.
+- [**UNDP Visualization Library**](https://github.com/UNDP-Data/undp-visualization-library): Used for visualizations, adding interaction and reading the csv data file.
 - **AntD**: For UI elements like dropdown, buttons, checkbox, and slider.
-- **lodash**: Used for manipulating and iterating arrays and objects.
+- **lucide-react**: For icons.
 
 ## Installation<a name="section-07"></a>
 
