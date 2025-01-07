@@ -49,7 +49,6 @@ _In progress_
 
 - [**dv-sustainable-finance-hub-data-repository**](https://github.com/UNDP-Data/dv-sustainable-finance-hub-data-repository): This is the data sheet for visualization
 - [**stylesheet-for-viz**](https://github.com/UNDP-Data/stylesheets-for-viz): Repo which defines the css settings for the project
-- [**undp-visualization-library**](https://github.com/UNDP-Data/undp-visualization-library): the Viz library is used for maps and cards.
 
 ## Global CSS for UI and Graphs<a name="section-05"></a>
 
