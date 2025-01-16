@@ -150,7 +150,7 @@ function App() {
     <div className='undp-container' style={{ maxWidth: '1980px' }}>
       <div className='padding-05 margin-05' ref={containerRef}>
         <h2 className='undp-typography bold'>
-          UNDP’s work on sustainable finance
+          UNDP’s Work on Sustainable Finance
         </h2>
         <Cards
           dataStatCard={data}
@@ -159,23 +159,18 @@ function App() {
             'public',
             'private',
             'inffs',
-            'academy',
           ]}
           titles={[
-            'Sustainable Finance Programmes',
+            'UNDP support',
             'Public Finance for the SDGs',
             'Private Finance for the SDGs',
             'INFFs',
-            'Biodiversity finance',
-            'SDG Finance Academy',
           ]}
           desc={[
-            'Number of Countries in 2024',
-            'Number of Countries in 2024',
-            'Number of Countries in 2024',
-            'Integrated National Financing Frameworks',
-            'Number of Countries in 2024',
-            'Number of Countries in 2024',
+            'Number of countries',
+            'Number of Countries',
+            'Number of Countries',
+            'Number of countries',
           ]}
         />
         <div
@@ -214,7 +209,6 @@ function App() {
                 <Option value='inffs'>
                   Integrated National Financing Frameworks
                 </Option>
-                <Option value='academy'>SDG Finance Academy</Option>
               </Select>
 
               {selectedService === 'public' && (
@@ -274,7 +268,7 @@ function App() {
                 <Option value={null}>All Work Areas</Option>
                 <Option value='biofin'>Biodiversity finance</Option>
                 <Option value='gender_equality'>Gender equality</Option>
-                <Option value='climate_finance'>Climate finance</Option>
+                <Option value='climate_finance'>Climate action</Option>
               </Select>
             </div>
 
