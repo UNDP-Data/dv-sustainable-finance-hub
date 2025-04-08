@@ -185,9 +185,12 @@ function App() {
             ]}
           />
         </div>
-        <div id='vizArea' className='w-full border-2 inline-flex'>
+        <div
+          id='vizArea'
+          className='w-full border-primary-gray-300 border-2 inline-flex'
+        >
           {/* Left Sidebar */}
-          <div className='flex flex-col gap-4 border-r-2 p-4 max-w-[360px]'>
+          <div className='flex flex-col gap-4 border-r-2 border-primary-gray-300 p-4 max-w-[360px]'>
             <div id='selectService'>
               <P size='sm' marginBottom='2xs'>
                 Select service
