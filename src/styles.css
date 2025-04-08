@@ -1,160 +1,308 @@
-.chip {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  margin: 2px;
-  font-size: 14px;
-  text-align: center;
-  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto', sans-serif !important;
-  color: white;
+@font-face {
+  font-family: 'SohneBreit';
+  src: url('src/assets/soehne-breit-web-dreiviertelfett-1.woff2')
+    format('woff2');
+}
+
+:root {
+  --custom-color-100: #ffe5b4;
+  --custom-color-200: #ffd38c;
+  --custom-color-300: #ffb85c;
+  --custom-color-400: #ffa242;
+  --custom-color-500: #ff971d;
+  --custom-color-600: #fd9d24;
+  --custom-color-700: #e6851d;
+  --custom-foreground: #fff;
+}
+
+.undp-viz-bivariate-legend-container {
+  width: 20rem;
+  position: relative;
+  bottom: 0;
+  z-index: 5;
+  height: 0;
+  display: flex;
+  align-items: flex-end;
+}
+
+@media (min-width: 961px) {
+  .undp-viz-bivariate-legend-container {
+    translate: 0 -100%;
+    width: fit-content;
+  }
+}
+
+.undp-viz-bivariate-legend {
+  background-color: rgba(255, 255, 255, 0.75);
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  display: flex;
+}
+
+.dark .undp-viz-bivariate-legend {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.text-outline {
+  -webkit-text-stroke: 2px black;
+  text-shadow: none;
+}
+
+.dark .text-outline {
+  -webkit-text-stroke: 2px white;
+}
+
+.transparent {
+  color: transparent;
+}
+
+.undp-viz-low-opacity {
+  opacity: 0.8;
+}
+
+.undp-viz-g-with-hover {
+  transition: opacity 0.2s;
+}
+
+.undp-viz-g-with-hover:hover {
+  opacity: 1 !important;
+}
+
+.maplibregl-control-container {
+  display: none;
+}
+
+.maplibregl-ctrl-scale {
+  font-size: 12px !important;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.maplibregl-ctrl-attrib-inner {
+  font-size: 12px !important;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.maplibregl-ctrl-attrib-inner a {
+  font-size: 12px !important;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+  background-image: none !important;
+  font-weight: 700 !important;
+}
+
+.maplibre-show-control .maplibregl-control-container {
+  display: block !important;
+}
+
+.maplibregl-ctrl-attrib-button:before {
+  content: none !important;
+}
+
+.undp-viz-data-cards-container {
+  container-type: inline-size;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  overflow-x: hidden !important;
+}
+
+.undp-markdown li {
+  font-size: 1rem;
   line-height: 1.4;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
 }
 
-.statCardSliderItem{
-  min-height: 200px; /* Consistent minimum height */
-  box-sizing: border-box; /* Prevent overflow */
+.undp-markdown p {
+  margin-top: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
 }
 
-.statCardSliderItem h3 {
-  font-size: 4.375rem;
-    line-height: 1;
-    text-shadow: none;
-    -webkit-text-stroke: 2px rgb(0, 0, 0);
-    color: rgb(247, 247, 247);
-    letter-spacing: 0.05rem;
-    margin-top: 0px;
+@media (min-width: 48em) {
+  .undp-markdown p {
+    font-size: 1.25rem;
+  }
+  .undp-markdown li {
+    font-size: 1.25rem;
+  }
+}
+
+.undp-markdown caption,
+.undp-markdown h1,
+.undp-markdown h2,
+.undp-markdown h3,
+.undp-markdown h4,
+.undp-markdown h5,
+.undp-markdown h6 {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+}
+@media (min-width: 48em) {
+  .undp-markdown caption,
+  .undp-markdown h1,
+  .undp-markdown h2,
+  .undp-markdown h3,
+  .undp-markdown h4,
+  .undp-markdown h5,
+  .undp-markdown h6 {
     margin-bottom: 1rem;
-    text-align: left;
-    font-family: SohneBreit, ProximaNova, proxima-nova, "Helvetica Neue", Roboto, sans-serif;
+  }
 }
 
-.chip-sub {
-  color: black;
-  background-color: white;
-}
-
-.statCardSliderItem > div {
-  flex-grow: 1; /* Ensures equal height content */
-}
-
-.public-chip {
-  background-color: var(--blue-600);
-}
-
-.public-chip-sub {
-  background-color: #0468B134;
-}
-
-.private-chip {
-  background-color: #02A38A;
-}
-
-.private-chip-sub {
-  background-color: #02a38b34;
-}
-
-.inffs-chip {
-  background-color: #E78625;
-}
-
-
-.academy-chip {
-  background-color: #757AF0;
-}
-
-
-.biofin-chip {
-  background-color: #E0529E;
-}
-
-.customCard h6 {
-    margin: 0;
-}
-.customCard {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-}
-
-.customTooltip {
-  padding: 8px!important;
-}
-.customTooltip .note {
-  color: var(--gray-500);
-}
-
-.customCardTop {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.customCard p {
-  font-size: 16px;
-  margin-bottom: 2px;
-}
-
-.cta-button {
-  text-transform: uppercase;
-  margin-top: 2.5rem;
-  align-items: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: block;
-  display: flex;
-  font-size: 0.875rem;
+.undp-markdown h1 {
+  font-size: 2.938rem;
   font-weight: 700;
-  letter-spacing: .03em;
-  line-height: 1;
+  letter-spacing: 0.06rem;
+  line-height: 1.08;
   text-transform: uppercase;
-  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto', sans-serif !important;
+  font-family: 'SohneBreit', 'ProximaNova', 'proxima-nova', 'Helvetica Neue',
+    'Roboto', sans-serif !important;
 }
 
-.cta-button::after {
-  content: '';
-  border-right: 2px solid #ee402d;
-  border-top: 2px solid #ee402d;
-  height: 10px;
-  right: 0;
-  top: 2px;
-  transform: rotate(45deg);
-  margin-left: 4px;
-  width: 10px;
+.undp-markdown h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
 }
 
-.undp-viz-modal-content {
-  padding: .75rem!important;
+.undp-markdown h2.page-title {
+  text-transform: uppercase;
+  font-family: 'SohneBreit', 'ProximaNova', 'proxima-nova', 'Helvetica Neue',
+    'Roboto', sans-serif !important;
 }
 
-.undp-viz-modal-content h6 {
-  margin-bottom: 4px;
+.undp-markdown h3 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.15;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
 }
 
-.undp-viz-modal-content .chips{
-  margin-bottom: 24px;
-}
-.customCard .chips{
-  margin-bottom: 0px;
-}
-
-.modal-table {
-  width: 100%;
-  border-collapse: collapse;
+.undp-markdown h4 {
+  font-size: 1.563rem;
+  font-weight: 400;
+  line-height: 1.15;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
 }
 
-.modal-table th,
-.modal-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
-  vertical-align: top;
+.undp-markdown h5 {
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.15;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
 }
 
-.modal-table th {
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 1.4;
-  background-color: var(--gray-300);
-  border-bottom: none;
+.undp-markdown blockquote {
+  font-size: 1.625rem;
+  font-weight: 600;
+  line-height: 1.16;
+  margin: 0;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+}
+
+.undp-markdown cite {
+  font-size: 1.25rem;
+  line-height: 1.1;
+  display: block;
+  font-style: inherit;
+  font-weight: 400;
+  margin-top: 1.125rem;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+}
+
+.undp-markdown code {
+  font-size: 1rem;
+  font-family: monospace;
+  background: #f7f7f7;
+  padding: 0 0.25rem 0.25rem;
+}
+
+@media (min-width: 64em) {
+  .undp-markdown h2 {
+    font-size: 3.438rem;
+  }
+  .undp-markdown h1 {
+    font-size: 6.25rem;
+  }
+}
+
+@media (min-width: 48em) {
+  .undp-markdown h5 {
+    font-size: 1.563rem;
+  }
+  .undp-markdown h4 {
+    font-size: 2.188rem;
+  }
+  .undp-markdown h3 {
+    font-size: 2.188rem;
+  }
+  .undp-markdown h2 {
+    font-size: 2.813rem;
+  }
+  .undp-markdown h1 {
+    font-size: 5.125rem;
+  }
+  .undp-markdown blockquote {
+    font-size: 2.188rem;
+    line-height: 1.15;
+  }
+  .undp-markdown cite {
+    font-size: 1.5rem;
+  }
+  .undp-markdown code {
+    font-size: 1.25rem;
+  }
+}
+
+.undp-markdown h6 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
+    sans-serif !important;
+}
+
+.undp-markdown a {
+  background-image: linear-gradient(#d12800, #d12800),
+    linear-gradient(#d12800, #d12800);
+  background-position: 100% 100%, -30px 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 2px, 0 1px;
+  text-decoration: none;
+  color: #000;
+}
+
+.undp-markdown a:hover {
+  animation: undp-viz-lineLoop-animation-for-link 2s linear infinite;
+  color: #000;
+}
+
+.undp-markdown a:focus-visible {
+  box-shadow: 0 0 4px #0468b1;
+  outline: 0;
+}
+
+.undp-ref-line {
+  stroke-width: 1.5;
+  stroke-dasharray: 4, 4;
+}
+
+.undp-tick-line {
+  stroke-width: 1;
+  stroke-dasharray: 4, 8;
 }
