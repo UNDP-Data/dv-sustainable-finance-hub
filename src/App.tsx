@@ -45,11 +45,24 @@ function App() {
         )) as any[];
 
         const processedData = d.map(row => {
-          const hasService =
-            row.public || row.private || row.inffs || row.academy;
+          const publicProgrammes = [
+            row.public_tax,
+            row.public_debt,
+            row.public_budget,
+            row.public_insurance,
+          ];
+          const privateProgrammes = [
+            row.private_pipelines,
+            row.private_impact,
+            row.private_environment,
+          ];
 
+          const publicVal = publicProgrammes.some(val => val === 1) ? 1 : 0;
+          const privateVal = privateProgrammes.some(val => val === 1) ? 1 : 0;
+
+          const hasService =
+            publicVal || privateVal || row.inffs || row.academy;
           const hasWorkArea = row.biofin;
-          // const hasWorkArea = row.biofin || row.climate_finance;
 
           const services_total = hasService ? 1 : undefined;
           const work_areas_total = hasWorkArea ? 1 : undefined;
@@ -58,6 +71,8 @@ function App() {
 
           return {
             ...row,
+            public: publicVal,
+            private: privateVal,
             services_total,
             work_areas_total,
             services_or_work_areas_total,
@@ -179,8 +194,8 @@ function App() {
             ]}
             desc={[
               'Number of countries',
-              'Number of Countries',
-              'Number of Countries',
+              'Number of countries',
+              'Number of countries',
               'Number of countries',
             ]}
           />
@@ -193,7 +208,7 @@ function App() {
           <div className='flex flex-col gap-4 border-r-2 border-primary-gray-300 p-4 max-w-[360px]'>
             <div id='selectService'>
               <P size='sm' marginBottom='2xs'>
-                Select service
+                Filter by service
               </P>
               <DropdownSelect
                 onChange={value => {
@@ -226,6 +241,7 @@ function App() {
                 </P>
                 {selectedService?.value === 'public' && (
                   <DropdownSelect
+                    isClearable
                     onChange={value =>
                       setSelectedSubcategory(value as OptionType)
                     }
@@ -277,7 +293,7 @@ function App() {
             ) : null}
             <div id='selectWorkArea'>
               <P size='sm' marginBottom='2xs'>
-                Select work area
+                Filter by work area
               </P>
               <DropdownSelect
                 onChange={value => setSelectedWorkArea(value as OptionType)}
@@ -294,7 +310,7 @@ function App() {
             </div>
             <div id='selectCountryGroup'>
               <P className='m-0 pb-2' size='sm'>
-                Select country group
+                Filter by country group
               </P>
               <RadioGroup
                 value={selectedCategory}
