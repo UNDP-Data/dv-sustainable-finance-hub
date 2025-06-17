@@ -1,29 +1,67 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+import '@/styles/fonts.css';
+import '@/styles/styles.css';
+
+import '@undp/data-viz/style.css';
+import '@undp/design-system-react/style.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import '@/styles/customStyles.css';
 import {
-  ChoroplethMap,
   fetchAndParseCSV,
   transformDataForGraph,
+  StatCardFromData,
+  ChoroplethMap,
   DataCards,
-} from '@undp-data/undp-visualization-library';
+} from '@undp/data-viz';
 import {
-  DropdownSelect,
   H2,
-  H6,
   P,
+  DropdownSelect,
   RadioGroup,
   RadioGroupItem,
+  H6,
   SegmentedControl,
-} from '@undp-data/undp-design-system-react';
-import '@undp-data/undp-design-system-react/dist/style.css';
-import { Cards } from './Cards';
-import './customStyles.css';
+} from '@undp/design-system-react';
+
+import { TITLES, VALUES } from './constants';
 
 type OptionType = { label: string; value: string };
 
+type RawDataRow = {
+  country: string;
+  iso: string;
+  fragile_country: number;
+  inffs?: number;
+  inffs_note?: string;
+  academy?: number;
+  academy_note?: string;
+  public_tax?: number;
+  public_tax_note?: string;
+  public_debt?: number;
+  public_debt_note?: string;
+  public_budget?: number;
+  public_budget_note?: string;
+  public_insurance?: number;
+  public_insurance_note?: string;
+  private_pipelines?: number;
+  private_pipelines_note?: string;
+  private_impact?: number;
+  private_impact_note?: string;
+  private_environment?: number;
+  private_environment_note?: string;
+  biofin?: number;
+  biofin_note?: string;
+  [key: string]: string | number | undefined;
+};
+
+interface CountryMeta {
+  'Alpha-3 code': string;
+  SIDS: boolean;
+  LDC: boolean;
+}
+
 function App() {
-  const [data, setData] = useState<any[] | null>(null);
-  const [taxonomy, setTaxonomy] = useState<any[] | null>(null);
+  const [data, setData] = useState<RawDataRow[] | null>(null);
+  const [taxonomy, setTaxonomy] = useState<CountryMeta[] | null>(null);
   const [selectedService, setSelectedService] = useState<OptionType | null>(
     null,
   );
@@ -42,7 +80,7 @@ function App() {
       try {
         const d = (await fetchAndParseCSV(
           'https://raw.githubusercontent.com/UNDP-Data/dv-sustainable-finance-hub-data-repository/refs/heads/main/data.csv',
-        )) as any[];
+        )) as RawDataRow[];
 
         const processedData = d.map(row => {
           const publicProgrammes = [
@@ -109,11 +147,11 @@ function App() {
     if (!data || !taxonomy) return [];
 
     const sidsCodes = taxonomy
-      .filter((country: any) => country.SIDS === true)
-      .map((country: any) => country['Alpha-3 code']);
+      .filter((country: CountryMeta) => country.SIDS === true)
+      .map((country: CountryMeta) => country['Alpha-3 code']);
     const ldcCodes = taxonomy
-      .filter((country: any) => country.LDC === true)
-      .map((country: any) => country['Alpha-3 code']);
+      .filter((country: CountryMeta) => country.LDC === true)
+      .map((country: CountryMeta) => country['Alpha-3 code']);
 
     return data.filter(row => {
       const matchesCategory =
@@ -155,7 +193,7 @@ function App() {
   const transformedData = useMemo(
     () =>
       transformDataForGraph(data, 'choroplethMap', [
-        { chartConfigId: 'countryCode', columnId: 'iso' },
+        { chartConfigId: 'id', columnId: 'iso' },
         { chartConfigId: 'x', columnId: 'services_or_work_areas_total' },
       ]),
     [data],
@@ -176,29 +214,31 @@ function App() {
   return (
     <div className='max-w-[1980px]'>
       <div className='p-5 m-5' ref={containerRef}>
-        <H2 className='text-lg'>UNDP’s Work on Sustainable Finance</H2>
+        <H2>UNDP’s Work on Sustainable Finance</H2>
         <div className='mt-8'>
-          <Cards
-            dataStatCard={data}
-            values={[
-              'services_or_work_areas_total',
-              'public',
-              'private',
-              'inffs',
-            ]}
-            titles={[
-              'UNDP support',
-              'Public Finance for the SDGs',
-              'Private Finance for the SDGs',
-              'INFFs',
-            ]}
-            desc={[
-              'Number of countries',
-              'Number of countries',
-              'Number of countries',
-              'Number of countries',
-            ]}
-          />
+          <div className='mb-4 mt-4'>
+            <div className='stat-container'>
+              {VALUES.map((value, index) => (
+                <div
+                  key={index}
+                  style={{ display: 'flex', alignItems: 'stretch' }}
+                >
+                  <StatCardFromData
+                    data={transformDataForGraph(data, 'statCard', [
+                      {
+                        chartConfigId: 'value',
+                        columnId: `${value}`,
+                      },
+                    ])}
+                    backgroundColor
+                    graphTitle={TITLES[index]}
+                    graphDescription='Number of countries'
+                    aggregationMethod='sum'
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div
           id='vizArea'
@@ -362,16 +402,14 @@ function App() {
                 mapNoDataColor='#D4D6D8'
                 mapBorderColor='#A9B1B7'
                 height={700}
-                scale={230}
                 detailsOnClick="<div style='padding:24px;'><p class='text-lg mb-2'>{{data.country}}</p><table class='modal-table' style='width:100%;border-collapse:collapse;'><thead><tr><th class='undp-viz-typography' style='text-align:left;'>SERVICES/WORK AREAS</th><th class='undp-viz-typography' style='text-align:left;'>SUBCATEGORIES</th><th class='undp-viz-typography' style='text-align:left;'>NOTES</th></tr></thead><tbody>{{#if data.private}}<tr><td><div class='chip private-chip'>Private</div></td><td>{{#if data.private_impact}}<div class='chip chip-sub private-chip-sub'>Managing for impact</div>{{/if}}{{#if data.private_pipelines}}<div class='chip chip-sub private-chip-sub'>Originating pipelines</div>{{/if}}{{#if data.private_environment}}<div class='chip chip-sub private-chip-sub'>Enabling environment</div>{{/if}}</td><td>{{data.private_note}}</td></tr>{{/if}}{{#if data.public}}<tr><td><div class='chip public-chip'>Public</div></td><td>{{#if data.public_tax}}<div class='chip chip-sub public-chip-sub'>Tax for the SDGs</div>{{/if}}{{#if data.public_debt}}<div class='chip chip-sub public-chip-sub'>Debt for the SDGs</div>{{/if}}{{#if data.public_budget}}<div class='chip chip-sub public-chip-sub'>Budget for the SDGs</div>{{/if}}{{#if data.public_insurance}}<div class='chip chip-sub public-chip-sub'>Insurance and risk finance</div>{{/if}}</td><td>{{data.public_note}}</td></tr>{{/if}}{{#if data.inffs}}<tr><td><div class='chip inffs-chip'>INFFs</div></td><td></td><td>{{data.inffs_note}}</td></tr>{{/if}}{{#if data.biofin}}<tr><td><div class='chip biofin-chip'>Biodiversity</div></td><td></td><td>{{data.biofin_note}}</td></tr>{{/if}}{{#if data.climate_finance}}<tr><td><div class='chip climate-finance-chip'>Climate</div></td><td></td><td>{{data.climate_finance_note}}</td></tr>{{/if}}</tbody></table></div>"
                 tooltip="<div class='p-4'><div><h6 class='mt-0 uppercase mb-0' style='font-size:14px;'>{{data.country}}</h6>{{#if data.services_total}}<div><p class='undp-viz-typography mt-2 mb-1'>Services:</p><div class='chips'>{{#if data.public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if data.private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if data.inffs}}<div class='chip inffs-chip'>INFFs</div>{{/if}}{{#if data.academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if data.work_areas_total}}<div><p class='undp-viz-typography'>Work areas:</p><div class='chips'>{{#if data.biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><p class='text-sm mb-0 italic text-primary-gray-500'>Click to learn more</p></div>"
                 padding='0rem 1.25rem 0 1.25rem'
                 centerPoint={[10, 25]}
                 showAntarctica={false}
-                zoomScaleExtend={[1, 1]}
-                domain={[0, 0.5, 0.7]}
+                colorDomain={[0, 0.5, 0.7]}
                 showColorScale={false}
-                highlightedCountryCodes={highlightedCountries}
+                highlightedIds={highlightedCountries}
               />
             </div>
 

@@ -63,9 +63,7 @@ _In progress_
 ## Build with<a name="section-06"></a>
 
 - **React**: Used as MVC framework.
-- **styled-components**: Utilizes tagged template literals and the power of CSS, allows to write actual CSS code to style the components in JS/TS.
 - [**UNDP Visualization Library**](https://github.com/UNDP-Data/undp-visualization-library): Used for visualizations, adding interaction and reading the csv data file.
-- **AntD**: For UI elements like dropdown, buttons, checkbox, and slider.
 - **lucide-react**: For icons.
 
 ## Installation<a name="section-07"></a>
