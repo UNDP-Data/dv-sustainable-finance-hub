@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint';
 import tailwindcss from '@tailwindcss/vite';
-import { AtRule } from 'postcss';
+// import { AtRule } from 'postcss';
 
 export default defineConfig({
   plugins: [react(), eslint(), tailwindcss()],
@@ -24,6 +24,7 @@ export default defineConfig({
             },
           },
         },
+        /*
         {
           postcssPlugin: 'wrap-with-undp-container', // If you want to wrap all the class in .undp-container
           Once(root) {
@@ -44,6 +45,7 @@ export default defineConfig({
             });
           },
         },
+        */
       ],
     },
   },

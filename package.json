@@ -13,7 +13,10 @@
     "@undp/design-system-react": "^0.0.72",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwind-animate": "^0.2.10",
+    "tailwind-merge": "^3.3.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/config-array": "^0.20.0",
