@@ -5,8 +5,8 @@
   margin: 2px;
   font-size: 14px;
   text-align: center;
-  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
-    sans-serif !important;
+  font-family:
+    'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto', sans-serif !important;
   color: white;
   line-height: 1.4;
 }
@@ -17,27 +17,9 @@
   gap: 1rem;
 }
 
-.stat-container h3 {
-  font-size: 4.375rem;
-  line-height: 1;
-  text-shadow: none;
-  -webkit-text-stroke: 2px rgb(0, 0, 0);
-  color: rgb(247, 247, 247);
-  letter-spacing: 0.05rem;
-  margin-top: 0px;
-  margin-bottom: 0rem;
-  text-align: left;
-  font-family: SohneBreit, ProximaNova, proxima-nova, 'Helvetica Neue', Roboto,
-    sans-serif;
-}
-
 .chip-sub {
   color: black;
   background-color: white;
-}
-
-.statCardSliderItem > div {
-  flex-grow: 1; /* Ensures equal height content */
 }
 
 .public-chip {
@@ -66,97 +48,4 @@
 
 .biofin-chip {
   background-color: #e0529e;
-}
-
-.customCard h6 {
-  margin: 0;
-}
-.customCard {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-}
-
-.customTooltip {
-  padding: 8px !important;
-}
-.customTooltip .note {
-  color: var(--gray-500);
-}
-
-.customCardTop {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.customCard p {
-  font-size: 16px;
-  margin-bottom: 2px;
-}
-
-.cta-button {
-  text-transform: uppercase;
-  margin-top: 2.5rem;
-  align-items: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: block;
-  display: flex;
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  line-height: 1;
-  text-transform: uppercase;
-  font-family: 'ProximaNova', 'proxima-nova', 'Helvetica Neue', 'Roboto',
-    sans-serif !important;
-}
-
-.cta-button::after {
-  content: '';
-  border-right: 2px solid #ee402d;
-  border-top: 2px solid #ee402d;
-  height: 10px;
-  right: 0;
-  top: 2px;
-  transform: rotate(45deg);
-  margin-left: 4px;
-  width: 10px;
-}
-
-.undp-viz-modal-content {
-  padding: 0.75rem !important;
-}
-
-.undp-viz-modal-content h6 {
-  margin-bottom: 4px;
-}
-
-.undp-viz-modal-content .chips {
-  margin-bottom: 24px;
-}
-.customCard .chips {
-  margin-bottom: 0px;
-}
-
-.modal-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.modal-table th,
-.modal-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
-  vertical-align: top;
-}
-
-.modal-table th {
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 1.4;
-  background-color: var(--gray-300);
-  border-bottom: none;
 }
