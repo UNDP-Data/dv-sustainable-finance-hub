@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@undp/data-viz": "^0.0.91",
+    "@undp/data-viz": "^0.0.95",
     "@undp/design-system-react": "^0.0.74",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
