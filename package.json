@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@undp/data-viz": "^0.0.90",
-    "@undp/design-system-react": "^0.0.73",
+    "@undp/data-viz": "^0.0.91",
+    "@undp/design-system-react": "^0.0.74",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
