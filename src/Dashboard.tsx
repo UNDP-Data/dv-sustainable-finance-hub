@@ -234,10 +234,12 @@ function Dashboard(props: Props) {
                   {filteredData.length} countries in total
                 </H6>
                 <SegmentedControl
-                  defaultValue='Map'
+                  value={viewMode}
                   size='sm'
                   color='black'
-                  onValueChange={value => setViewMode(value)}
+                  onValueChange={value => {
+                    setViewMode(value);
+                  }}
                   options={[
                     {
                       label: 'Map',
