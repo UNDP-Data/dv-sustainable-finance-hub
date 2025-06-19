@@ -16,6 +16,7 @@ import {
   ChoroplethMap,
   DataCards,
 } from '@undp/data-viz';
+import { Globe, LayoutGrid } from 'lucide-react';
 
 import { DataType } from './types';
 import { VALUES, TITLES } from './constants';
@@ -242,11 +243,29 @@ function Dashboard(props: Props) {
                   }}
                   options={[
                     {
-                      label: 'Map',
+                      label: (
+                        <div className='flex gap-2 h-fit items-center'>
+                          <div className='h-fit'>
+                            <Globe size={16} strokeWidth={1.5} />
+                          </div>
+                          <P marginBottom='none' size='sm'>
+                            Map
+                          </P>
+                        </div>
+                      ),
                       value: 'Map',
                     },
                     {
-                      label: 'Cards',
+                      label: (
+                        <div className='flex gap-2 h-fit items-center'>
+                          <div className='h-fit'>
+                            <LayoutGrid size={16} strokeWidth={1.5} />
+                          </div>
+                          <P marginBottom='none' size='sm'>
+                            Cards
+                          </P>
+                        </div>
+                      ),
                       value: 'Cards',
                     },
                   ]}
