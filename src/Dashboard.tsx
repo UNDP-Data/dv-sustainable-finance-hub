@@ -134,7 +134,8 @@ function Dashboard(props: Props) {
                   ]}
                 />
               </div>
-              {selectedService ? (
+              {selectedService?.value === 'public' ||
+              selectedService?.value === 'private' ? (
                 <div id='selectSubcategory'>
                   <P size='sm' marginBottom='2xs'>
                     Select subcategory
@@ -292,7 +293,6 @@ function Dashboard(props: Props) {
                         minWidth: '150px',
                       },
                     }}
-                    padding='0rem 1.25rem 0 1.25rem'
                     centerPoint={[10, 10]}
                     showAntarctica={false}
                     colorDomain={[0, 0.5, 0.7]}
