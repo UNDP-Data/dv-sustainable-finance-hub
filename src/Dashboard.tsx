@@ -20,6 +20,7 @@ import { Globe, LayoutGrid } from 'lucide-react';
 
 import { DataType } from './types';
 import { VALUES, TITLES } from './constants';
+import ModalContent from './Modal';
 
 type OptionType = { label: string; value: string };
 
@@ -285,8 +286,58 @@ function Dashboard(props: Props) {
                     mapNoDataColor='#D4D6D8'
                     mapBorderColor='#A9B1B7'
                     height={700}
-                    detailsOnClick="<div><p class='text-xl mt-0 pb-4'>{{data.country}}</p><table class='modal-table' style='w-full'><thead><tr><th class='text-sm uppercase font-bold text-left'>SERVICES/WORK AREAS</th><th class='text-sm uppercase font-bold text-left'>SUBCATEGORIES</th><th class='text-sm uppercase font-bold text-left'>NOTES</th></tr></thead><tbody>{{#if data.private}}<tr><td><div class='chip private-chip'>Private</div></td><td>{{#if data.private_impact}}<div class='chip chip-sub private-chip-sub'>Managing for impact</div>{{/if}}{{#if data.private_pipelines}}<div class='chip chip-sub private-chip-sub'>Originating pipelines</div>{{/if}}{{#if data.private_environment}}<div class='chip chip-sub private-chip-sub'>Enabling environment</div>{{/if}}</td><td>{{data.private_note}}</td></tr>{{/if}}{{#if data.public}}<tr><td><div class='chip public-chip'>Public</div></td><td>{{#if data.public_tax}}<div class='chip chip-sub public-chip-sub'>Tax for the SDGs</div>{{/if}}{{#if data.public_debt}}<div class='chip chip-sub public-chip-sub'>Debt for the SDGs</div>{{/if}}{{#if data.public_budget}}<div class='chip chip-sub public-chip-sub'>Budget for the SDGs</div>{{/if}}{{#if data.public_insurance}}<div class='chip chip-sub public-chip-sub'>Insurance and risk finance</div>{{/if}}</td><td>{{data.public_note}}</td></tr>{{/if}}{{#if data.inffs}}<tr><td><div class='chip inffs-chip'>INFFs</div></td><td></td><td>{{data.inffs_note}}</td></tr>{{/if}}{{#if data.biofin}}<tr><td><div class='chip biofin-chip'>Biodiversity</div></td><td></td><td>{{data.biofin_note}}</td></tr>{{/if}}{{#if data.climate_finance}}<tr><td><div class='chip climate-finance-chip'>Climate</div></td><td></td><td>{{data.climate_finance_note}}</td></tr>{{/if}}</tbody></table></div>"
-                    tooltip="<div class='font-bold p-2 bg-primary-gray-300 min-w-[240px] uppercase text-xs'>{{row}} {{data.country}}</div><div class='p-2'>{{#if data.services_total}}<div><p class='mt-2 mb-1'>Services</p><div class='chips'>{{#if data.public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if data.private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if data.inffs}}<div class='chip inffs-chip'>INFFs</div>{{/if}}{{#if data.academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if data.work_areas_total}}<div><p class='mt-2 mb-1'>Work areas</p><div class='chips'>{{#if data.biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}<p class='text-sm mb-1 mt-2 text-primary-gray-500'>Click to learn more</p></div></div>"
+                    detailsOnClick={d => {
+                      return <ModalContent data={d.data} />;
+                    }}
+                    tooltip={d => (
+                      <div>
+                        <div className='font-bold p-2 bg-primary-gray-300 min-w-[240px] uppercase text-xs'>
+                          {d.data.country}
+                        </div>
+                        <div className='p-2'>
+                          {d.data.services_total ? (
+                            <div>
+                              <p className='mt-2 mb-1'>Services</p>
+                              <div className='chips'>
+                                {d.data.public ? (
+                                  <div className='chip public-chip'>
+                                    Public finance
+                                  </div>
+                                ) : null}
+                                {d.data.private ? (
+                                  <div className='chip private-chip'>
+                                    Private finance
+                                  </div>
+                                ) : null}
+                                {d.data.inffs ? (
+                                  <div className='chip inffs-chip'>INFFs</div>
+                                ) : null}
+                                {d.data.academy ? (
+                                  <div className='chip academy-chip'>
+                                    SDG Finance Academy
+                                  </div>
+                                ) : null}
+                              </div>
+                            </div>
+                          ) : null}
+                          {d.data.work_areas_total ? (
+                            <div>
+                              <p className='mt-2 mb-1'>Work areas</p>
+                              <div className='chips'>
+                                {d.data.biofin ? (
+                                  <div className='chip biofin-chip'>
+                                    Biodiversity finance
+                                  </div>
+                                ) : null}
+                              </div>
+                            </div>
+                          ) : null}
+                          <p className='text-sm mb-1 mt-2 text-primary-gray-500'>
+                            Click to learn more
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     styles={{
                       tooltip: {
                         padding: '0',
@@ -313,9 +364,59 @@ function Dashboard(props: Props) {
                     uiMode='light'
                     height={800}
                     cardSearchColumns={['country']}
-                    cardTemplate="<div class='p-4 flex flex-col h-full justify-between'><div><p class='m-0 text-xl'>{{country}}</p>{{#if services_total}}<div><p class='text-sm mb-1 pt-4'>Services</p><div class='chips'>{{#if public}}<div class='chip public-chip'>Public finance</div>{{/if}}{{#if private}}<div class='chip private-chip'>Private finance</div>{{/if}}{{#if inffs}}<div class='chip inffs-chip'>INFFs</div></br>{{/if}}{{#if academy}}<div class='chip academy-chip'>SDG Finance Academy</div>{{/if}}</div></div>{{/if}}{{#if work_areas_total}}<div><p class='text-sm mb-1 pt-4'>Work areas</p><div class='chips'>{{#if biofin}}<div class='chip biofin-chip'>Biodiversity finance</div>{{/if}}</div></div>{{/if}}</div><div class='cta-button'>Read more</div></div>"
+                    cardTemplate={d => (
+                      <div className='p-4 flex flex-col h-full justify-between'>
+                        <div>
+                          <p className='m-0 text-xl'>{d.country}</p>
+
+                          {d.services_total ? (
+                            <div>
+                              <p className='text-sm mb-1 pt-4'>Services</p>
+                              <div className='chips'>
+                                {d.public ? (
+                                  <div className='chip public-chip'>
+                                    Public finance
+                                  </div>
+                                ) : null}
+                                {d.private ? (
+                                  <div className='chip private-chip'>
+                                    Private finance
+                                  </div>
+                                ) : null}
+                                {d.inffs ? (
+                                  <>
+                                    <div className='chip inffs-chip'>INFFs</div>
+                                    <br />
+                                  </>
+                                ) : null}
+                                {d.academy && (
+                                  <div className='chip academy-chip'>
+                                    SDG Finance Academy
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ) : null}
+
+                          {d.work_areas_total ? (
+                            <div>
+                              <p className='text-sm mb-1 pt-4'>Work areas</p>
+                              <div className='chips'>
+                                {d.biofin && (
+                                  <div className='chip biofin-chip'>
+                                    Biodiversity finance
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        <div className='cta-button'>Read more</div>
+                      </div>
+                    )}
                     cardBackgroundColor='#fff'
-                    detailsOnClick="<div><p class='text-xl mt-0 pb-4'>{{country}}</p><table class='modal-table' style='w-full'><thead><tr><th class='text-sm uppercase font-bold text-left'>SERVICES/WORK AREAS</th><th class='text-sm uppercase font-bold text-left'>SUBCATEGORIES</th><th class='text-sm uppercase font-bold text-left'>NOTES</th></tr></thead><tbody>{{#if private}}<tr><td><div class='chip private-chip'>Private</div></td><td>{{#if private_impact}}<div class='chip chip-sub private-chip-sub'>Managing for impact</div>{{/if}}{{#if private_pipelines}}<div class='chip chip-sub private-chip-sub'>Originating pipelines</div>{{/if}}{{#if private_environment}}<div class='chip chip-sub private-chip-sub'>Enabling environment</div>{{/if}}</td><td>{{private_note}}</td></tr>{{/if}}{{#if public}}<tr><td><div class='chip public-chip'>Public</div></td><td>{{#if public_tax}}<div class='chip chip-sub public-chip-sub'>Tax for the SDGs</div>{{/if}}{{#if public_debt}}<div class='chip chip-sub public-chip-sub'>Debt for the SDGs</div>{{/if}}{{#if public_budget}}<div class='chip chip-sub public-chip-sub'>Budget for the SDGs</div>{{/if}}{{#if public_insurance}}<div class='chip chip-sub public-chip-sub'>Insurance and risk finance</div>{{/if}}</td><td>{{public_note}}</td></tr>{{/if}}{{#if inffs}}<tr><td><div class='chip inffs-chip'>INFFs</div></td><td></td><td>{{inffs_note}}</td></tr>{{/if}}{{#if biofin}}<tr><td><div class='chip biofin-chip'>Biodiversity</div></td><td></td><td>{{biofin_note}}</td></tr>{{/if}}{{#if climate_finance}}<tr><td><div class='chip climate-finance-chip'>Climate</div></td><td></td><td>{{climate_finance_note}}</td></tr>{{/if}}</tbody></table></div>"
+                    detailsOnClick={(d: DataType) => <ModalContent data={d} />}
                   />
                 </div>
               )}

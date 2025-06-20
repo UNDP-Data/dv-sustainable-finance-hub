@@ -6,14 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "clean": "rimraf node_modules && rimraf build && rimraf package-lock.json",
+    "update-undp-libraries": "npm i @undp/data-viz@latest @undp/design-system-react@latest"
   },
   "dependencies": {
-    "@undp/data-viz": "^0.0.95",
-    "@undp/design-system-react": "^0.0.74",
+    "@undp/data-viz": "^0.0.99",
+    "@undp/design-system-react": "^0.0.77",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
     "tailwind-animate": "^0.2.10",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7"

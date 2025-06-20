@@ -9,6 +9,8 @@ export interface RawDataRow {
   fragile_country?: number;
   inffs?: number;
   inffs_note?: string;
+  public_note?: string;
+  private_note?: string;
   academy?: number;
   academy_note?: string;
   public_tax?: number;
@@ -27,6 +29,8 @@ export interface RawDataRow {
   private_environment_note?: string;
   biofin?: number;
   biofin_note?: string;
+  climate_finance?: number;
+  climate_finance_note?: string;
 }
 
 export interface DataType extends RawDataRow {
