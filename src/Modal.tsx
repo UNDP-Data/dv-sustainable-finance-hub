@@ -1,4 +1,4 @@
-import ReactMarkdown from 'react-markdown';
+import { MarkdownRenderer } from '@undp/design-system-react';
 
 import { DataType } from './types';
 interface Props {
@@ -48,7 +48,10 @@ function ModalContent(props: Props) {
                 )}
               </td>
               <td className='w-1/3'>
-                <ReactMarkdown>{data.private_note}</ReactMarkdown>
+                <MarkdownRenderer
+                  text={data.private_note}
+                  classNames={{ li: 'mb-1', ol: 'mb-1', p: 'mb-3' }}
+                />
               </td>
             </tr>
           ) : null}
@@ -80,7 +83,10 @@ function ModalContent(props: Props) {
                 )}
               </td>
               <td className='w-1/3'>
-                <ReactMarkdown>{data.public_note}</ReactMarkdown>
+                <MarkdownRenderer
+                  text={data.public_note}
+                  classNames={{ li: 'mb-1', ol: 'mb-1', p: 'mb-3' }}
+                />
               </td>
             </tr>
           ) : null}
@@ -91,7 +97,10 @@ function ModalContent(props: Props) {
               </td>
               <td />
               <td className='w-1/3'>
-                <ReactMarkdown>{data.inffs_note}</ReactMarkdown>
+                <MarkdownRenderer
+                  text={data.inffs_note}
+                  classNames={{ li: 'mb-1', ol: 'mb-1', p: 'mb-3' }}
+                />
               </td>
             </tr>
           ) : null}
@@ -102,7 +111,10 @@ function ModalContent(props: Props) {
               </td>
               <td />
               <td className='w-1/3'>
-                <ReactMarkdown>{data.biofin_note}</ReactMarkdown>
+                <MarkdownRenderer
+                  text={data.biofin_note}
+                  classNames={{ li: 'mb-1', ol: 'mb-1', p: 'mb-3' }}
+                />
               </td>
             </tr>
           ) : null}
@@ -113,7 +125,10 @@ function ModalContent(props: Props) {
               </td>
               <td />
               <td className='w-1/3'>
-                <ReactMarkdown>{data.climate_finance_note}</ReactMarkdown>
+                <MarkdownRenderer
+                  text={data.climate_finance_note}
+                  classNames={{ li: 'mb-1', ol: 'mb-1', p: 'mb-3' }}
+                />
               </td>
             </tr>
           ) : null}

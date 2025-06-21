@@ -1,3 +1,32 @@
 @import 'tailwindcss';
 
 @config '../../tailwind.config.js';
+
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--gray-200, currentcolor);
+  }
+  
+  body {
+    margin: 0;
+    line-height: inherit;
+    color: var(--black);
+  }
+  
+  .dark {
+    color: var(--white);
+  }
+  
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+}
