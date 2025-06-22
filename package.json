@@ -1,5 +1,5 @@
 {
-  "name": "dv-visualization_template-viz",
+  "name": "undp-sfh-dashboard",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,8 +11,8 @@
     "update-undp-libraries": "npm i @undp/data-viz@latest @undp/design-system-react@latest"
   },
   "dependencies": {
-    "@undp/data-viz": "^0.0.100",
-    "@undp/design-system-react": "^0.0.78",
+    "@undp/data-viz": "^0.0.101",
+    "@undp/design-system-react": "^0.0.79",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
