@@ -11,7 +11,7 @@
     "update-undp-libraries": "npm i @undp/data-viz@latest @undp/design-system-react@latest"
   },
   "dependencies": {
-    "@undp/data-viz": "^0.0.101",
+    "@undp/data-viz": "^0.0.103",
     "@undp/design-system-react": "^0.0.79",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
